@@ -8,13 +8,24 @@
     "start": "next start"
   },
   "dependencies": {
+    "cookies": "^0.8.0",
+    "cors": "^2.8.5",
+    "keygrip": "^1.1.0",
     "next": "9.3.5",
     "react": "16.13.1",
     "react-dom": "16.13.1"
   },
   "devDependencies": {
+    "@types/cookies": "^0.7.4",
+    "@types/cors": "^2.8.6",
+    "@types/jest": "^25.2.1",
+    "@types/keygrip": "^1.0.2",
     "@types/node": "^13.13.0",
     "@types/react": "^16.9.34",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "jest": "^25.4.0",
+    "test-jest": "^1.0.1",
+    "ts-jest": "^25.4.0",
     "typescript": "^3.8.3"
   }
 }

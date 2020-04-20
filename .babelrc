@@ -1,0 +1,4 @@
+{
+  "plugins": ["module-resolver"],
+  "presets": ["next/babel"]
+}
