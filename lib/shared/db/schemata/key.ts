@@ -19,4 +19,6 @@ keySchema.post('findOneAndUpdate', async function () {
   return model.update({ updatedAt: new Date(), $inc: { __v: 1 } });
 });
 
-export default mongoose.model('Key', keySchema);
+export const KeyModel = mongoose.model('Key', keySchema);
+
+export default KeyModel;

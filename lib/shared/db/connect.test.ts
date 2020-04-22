@@ -1,12 +1,10 @@
 import mongoose, { Mongoose } from 'mongoose';
 
-import connect, { config as defaultConfig } from '~/lib/shared/db/connect';
+import connect from '~/lib/shared/db/connect';
 
 describe('MongoDB Connection', () => {
   it('connects', async () => {
-    jest.setTimeout(20000);
-    const { user, pass, ...config } = defaultConfig;
-    const connection: Promise<Mongoose> = connect(config);
+    const connection: Promise<Mongoose> = connect();
 
     await expect(connection).resolves.toBeTruthy();
     mongoose.connection.close();

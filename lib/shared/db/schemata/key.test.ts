@@ -1,15 +1,17 @@
 import mongoose from 'mongoose';
 import { randomBytes } from 'crypto';
 
-import connect, { config as defaultConfig } from '~/lib/shared/db/connect';
-import Key from '~/lib/shared/db/schemata/key';
+import connect from '~/lib/shared/db/connect';
+import KeyModel from '~/lib/shared/db/schemata/key';
 
 describe('Key', () => {
-  afterAll(() => mongoose.connection.close());
+  afterAll(async () => {
+    await KeyModel.findByIdAndDelete('master');
+    mongoose.connection.close();
+  });
 
   beforeAll(async () => {
-    const { user, pass, ...config } = defaultConfig;
-    await connect(config);
+    await connect();
   });
 
   it('creates a Key entry', async () => {
@@ -18,14 +20,14 @@ describe('Key', () => {
       bin: randomBytes(64),
     };
 
-    const model = await Key.create(key);
+    const model = await KeyModel.create(key);
     expect(model).toHaveProperty('_id', 'master');
     expect(model).toHaveProperty('createdAt');
   });
 
   it('updates a Key entry', async () => {
-    const original = await Key.findById('master');
-    const updated = await Key.findByIdAndUpdate(
+    const original = await KeyModel.findById('master');
+    const updated = await KeyModel.findByIdAndUpdate(
       'master',
       {
         $set: {
