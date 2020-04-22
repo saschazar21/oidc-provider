@@ -7,6 +7,7 @@ const { password: pass, url, user } = connectionDetails();
 export const config: ConnectionOptions = {
   authSource: 'admin',
   pass,
+  useFindAndModify: false,
   useNewUrlParser: true,
   useUnifiedTopology: true,
   user,
