@@ -1,7 +1,10 @@
+require('dotenv').config();
+
 module.exports = {
+  globals: { ...process.env },
   moduleNameMapper: {
     '^~/(.*)': '<rootDir>/$1',
   },
-  preset: 'ts-jest',
+  preset: '@shelf/jest-mongodb',
   testEnvironment: 'node',
 };

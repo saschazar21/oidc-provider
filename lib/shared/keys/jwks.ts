@@ -3,7 +3,6 @@ import config, { JWKSConfig } from '~/lib/shared/config/jwks';
 
 let keystore: JWKS.KeyStore;
 
-// TODO: initialize keystore with DB result
 const initialize = async (jwks?: JSONWebKeySet): Promise<void> => {
   try {
     keystore = jwks ? JWKS.asKeyStore(jwks) : new JWKS.KeyStore();
@@ -29,3 +28,5 @@ export const getKeystore = async (
 
   return keystore;
 };
+
+export default getKeystore;
