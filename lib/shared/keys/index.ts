@@ -1,21 +1,34 @@
-import { JSONWebKey } from 'jose';
+import { JWKS, JSONWebKeySet } from 'jose';
+import Keygrip from 'keygrip';
 
 import connect, { KeyModel } from '~/lib/shared/db';
-import getKeyStore from '~/lib/shared/keys/jwks';
-import createkeys from '~/lib/shared/config/keygrip';
+import getKeystore from '~/lib/shared/keys/jwks';
+import createCookieSecrets from '~/lib/shared/config/keygrip';
 import getKeygrip from '~/lib/shared/keys/keygrip';
 import { decrypt, encrypt } from '~/lib/shared/util/aes';
 
-export interface KeyStructure {
+export interface KeyObject {
   cookies: string[];
-  keys: JSONWebKey[];
+  keys: JSONWebKeySet;
+}
+
+export interface KeyStructure {
+  keygrip: Keygrip;
+  keystore: JWKS.KeyStore;
 }
 
 let keys: KeyStructure;
 
-const createKeys = async () => ({
-  ...(await getKeyStore()).toJWKS(true),
-  cookies: await createkeys(),
+export const clearKeys = (): void => {
+  keys = undefined;
+};
+
+const createKeys = async (
+  cookieSecrets: string[],
+  jwks?: JSONWebKeySet
+): Promise<KeyStructure> => ({
+  keygrip: await getKeygrip(cookieSecrets),
+  keystore: await getKeystore(jwks),
 });
 
 const fetchKeys = async () =>
@@ -45,25 +58,27 @@ const getKeys = async (
     if (!retrieved || !retrieved.get('bin')) {
       throw new Error('NOT_FOUND');
     }
-    console.log(masterkey, retrieved.get('bin'));
-    keys = JSON.parse(await decrypt(masterkey, retrieved.get('bin')));
-    await Promise.all([
-      getKeyStore({ keys: keys.keys }),
-      getKeygrip(keys.cookies),
-    ]);
+    const { cookies, keys: jwks } = JSON.parse(
+      await decrypt(masterkey, retrieved.get('bin'))
+    );
+    keys = await createKeys(cookies, { keys: jwks });
     return keys;
   } catch (e) {
     if (e.message !== 'NOT_FOUND') {
       throw e;
     }
 
-    keys = await createKeys();
+    const cookieSecrets = await createCookieSecrets();
+    keys = await createKeys(cookieSecrets);
 
-    const [encrypted] = await Promise.all([
-      encrypt(masterkey, JSON.stringify(keys)) as Promise<Buffer>,
-      getKeyStore({ keys: keys.keys }),
-      getKeygrip(keys.cookies),
-    ]);
+    const encrypted = (await encrypt(
+      masterkey,
+      JSON.stringify({
+        ...keys.keystore.toJWKS(true),
+        cookies: cookieSecrets,
+      })
+    )) as Buffer;
+
     await saveKeys(encrypted);
     return keys;
   }
