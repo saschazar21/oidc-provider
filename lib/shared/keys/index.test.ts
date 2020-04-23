@@ -96,9 +96,8 @@ describe('Existing Keys', () => {
   });
 
   it('should retrieve existing keys from DB', async () => {
-    const { keystore: fetchedKeystore }: KeyStructure = await getKeys(
-      masterkey
-    );
+    process.env.MASTER_KEY = masterkey;
+    const { keystore: fetchedKeystore }: KeyStructure = await getKeys();
 
     expect(fetchedKeystore.toJWKS(true)).toMatchObject(keystore.toJWKS(true));
   });
