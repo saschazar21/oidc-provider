@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
-import connect from '~/lib/shared/db';
-import ClientModel from '~/lib/shared/db/schemata/client';
+import connect, { ClientModel } from '~/lib/shared/db';
 
 describe('Clients', () => {
   let client_id: string;
@@ -18,6 +17,17 @@ describe('Clients', () => {
 
   beforeAll(async () => {
     await connect();
+  });
+
+  it('should fail when _id is present', async () => {
+    const data = { ...baseData, _id: 'I am invalid' };
+    await expect(ClientModel.create(data)).rejects.toThrowError();
+    await expect(ClientModel.find()).resolves.toHaveLength(0);
+  });
+
+  it('should fail when client_secret is present', async () => {
+    const data = { ...baseData, client_secret: 'I am invalid' };
+    await expect(ClientModel.create(data)).rejects.toThrowError();
   });
 
   it('should fail when name is omitted', async () => {
@@ -87,5 +97,19 @@ describe('Clients', () => {
 
     expect(updated.get('client_id')).toEqual(client_id);
     expect(updated.get('name')).toEqual(data.name);
+    expect(updated.get('__v')).toBeGreaterThan(1);
+  });
+
+  it('should fail when client_secret gets updated', async () => {
+    const data = {
+      client_secret: 'I am invalid anyways',
+    };
+
+    const updated = ClientModel.findByIdAndUpdate(
+      client_id,
+      { ...data },
+      { new: true }
+    );
+    await expect(updated).rejects.toThrowError();
   });
 });

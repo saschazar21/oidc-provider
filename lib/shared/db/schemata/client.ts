@@ -7,7 +7,7 @@ import generateId from '~/lib/shared/util/id';
 const generateClientId = generateId();
 const generateClientSecret = generateId(ALPHABET_LENGTH.LONG);
 
-export const clientSchema = new Schema({
+const clientSchema = new Schema({
   _id: {
     alias: 'client_id',
     required: true,
@@ -25,6 +25,7 @@ export const clientSchema = new Schema({
   },
   createdAt: Date,
   logo: {
+    lowercase: true,
     type: String,
     validate: {
       validator: uri => URL_REGEX.test(uri),
@@ -39,12 +40,13 @@ export const clientSchema = new Schema({
     unique: true,
   },
   owner: {
-    ref: 'Identity',
+    ref: 'User',
     // required: true,  // TODO: remove when Idendity is created
     trim: true,
     type: String,
   },
   redirect_uris: {
+    lowercase: true,
     type: [String],
     validate: {
       validator: uris =>
@@ -87,11 +89,25 @@ clientSchema.pre('save', function () {
   this.set({ createdAt: new Date() });
 });
 
-clientSchema.post('findOneAndUpdate', async function () {
-  const model = await this.model.findOne(this.getQuery());
-  return model.update({ $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
+clientSchema.pre('findOneAndUpdate', async function () {
+  const {
+    $set: { _id: nestedId = '', client_secret: nestedClientSecret = '' } = {},
+    _id = '',
+    client_secret = '',
+  } = this.getUpdate();
+
+  if (
+    _id.length ||
+    client_secret.length ||
+    nestedId.length ||
+    nestedClientSecret.length
+  ) {
+    throw new Error('ERROR: Updating client_id or client_secret is forbidden!');
+  }
+  const self = this as any;
+  return self.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
 });
 
-const clientModel = mongoose.model('Client', clientSchema);
+export const ClientModel = mongoose.model('Client', clientSchema);
 
-export default clientModel;
+export default ClientModel;
