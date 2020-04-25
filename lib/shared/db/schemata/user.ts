@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 import { EMAIL_REGEX } from '~/lib/shared/types/email';
 import { URL_REGEX } from '~/lib/shared/types/url';
-import id from '~/lib/shared/util/id';
+import id, { id as idSync } from '~/lib/shared/util/id';
 import hashPassword, { comparePassword } from '~/lib/shared/util/password';
 
 const generateId = id();
@@ -10,6 +10,10 @@ const generateId = id();
 const rightPad = (val: string): string => (val ? `${val} ` : '');
 
 const addressSchema = new Schema({
+  _id: {
+    default: idSync(),
+    type: String,
+  },
   street_address: {
     trim: true,
     type: String,
@@ -32,7 +36,7 @@ const addressSchema = new Schema({
   },
 });
 
-addressSchema.virtual('formatted').get(function () {
+addressSchema.virtual('formatted').get(function() {
   return `${this.street_address}
 ${rightPad(this.postal_code)}${rightPad(this.locality)}${this.region}
 ${this.country}`;
@@ -54,7 +58,10 @@ const userSchema = new Schema({
     trim: true,
     type: String,
   },
-  createdAt: Date,
+  createdAt: {
+    default: Date.now,
+    type: Date,
+  },
   updatedAt: {
     alias: 'updated_at',
     type: Date,
@@ -84,7 +91,7 @@ const userSchema = new Schema({
     validate: {
       validator: (value: string): boolean => URL_REGEX.test(value),
       message: ({ value }) =>
-        `ERROR: ${value} is an invalid URL! Only 'https://'-prefixes are allowed!`,
+        `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
     },
     trim: true,
     type: String,
@@ -94,7 +101,7 @@ const userSchema = new Schema({
     validate: {
       validator: (value: string): boolean => URL_REGEX.test(value),
       message: ({ value }) =>
-        `ERROR: ${value} is an invalid URL! Only 'https://'-prefixes are allowed!`,
+        `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
     },
     trim: true,
     type: String,
@@ -104,7 +111,7 @@ const userSchema = new Schema({
     validate: {
       validator: (value: string): boolean => URL_REGEX.test(value),
       message: ({ value }) =>
-        `ERROR: ${value} is an invalid URL! Only 'https://'-prefixes are allowed!`,
+        `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
     },
     trim: true,
     type: String,
@@ -141,33 +148,32 @@ const userSchema = new Schema({
 
 userSchema
   .virtual('name')
-  .get(function () {
+  .get(function() {
     return `${rightPad(this.given_name)}${this.family_name}`;
   })
-  .set(function (name: string): void {
+  .set(function(name: string): void {
     const [given_name, family_name] = name.split(/\s+/);
     this.set({ given_name, family_name });
   });
 
-userSchema.method('comparePassword', async function (plain: string) {
+userSchema.method('comparePassword', async function(plain: string) {
   return comparePassword(plain, this.get('password'));
 });
 
-userSchema.pre('validate', async function () {
+userSchema.pre('validate', async function() {
   if (this.get('_id')) {
     throw new Error('ERROR: Custom ID is forbidden!');
   }
   this.set({ _id: await generateId() });
 });
 
-userSchema.pre('save', async function () {
+userSchema.pre('save', async function() {
   this.set({
-    createdAt: new Date(),
     password: await hashPassword(this.get('password')),
   });
 });
 
-userSchema.pre('findOneAndUpdate', async function () {
+userSchema.pre('findOneAndUpdate', async function() {
   const self = this as any;
   const {
     _id = '',
@@ -190,7 +196,7 @@ userSchema.pre('findOneAndUpdate', async function () {
         $set: {
           password: await hashPassword(nestedPassword),
         },
-      }
+      },
     );
   }
 

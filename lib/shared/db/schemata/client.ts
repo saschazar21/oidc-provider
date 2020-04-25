@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { ALPHABET_LENGTH } from '~/lib/shared/config/id';
-import { URL_REGEX } from '~/lib/shared/types/url';
+import { HTTPS_REGEX, URL_REGEX } from '~/lib/shared/types/url';
 import generateId from '~/lib/shared/util/id';
 
 const generateClientId = generateId();
@@ -23,14 +23,17 @@ const clientSchema = new Schema({
     trim: true,
     type: String,
   },
-  createdAt: Date,
+  createdAt: {
+    default: Date.now,
+    type: Date,
+  },
   logo: {
     lowercase: true,
     type: String,
     validate: {
       validator: uri => URL_REGEX.test(uri),
       message: ({ value }) =>
-        `ERROR: ${value} is an invalid URL! Only 'https://'-prefixes are allowed!`,
+        `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
     },
   },
   name: {
@@ -51,10 +54,10 @@ const clientSchema = new Schema({
     validate: {
       validator: uris =>
         uris.length > 0 &&
-        uris.filter(uri => URL_REGEX.test(uri)).length === uris.length,
+        uris.filter(uri => HTTPS_REGEX.test(uri)).length === uris.length,
       message: ({ value }) =>
         `ERROR: One of [${value.join(
-          ', '
+          ', ',
         )}] is an invalid URL! Only 'https://'-prefixes are allowed!`,
     },
   },
@@ -69,10 +72,10 @@ clientSchema.method('resetSecret', async function resetSecret(): Promise<
   return client_secret;
 });
 
-clientSchema.pre('validate', async function () {
+clientSchema.pre('validate', async function() {
   const self = this as any;
   const [_id, client_secret] = ['_id', 'client_secret'].map(key =>
-    self.get(key)
+    self.get(key),
   );
 
   if (_id || client_secret) {
@@ -85,11 +88,7 @@ clientSchema.pre('validate', async function () {
   });
 });
 
-clientSchema.pre('save', function () {
-  this.set({ createdAt: new Date() });
-});
-
-clientSchema.pre('findOneAndUpdate', async function () {
+clientSchema.pre('findOneAndUpdate', async function() {
   const {
     $set: { _id: nestedId = '', client_secret: nestedClientSecret = '' } = {},
     _id = '',
