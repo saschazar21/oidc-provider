@@ -1,22 +1,38 @@
 import mongoose from 'mongoose';
 
-import connect, { ClientModel } from '~/lib/shared/db';
+import connect, { ClientModel, UserModel } from '~/lib/shared/db';
+import { ClientSchema } from '~/lib/shared/db/schemata/client';
+import { UserSchema } from '~/lib/shared/db/schemata/user';
 
 describe('Clients', () => {
   let client_id: string;
-  const baseData = {
-    logo: 'https://source.unsplash.com/random/512x512',
-    name: 'Test Client',
-    redirect_uris: ['https://test.com/cb'],
+  let sub: string;
+  let baseData: ClientSchema;
+
+  const userData: UserSchema = {
+    email: 'john.doe@mail.com',
+    password: 'a random password',
   };
 
   afterAll(async () => {
-    await ClientModel.findByIdAndDelete(client_id);
+    await Promise.all([
+      UserModel.findByIdAndDelete(sub),
+      ClientModel.findByIdAndDelete(client_id),
+    ]);
     mongoose.connection.close();
   });
 
   beforeAll(async () => {
     await connect();
+    const user = await UserModel.create(userData);
+
+    sub = user.get('_id');
+    baseData = {
+      logo: 'https://source.unsplash.com/random/512x512',
+      name: 'Test Client',
+      owner: sub,
+      redirect_uris: ['https://test.com/cb'],
+    };
   });
 
   it('should fail when _id is present', async () => {
@@ -33,7 +49,7 @@ describe('Clients', () => {
   it('should fail when name is omitted', async () => {
     const { name, ...data } = baseData;
     await expect(ClientModel.create(data)).rejects.toThrowError(
-      'Client name is mandatory!'
+      'Client name is mandatory!',
     );
   });
 
@@ -66,10 +82,20 @@ describe('Clients', () => {
 
   it('should create a client', async () => {
     const client = await ClientModel.create(baseData);
+    const user = await UserModel.findById(sub);
     client_id = client.get('_id');
+
+    await ClientModel.populate(client, {
+      path: 'owner',
+      model: UserModel,
+      select: '-password',
+    });
 
     expect(client.get('client_id')).toBeTruthy();
     expect(client.get('client_secret')).toBeTruthy();
+    expect(client.get('owner').get('sub')).toEqual(user.get('sub'));
+    expect(client.get('owner').get('email')).toEqual(userData.email);
+    expect(client.get('owner').get('password')).not.toBeDefined();
   });
 
   it('should reset client secret', async () => {
@@ -92,7 +118,7 @@ describe('Clients', () => {
     const updated = await ClientModel.findByIdAndUpdate(
       client_id,
       { $set: data },
-      { new: true }
+      { new: true },
     );
 
     expect(updated.get('client_id')).toEqual(client_id);
@@ -108,7 +134,7 @@ describe('Clients', () => {
     const updated = ClientModel.findByIdAndUpdate(
       client_id,
       { ...data },
-      { new: true }
+      { new: true },
     );
     await expect(updated).rejects.toThrowError();
   });

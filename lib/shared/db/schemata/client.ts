@@ -1,8 +1,21 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { ALPHABET_LENGTH } from '~/lib/shared/config/id';
+import { UserSchema } from '~/lib/shared/db/schemata/user';
 import { HTTPS_REGEX, URL_REGEX } from '~/lib/shared/types/url';
 import generateId from '~/lib/shared/util/id';
+
+export interface ClientSchema {
+  _id?: string;
+  active?: boolean;
+  client_secret?: string;
+  createdAt?: Date;
+  logo?: string;
+  name: string;
+  owner: string | UserSchema;
+  redirect_uris: string[];
+  updatedAt?: Date;
+}
 
 const generateClientId = generateId();
 const generateClientSecret = generateId(ALPHABET_LENGTH.LONG);
@@ -31,7 +44,7 @@ const clientSchema = new Schema({
     lowercase: true,
     type: String,
     validate: {
-      validator: uri => URL_REGEX.test(uri),
+      validator: (uri: string) => URL_REGEX.test(uri),
       message: ({ value }) =>
         `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
     },
@@ -44,17 +57,16 @@ const clientSchema = new Schema({
   },
   owner: {
     ref: 'User',
-    // required: true,  // TODO: remove when Idendity is created
-    trim: true,
+    required: true,
     type: String,
   },
   redirect_uris: {
     lowercase: true,
     type: [String],
     validate: {
-      validator: uris =>
+      validator: (uris: string[]) =>
         uris.length > 0 &&
-        uris.filter(uri => HTTPS_REGEX.test(uri)).length === uris.length,
+        uris.filter((uri) => HTTPS_REGEX.test(uri)).length === uris.length,
       message: ({ value }) =>
         `ERROR: One of [${value.join(
           ', ',
@@ -72,9 +84,9 @@ clientSchema.method('resetSecret', async function resetSecret(): Promise<
   return client_secret;
 });
 
-clientSchema.pre('validate', async function() {
+clientSchema.pre('validate', async function () {
   const self = this as any;
-  const [_id, client_secret] = ['_id', 'client_secret'].map(key =>
+  const [_id, client_secret] = ['_id', 'client_secret'].map((key) =>
     self.get(key),
   );
 
@@ -88,7 +100,7 @@ clientSchema.pre('validate', async function() {
   });
 });
 
-clientSchema.pre('findOneAndUpdate', async function() {
+clientSchema.pre('findOneAndUpdate', async function () {
   const {
     $set: { _id: nestedId = '', client_secret: nestedClientSecret = '' } = {},
     _id = '',

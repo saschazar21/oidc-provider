@@ -1,11 +1,48 @@
 import mongoose, { Schema } from 'mongoose';
 
+import { ALPHABET_LENGTH } from '~/lib/shared/config/id';
 import { EMAIL_REGEX } from '~/lib/shared/types/email';
 import { URL_REGEX } from '~/lib/shared/types/url';
 import id, { id as idSync } from '~/lib/shared/util/id';
 import hashPassword, { comparePassword } from '~/lib/shared/util/password';
 
-const generateId = id();
+export interface AddressSchema {
+  _id?: string;
+  formatted?: string;
+  street_address?: string;
+  locality?: string;
+  region?: string;
+  postal_code?: string;
+  country?: string;
+}
+
+export interface UserSchema {
+  _id?: string;
+  active?: boolean;
+  password: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+  middle_name?: string;
+  nickname?: string;
+  preferred_username?: string;
+  profile?: string;
+  picture?: string;
+  website?: string;
+  email: string;
+  email_verified?: boolean;
+  gender?: string;
+  birthdate?: Date;
+  zoneinfo?: string;
+  locale?: string;
+  phone_number?: string;
+  phone_number_verified?: boolean;
+  address?: AddressSchema;
+}
+
+const generateId = id(ALPHABET_LENGTH.SHORT);
 
 const rightPad = (val: string): string => (val ? `${val} ` : '');
 
@@ -36,7 +73,7 @@ const addressSchema = new Schema({
   },
 });
 
-addressSchema.virtual('formatted').get(function() {
+addressSchema.virtual('formatted').get(function () {
   return `${this.street_address}
 ${rightPad(this.postal_code)}${rightPad(this.locality)}${this.region}
 ${this.country}`;
@@ -148,32 +185,32 @@ const userSchema = new Schema({
 
 userSchema
   .virtual('name')
-  .get(function() {
+  .get(function () {
     return `${rightPad(this.given_name)}${this.family_name}`;
   })
-  .set(function(name: string): void {
+  .set(function (name: string): void {
     const [given_name, family_name] = name.split(/\s+/);
     this.set({ given_name, family_name });
   });
 
-userSchema.method('comparePassword', async function(plain: string) {
+userSchema.method('comparePassword', async function (plain: string) {
   return comparePassword(plain, this.get('password'));
 });
 
-userSchema.pre('validate', async function() {
+userSchema.pre('validate', async function () {
   if (this.get('_id')) {
     throw new Error('ERROR: Custom ID is forbidden!');
   }
   this.set({ _id: await generateId() });
 });
 
-userSchema.pre('save', async function() {
+userSchema.pre('save', async function () {
   this.set({
     password: await hashPassword(this.get('password')),
   });
 });
 
-userSchema.pre('findOneAndUpdate', async function() {
+userSchema.pre('findOneAndUpdate', async function () {
   const self = this as any;
   const {
     _id = '',

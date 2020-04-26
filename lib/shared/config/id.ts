@@ -4,4 +4,5 @@ export const ALPHABET =
 export enum ALPHABET_LENGTH {
   DEFAULT = 18,
   LONG = 36,
+  SHORT = 10,
 }
