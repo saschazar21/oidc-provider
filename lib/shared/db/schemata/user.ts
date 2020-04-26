@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 
-import { ACR_VALUES } from '~/lib/shared/config/acr';
+import { ACR_VALUES } from '~/lib/shared/types/acr';
 import { ALPHABET_LENGTH } from '~/lib/shared/config/id';
 import { EMAIL_REGEX } from '~/lib/shared/types/email';
 import { URL_REGEX } from '~/lib/shared/types/url';
@@ -184,7 +184,8 @@ const userSchema = new Schema({
   },
   address: addressSchema,
   acr: {
-    default: () => ACR_VALUES[0],
+    default: () => ACR_VALUES.BASIC,
+    enum: Object.values(ACR_VALUES),
     type: String,
   },
 });
