@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 import connect, { UserModel } from '~/lib/shared/db';
+import { ACR_VALUES } from '~/lib/shared/config/acr';
 
 describe('UserModel', () => {
   let sub: string;
@@ -63,6 +64,7 @@ describe('UserModel', () => {
     expect(user.get('name')).toEqual(baseData.name);
     expect(user.get('given_name')).toEqual(baseData.name.split(' ')[0]);
     expect(user.get('createdAt')).toBeTruthy();
+    expect(user.get('acr')).toEqual(ACR_VALUES[0]);
     expect(match).toBeTruthy();
   });
 

@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 
+import { ACR_VALUES } from '~/lib/shared/config/acr';
 import { ALPHABET_LENGTH } from '~/lib/shared/config/id';
 import { EMAIL_REGEX } from '~/lib/shared/types/email';
 import { URL_REGEX } from '~/lib/shared/types/url';
@@ -40,6 +41,7 @@ export interface UserSchema {
   phone_number?: string;
   phone_number_verified?: boolean;
   address?: AddressSchema;
+  acr?: string;
 }
 
 const generateId = id(ALPHABET_LENGTH.SHORT);
@@ -181,6 +183,10 @@ const userSchema = new Schema({
     type: Boolean,
   },
   address: addressSchema,
+  acr: {
+    default: () => ACR_VALUES[0],
+    type: String,
+  },
 });
 
 userSchema
