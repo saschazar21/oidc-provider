@@ -27,7 +27,7 @@ describe('AuthorizationModel', () => {
   };
 
   const baseClient: ClientSchema = {
-    name: 'Test Client',
+    name: 'Authorization Test Client',
     owner: sub,
     redirect_uris: ['https://url.com/cb'],
   };
@@ -77,14 +77,59 @@ describe('AuthorizationModel', () => {
       });
   });
 
+  it('should throw when custom ID is given', async () => {
+    const data = {
+      ...baseAuthorization,
+      _id: 'custom ID',
+    };
+
+    await expect(AuthorizationModel.create(data)).rejects.toThrowError();
+  });
+
+  it('should throw when invalid redirect_uri is given', async () => {
+    const data = {
+      ...baseAuthorization,
+      redirect_uri: 'https://url.com/callback',
+    };
+    await expect(AuthorizationModel.create(data)).rejects.toThrowError();
+  });
+
   it('should create an Authorization', async () => {
     const authorization = await AuthorizationModel.create(baseAuthorization);
     await AuthorizationModel.populate(authorization, [
       { path: 'user' },
       { path: 'client', populate: { path: 'owner' } },
     ]);
+    authorization_id = authorization.get('_id');
 
     expect(authorization.get('user').get('email')).toEqual(baseUser.email);
     expect(authorization.get('client').get('name')).toEqual(baseClient.name);
+  });
+
+  it('should update AuthorizationModel', async () => {
+    const data = {
+      consent: !baseAuthorization.consent,
+    };
+
+    const updated = await AuthorizationModel.findByIdAndUpdate(
+      authorization_id,
+      data,
+      { new: true }
+    );
+
+    expect(updated).toBeDefined();
+    expect(updated.get('updatedAt')).toBeTruthy();
+    expect(updated.get('__v')).toBeGreaterThan(0);
+    expect(updated.get('consent')).not.toEqual(baseAuthorization.consent);
+  });
+
+  it('should throw when updating with custom ID', async () => {
+    const data = {
+      _id: 'a custom ID',
+    };
+
+    await expect(
+      AuthorizationModel.findByIdAndUpdate(authorization_id, data)
+    ).rejects.toThrowError();
   });
 });

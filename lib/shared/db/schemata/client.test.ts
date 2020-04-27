@@ -38,7 +38,6 @@ describe('Clients', () => {
   it('should fail when _id is present', async () => {
     const data = { ...baseData, _id: 'I am invalid' };
     await expect(ClientModel.create(data)).rejects.toThrowError();
-    await expect(ClientModel.find()).resolves.toHaveLength(0);
   });
 
   it('should fail when client_secret is present', async () => {
@@ -49,7 +48,7 @@ describe('Clients', () => {
   it('should fail when name is omitted', async () => {
     const { name, ...data } = baseData;
     await expect(ClientModel.create(data)).rejects.toThrowError(
-      'Client name is mandatory!',
+      'Client name is mandatory!'
     );
   });
 
@@ -118,7 +117,7 @@ describe('Clients', () => {
     const updated = await ClientModel.findByIdAndUpdate(
       client_id,
       { $set: data },
-      { new: true },
+      { new: true }
     );
 
     expect(updated.get('client_id')).toEqual(client_id);
@@ -134,7 +133,7 @@ describe('Clients', () => {
     const updated = ClientModel.findByIdAndUpdate(
       client_id,
       { ...data },
-      { new: true },
+      { new: true }
     );
     await expect(updated).rejects.toThrowError();
   });

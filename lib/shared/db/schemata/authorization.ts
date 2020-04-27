@@ -1,6 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { ALPHABET_LENGTH } from '~/lib/shared/config/id';
+import { ClientModel } from '~/lib/shared/db';
 import { ACR_VALUES } from '~/lib/shared/types/acr';
 import { DISPLAY } from '~/lib/shared/types/display';
 import { LIFETIME } from '~/lib/shared/types/lifetime';
@@ -88,9 +89,12 @@ const authSchema = new Schema({
     trim: true,
     type: String,
     validate: {
-      validator: (value: string) => HTTPS_REGEX.test(value),
-      message: ({ value }) =>
-        `ERROR: ${value} is an invalid URL! Only 'https://'-prefixes are allowed!`,
+      validator: async function (value: string): Promise<boolean> {
+        const client = await ClientModel.findById(this.get('client'));
+        const redirect_uris: string[] = client.get('redirect_uris') || [];
+        return redirect_uris.indexOf(value) > -1;
+      },
+      message: ({ value }) => `ERROR: ${value} not a redirect URL of client!`,
     },
   },
   state: String,
@@ -136,7 +140,7 @@ authSchema.pre('findOneAndUpdate', async function () {
     throw new Error('ERROR: Custom ID is not allowed!');
   }
 
-  self.setUpdate({ $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
+  self.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
 });
 
 export const AuthorizationModel = mongoose.model('Authorization', authSchema);
