@@ -10,7 +10,6 @@ import { PROMPT } from '~/lib/shared/types/prompt';
 import { RESPONSE_MODE } from '~/lib/shared/types/response_mode';
 import { RESPONSE_TYPE } from '~/lib/shared/types/response_type';
 import { SCOPE } from '~/lib/shared/types/scope';
-import { HTTPS_REGEX } from '~/lib/shared/types/url';
 import id from '~/lib/shared/util/id';
 
 export interface AuthorizationSchema {
