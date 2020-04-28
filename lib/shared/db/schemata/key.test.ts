@@ -4,7 +4,7 @@ import { randomBytes } from 'crypto';
 import connect from '~/lib/shared/db/connect';
 import KeyModel from '~/lib/shared/db/schemata/key';
 
-describe('Key', () => {
+describe('KeyModel', () => {
   afterAll(async () => {
     await KeyModel.findByIdAndDelete('master');
     mongoose.connection.close();

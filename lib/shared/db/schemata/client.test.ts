@@ -4,7 +4,7 @@ import connect, { ClientModel, UserModel } from '~/lib/shared/db';
 import { ClientSchema } from '~/lib/shared/db/schemata/client';
 import { UserSchema } from '~/lib/shared/db/schemata/user';
 
-describe('Clients', () => {
+describe('ClientModel', () => {
   let client_id: string;
   let sub: string;
   let baseData: ClientSchema;
