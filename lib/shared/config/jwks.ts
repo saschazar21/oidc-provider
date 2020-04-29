@@ -22,6 +22,27 @@ export const JWE: JWKSConfig[] = [
   { kty: 'EC', size: 'P-256', options: { alg: 'ECDH-ES', use: 'enc' } },
 ];
 
+export const supportedAlgorithms = (type: 'JWE' | 'JWS'): string[] => {
+  let config: JWKSConfig[] = [];
+
+  switch (type) {
+    case 'JWE':
+      config = [...JWE];
+      break;
+    case 'JWS':
+      config = [...JWS];
+      break;
+  }
+
+  return config.reduce(
+    (filtered: string[], { options: { alg = '' } = {} }: any) => {
+      const arr = [...filtered, alg];
+      return arr;
+    },
+    [] as string[]
+  );
+};
+
 export const JWKS: JWKSConfig[] = [].concat(...JWS, ...JWE);
 
 export default JWKS;

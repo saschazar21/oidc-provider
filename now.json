@@ -1,4 +1,6 @@
 {
   "name": "oidc-provider",
-  "rewrites": []
+  "rewrites": [
+    { "source": "/.well-known/(.*)", "destination": "/api/well-known/$1" }
+  ]
 }

@@ -1,6 +1,11 @@
 import { JWKS, JWT } from 'jose';
 
-import { JWKS as config } from '~/lib/shared/config/jwks';
+import {
+  JWKS as config,
+  JWE,
+  JWS,
+  supportedAlgorithms,
+} from '~/lib/shared/config/jwks';
 import getKeystore from '~/lib/shared/keys/jwks';
 
 describe('JWKS', () => {
@@ -21,8 +26,8 @@ describe('JWKS', () => {
     const keystore = new JWKS.KeyStore();
     await Promise.all(
       config.map(async ({ kty, size, options }) =>
-        keystore.generate(kty as any, size as any, options),
-      ),
+        keystore.generate(kty as any, size as any, options)
+      )
     );
 
     const keys = keystore.toJWKS(true);
@@ -32,15 +37,23 @@ describe('JWKS', () => {
     expect(keys.keys.length).toEqual(jwks.keys.length);
     expect(keys.keys).toMatchObject(jwks.keys);
 
-    const signatures = algorithms.map((alg) => keystore.get({ alg }));
-    const verifications = algorithms.map((alg) =>
-      inheritedKeystore.get({ alg }),
-    );
+    const signatures = algorithms.map(alg => keystore.get({ alg }));
+    const verifications = algorithms.map(alg => inheritedKeystore.get({ alg }));
 
     signatures.forEach((sign, i) => {
       const test = JWT.sign(jwt, sign);
       expect(JWT.verify(test, signatures[i])).toHaveProperty('sub', jwt.sub);
       expect(JWT.verify(test, verifications[i])).toHaveProperty('sub', jwt.sub);
     });
+  });
+});
+
+describe('Configuration', () => {
+  it('returns supported JWE algorithms', () => {
+    expect(supportedAlgorithms('JWE')).toHaveLength(JWE.length);
+  });
+
+  it('returns supported JWS algorithms', () => {
+    expect(supportedAlgorithms('JWS')).toHaveLength(JWS.length);
   });
 });

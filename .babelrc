@@ -1,4 +1,14 @@
 {
-  "plugins": ["module-resolver"],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./"],
+        "alias": {
+          "~": "./"
+        }
+      }
+    ]
+  ],
   "presets": ["next/babel"]
 }
