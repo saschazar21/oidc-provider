@@ -9,7 +9,7 @@ export default (req: NextApiRequest, res: NextApiResponse): void => {
     res.json(getConfiguration());
   } catch (e) {
     const { method, url: path } = req;
-    res.status(500);
+    res.status(500).end('Internal Server Error');
 
     logError({
       method,

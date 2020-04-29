@@ -13,7 +13,7 @@ export default async (
     res.json(keystore.toJWKS());
   } catch (e) {
     const { method, url: path } = req;
-    res.status(500);
+    res.status(500).end('Internal Server Error');
 
     logError({ method, path, statusCode: 500, message: e.message || e });
   }
