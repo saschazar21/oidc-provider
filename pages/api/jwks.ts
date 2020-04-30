@@ -7,10 +7,12 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   try {
     const { keystore } = await getKeys();
-    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
-    res.json(keystore.toJWKS());
+    const jwks = keystore.toJWKS();
+
+    res.json(jwks);
   } catch (e) {
     const { method, url: path } = req;
     res.status(500).end('Internal Server Error');
