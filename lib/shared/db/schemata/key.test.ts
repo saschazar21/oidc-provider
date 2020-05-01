@@ -5,6 +5,8 @@ import connect from '~/lib/shared/db/connect';
 import KeyModel from '~/lib/shared/db/schemata/key';
 
 describe('KeyModel', () => {
+  const _id = 'testmaster';
+
   afterAll(async () => {
     await KeyModel.findByIdAndDelete('master');
     mongoose.connection.close();
@@ -16,19 +18,19 @@ describe('KeyModel', () => {
 
   it('creates a Key entry', async () => {
     const key = {
-      _id: 'master',
+      _id,
       bin: randomBytes(64),
     };
 
     const model = await KeyModel.create(key);
-    expect(model).toHaveProperty('_id', 'master');
+    expect(model).toHaveProperty('_id', _id);
     expect(model).toHaveProperty('createdAt');
   });
 
   it('updates a Key entry', async () => {
-    const original = await KeyModel.findById('master');
+    const original = await KeyModel.findById(_id);
     const updated = await KeyModel.findByIdAndUpdate(
-      'master',
+      _id,
       {
         $set: {
           bin: randomBytes(64),
