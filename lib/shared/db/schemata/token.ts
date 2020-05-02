@@ -50,7 +50,7 @@ const baseTokenSchema = new Schema(
       type: String,
     },
   },
-  discriminatorOptions
+  discriminatorOptions,
 );
 
 const accessTokenSchema = new Schema(
@@ -64,11 +64,11 @@ const accessTokenSchema = new Schema(
       type: Date,
     },
     expires: {
-      default: () => Date.now() + LIFETIME.ACCESS_TOKEN * 1000,
+      default: (): number => Date.now() + LIFETIME.ACCESS_TOKEN * 1000,
       type: Date,
     },
   },
-  discriminatorOptions
+  discriminatorOptions,
 );
 
 const refreshTokenSchema = new Schema(
@@ -82,11 +82,11 @@ const refreshTokenSchema = new Schema(
       type: Date,
     },
     expires: {
-      default: () => Date.now() + LIFETIME.REFRESH_TOKEN * 1000,
+      default: (): number => Date.now() + LIFETIME.REFRESH_TOKEN * 1000,
       type: Date,
     },
   },
-  discriminatorOptions
+  discriminatorOptions,
 );
 
 baseTokenSchema.pre('validate', async function () {
@@ -100,10 +100,10 @@ const BaseTokenModel = mongoose.model('BaseToken', baseTokenSchema);
 
 export const AccessTokenModel = BaseTokenModel.discriminator(
   'AccessToken',
-  accessTokenSchema
+  accessTokenSchema,
 );
 
 export const RefreshTokenModel = BaseTokenModel.discriminator(
   'RefreshToken',
-  refreshTokenSchema
+  refreshTokenSchema,
 );

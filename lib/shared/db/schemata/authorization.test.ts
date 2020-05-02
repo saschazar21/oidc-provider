@@ -1,4 +1,4 @@
-import mongoose, { connection } from 'mongoose';
+import mongoose from 'mongoose';
 
 import connect, {
   AuthorizationModel,
@@ -63,11 +63,11 @@ describe('AuthorizationModel', () => {
   beforeAll(async () => {
     await connect()
       .then(() => UserModel.create(baseUser))
-      .then(user => {
+      .then((user) => {
         sub = user.get('sub');
         return ClientModel.create({ ...baseClient, owner: sub });
       })
-      .then(client => {
+      .then((client) => {
         client_id = client.get('client_id');
         baseAuthorization = {
           ...baseAuthorization,
@@ -114,7 +114,7 @@ describe('AuthorizationModel', () => {
     const updated = await AuthorizationModel.findByIdAndUpdate(
       authorization_id,
       data,
-      { new: true }
+      { new: true },
     );
 
     expect(updated).toBeDefined();
@@ -129,7 +129,7 @@ describe('AuthorizationModel', () => {
     };
 
     await expect(
-      AuthorizationModel.findByIdAndUpdate(authorization_id, data)
+      AuthorizationModel.findByIdAndUpdate(authorization_id, data),
     ).rejects.toThrowError();
   });
 });

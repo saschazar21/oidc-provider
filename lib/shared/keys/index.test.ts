@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { randomBytes } from 'crypto';
-import { JWKS } from 'jose';
+import { JWKS, keyType } from 'jose';
 
 import JWKSConfig from '~/lib/shared/config/jwks';
 import createCookieSecrets from '~/lib/shared/config/keygrip';
@@ -24,7 +24,7 @@ describe('Keys', () => {
 
   it('should throw without masterkey', async () => {
     await expect(getKeys()).rejects.toThrowError(
-      'ERROR: Masterkey is missing!'
+      'ERROR: Masterkey is missing!',
     );
   });
 
@@ -64,7 +64,20 @@ describe('Existing Keys', () => {
     cookies = await createCookieSecrets();
     keystore = new JWKS.KeyStore();
     JWKSConfig.map(({ kty, size, options }) =>
-      keystore.generateSync(kty as any, size as any, options)
+      keystore.generateSync(
+        kty as keyType,
+        size as
+          | number
+          | 'Ed25519'
+          | 'Ed448'
+          | 'X25519'
+          | 'X448'
+          | 'P-256'
+          | 'secp256k1'
+          | 'P-384'
+          | 'P-521',
+        options,
+      ),
     );
 
     const keys = {
@@ -78,20 +91,20 @@ describe('Existing Keys', () => {
       KeyModel.create({
         _id: 'master',
         bin,
-      })
+      }),
     );
   });
 
   it('should throw without masterkey', async () => {
     await expect(getKeys()).rejects.toThrowError(
-      'ERROR: Masterkey is missing!'
+      'ERROR: Masterkey is missing!',
     );
   });
 
   it('should throw without correct masterkey', async () => {
     const wrongKey = Buffer.from(randomBytes(32)).toString('base64');
     await expect(getKeys(wrongKey)).rejects.toThrowError(
-      'Unsupported state or unable to authenticate data'
+      'Unsupported state or unable to authenticate data',
     );
   });
 

@@ -129,7 +129,7 @@ const userSchema = new Schema({
     lowercase: true,
     validate: {
       validator: (value: string): boolean => URL_REGEX.test(value),
-      message: ({ value }) =>
+      message: ({ value }): string =>
         `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
     },
     trim: true,
@@ -139,7 +139,7 @@ const userSchema = new Schema({
     lowercase: true,
     validate: {
       validator: (value: string): boolean => URL_REGEX.test(value),
-      message: ({ value }) =>
+      message: ({ value }): string =>
         `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
     },
     trim: true,
@@ -149,7 +149,7 @@ const userSchema = new Schema({
     lowercase: true,
     validate: {
       validator: (value: string): boolean => URL_REGEX.test(value),
-      message: ({ value }) =>
+      message: ({ value }): string =>
         `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
     },
     trim: true,
@@ -161,7 +161,8 @@ const userSchema = new Schema({
     unique: true,
     validate: {
       validator: (value: string): boolean => EMAIL_REGEX.test(value),
-      message: ({ value }) => `ERROR: ${value} is an invalid E-Mail Address!`,
+      message: ({ value }): string =>
+        `ERROR: ${value} is an invalid E-Mail Address!`,
     },
     trim: true,
     type: String,
@@ -184,7 +185,7 @@ const userSchema = new Schema({
   },
   address: addressSchema,
   acr: {
-    default: () => ACR_VALUES.BASIC,
+    default: (): string => ACR_VALUES.BASIC,
     enum: Object.values(ACR_VALUES),
     type: String,
   },
@@ -218,6 +219,7 @@ userSchema.pre('save', async function () {
 });
 
 userSchema.pre('findOneAndUpdate', async function () {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const self = this as any;
   const {
     _id = '',

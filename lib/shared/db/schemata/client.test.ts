@@ -46,13 +46,15 @@ describe('ClientModel', () => {
   });
 
   it('should fail when name is omitted', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { name, ...data } = baseData;
     await expect(ClientModel.create(data)).rejects.toThrowError(
-      'Client name is mandatory!'
+      'Client name is mandatory!',
     );
   });
 
   it('should fail when redirect URIs are omitted', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { redirect_uris, ...data } = baseData;
     await expect(ClientModel.create(data)).rejects.toThrowError();
   });
@@ -98,6 +100,7 @@ describe('ClientModel', () => {
   });
 
   it('should reset client secret', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const client = (await ClientModel.findById(client_id)) as any;
     const { client_secret: original } = client.toJSON();
     const updated = await client.resetSecret();
@@ -117,7 +120,7 @@ describe('ClientModel', () => {
     const updated = await ClientModel.findByIdAndUpdate(
       client_id,
       { $set: data },
-      { new: true }
+      { new: true },
     );
 
     expect(updated.get('client_id')).toEqual(client_id);
@@ -133,7 +136,7 @@ describe('ClientModel', () => {
     const updated = ClientModel.findByIdAndUpdate(
       client_id,
       { ...data },
-      { new: true }
+      { new: true },
     );
     await expect(updated).rejects.toThrowError();
   });

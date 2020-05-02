@@ -29,7 +29,7 @@ const clientSchema = new Schema({
   },
   active: {
     type: Boolean,
-    default: () => true,
+    default: true,
   },
   client_secret: {
     required: true,
@@ -44,8 +44,8 @@ const clientSchema = new Schema({
     lowercase: true,
     type: String,
     validate: {
-      validator: (uri: string) => URL_REGEX.test(uri),
-      message: ({ value }) =>
+      validator: (uri: string): boolean => URL_REGEX.test(uri),
+      message: ({ value }): string =>
         `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
     },
   },
@@ -64,10 +64,10 @@ const clientSchema = new Schema({
     lowercase: true,
     type: [String],
     validate: {
-      validator: (uris: string[]) =>
+      validator: (uris: string[]): boolean =>
         uris.length > 0 &&
         uris.filter((uri) => HTTPS_REGEX.test(uri)).length === uris.length,
-      message: ({ value }) =>
+      message: ({ value }): string =>
         `ERROR: One of [${value.join(
           ', ',
         )}] is an invalid URL! Only 'https://'-prefixes are allowed!`,
@@ -85,6 +85,7 @@ clientSchema.method('resetSecret', async function resetSecret(): Promise<
 });
 
 clientSchema.pre('validate', async function () {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const self = this as any;
   const [_id, client_secret] = ['_id', 'client_secret'].map((key) =>
     self.get(key),
@@ -115,6 +116,7 @@ clientSchema.pre('findOneAndUpdate', async function () {
   ) {
     throw new Error('ERROR: Updating client_id or client_secret is forbidden!');
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const self = this as any;
   return self.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
 });

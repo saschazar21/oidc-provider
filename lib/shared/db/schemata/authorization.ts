@@ -22,9 +22,9 @@ export interface AuthorizationSchema {
   response_type: RESPONSE_TYPE[];
   client: string;
   redirect_uri: string;
-  state?: String;
+  state?: string;
   response_mode?: RESPONSE_MODE;
-  nonce?: String;
+  nonce?: string;
   display?: DISPLAY[];
   prompt?: PROMPT[];
   max_age?: number;
@@ -59,7 +59,7 @@ const authSchema = new Schema({
   user: {
     ref: 'User',
     required: [
-      function () {
+      function (): boolean {
         return this.consent;
       },
       'ERROR! User is required, if consent is given!',
@@ -93,7 +93,8 @@ const authSchema = new Schema({
         const redirect_uris: string[] = client.get('redirect_uris') || [];
         return redirect_uris.indexOf(value) > -1;
       },
-      message: ({ value }) => `ERROR: ${value} not a redirect URL of client!`,
+      message: ({ value }): string =>
+        `ERROR: ${value} not a redirect URL of client!`,
     },
   },
   state: String,
@@ -132,6 +133,7 @@ authSchema.pre('validate', async function () {
 });
 
 authSchema.pre('findOneAndUpdate', async function () {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const self = this as any;
   const { _id = '', $set: { _id: nestedId = '' } = {} } = this.getUpdate();
 

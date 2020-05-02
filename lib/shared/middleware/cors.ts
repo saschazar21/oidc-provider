@@ -7,10 +7,11 @@ const cors = crossOrigin(config);
 
 const middleware = async (
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ): Promise<boolean> =>
   new Promise((resolve, reject) => {
-    cors(req as any, res as any, (err: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    cors(req as any, res as any, (err: Error) => {
       if (err instanceof Error) {
         return reject(err);
       }

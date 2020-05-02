@@ -17,6 +17,7 @@ describe('/.well-known/openid-configuration', () => {
     req = mockRequest({
       method: 'GET',
       url: '/.well-known/openid-configuration',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
 
     res = mockResponse({
@@ -24,6 +25,7 @@ describe('/.well-known/openid-configuration', () => {
       setHeader,
       status,
       end,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
   });
 

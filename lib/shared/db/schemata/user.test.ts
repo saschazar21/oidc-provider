@@ -25,37 +25,37 @@ describe('UserModel', () => {
 
   it('should fail when custom ID is present', async () => {
     await expect(
-      UserModel.create({ ...baseData, _id: 'custom ID' })
+      UserModel.create({ ...baseData, _id: 'custom ID' }),
     ).rejects.toThrowError();
   });
 
   it('should fail when custom sub is present', async () => {
     await expect(
-      UserModel.create({ ...baseData, sub: 'custom ID' })
+      UserModel.create({ ...baseData, sub: 'custom ID' }),
     ).rejects.toThrowError();
   });
 
   it('should fail when malformed e-mail address is present', async () => {
     await expect(
-      UserModel.create({ ...baseData, email: 'saschazar21@huhu' })
+      UserModel.create({ ...baseData, email: 'saschazar21@huhu' }),
     ).rejects.toThrowError();
   });
 
   it('should fail when malformed picture URL is present', async () => {
     await expect(
-      UserModel.create({ ...baseData, picture: 'http:/url' })
+      UserModel.create({ ...baseData, picture: 'http:/url' }),
     ).rejects.toThrowError();
   });
 
   it('should fail when malformed profile URL is present', async () => {
     await expect(
-      UserModel.create({ ...baseData, profile: 'ftp://profile.com' })
+      UserModel.create({ ...baseData, profile: 'ftp://profile.com' }),
     ).rejects.toThrowError();
   });
 
   it('should fail when malformed website URL is present', async () => {
     await expect(
-      UserModel.create({ ...baseData, website: 'custom://url.com' })
+      UserModel.create({ ...baseData, website: 'custom://url.com' }),
     ).rejects.toThrowError();
   });
 
@@ -63,6 +63,7 @@ describe('UserModel', () => {
     const user = await UserModel.create(baseData);
     sub = user.get('sub');
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const match = await (user as any).comparePassword(baseData.password);
 
     expect(user.get('sub')).toEqual(user.get('_id'));
@@ -82,7 +83,7 @@ describe('UserModel', () => {
       {
         password: 'a new password',
       },
-      { new: true }
+      { new: true },
     );
 
     expect(updated.get('password')).not.toEqual(oldPassword);
@@ -98,7 +99,7 @@ describe('UserModel', () => {
       {
         $set: { password: 'a newer password' },
       },
-      { new: true }
+      { new: true },
     );
 
     expect(updated.get('password')).not.toEqual(oldPassword);
@@ -118,7 +119,7 @@ describe('UserModel', () => {
     const updated = await UserModel.findByIdAndUpdate(
       sub,
       { address },
-      { new: true }
+      { new: true },
     );
 
     expect(updated.get('address')).toBeTruthy();
@@ -130,7 +131,7 @@ describe('UserModel', () => {
     const user = await UserModel.findByIdAndUpdate(
       sub,
       { 'address.locality': 'Los Angeles' },
-      { new: true }
+      { new: true },
     );
 
     expect(user.get('address').get('locality')).toEqual('Los Angeles');
@@ -139,7 +140,7 @@ describe('UserModel', () => {
 
   it('should fail to update custom ID', async () => {
     await expect(
-      UserModel.findByIdAndUpdate(sub, { $set: { _id: 'i am invalid' } })
+      UserModel.findByIdAndUpdate(sub, { $set: { _id: 'i am invalid' } }),
     ).rejects.toThrowError();
   });
 });

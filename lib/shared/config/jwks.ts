@@ -34,13 +34,11 @@ export const supportedAlgorithms = (type: 'JWE' | 'JWS'): string[] => {
       break;
   }
 
-  return config.reduce(
-    (filtered: string[], { options: { alg = '' } = {} }: any) => {
-      const arr = [...filtered, alg];
-      return arr;
-    },
-    [] as string[]
-  );
+  return config.reduce((filtered: string[], current: JWKSConfig) => {
+    const { options: { alg = '' } = {} } = current;
+    const arr = [...filtered, alg];
+    return arr;
+  }, [] as string[]);
 };
 
 export const JWKS: JWKSConfig[] = [].concat(...JWS, ...JWE);

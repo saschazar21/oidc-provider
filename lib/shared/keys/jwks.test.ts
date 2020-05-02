@@ -1,4 +1,4 @@
-import { JWKS, JWT } from 'jose';
+import { JWKS, JWT, keyType } from 'jose';
 
 import {
   JWKS as config,
@@ -33,8 +33,21 @@ describe('JWKS', () => {
     const keystore = new JWKS.KeyStore();
     await Promise.all(
       config.map(async ({ kty, size, options }) =>
-        keystore.generate(kty as any, size as any, options)
-      )
+        keystore.generate(
+          kty as keyType,
+          size as
+            | number
+            | 'Ed25519'
+            | 'Ed448'
+            | 'X25519'
+            | 'X448'
+            | 'P-256'
+            | 'secp256k1'
+            | 'P-384'
+            | 'P-521',
+          options,
+        ),
+      ),
     );
 
     const keys = keystore.toJWKS(true);
@@ -44,8 +57,10 @@ describe('JWKS', () => {
     expect(keys.keys.length).toEqual(jwks.keys.length);
     expect(keys.keys).toMatchObject(jwks.keys);
 
-    const signatures = algorithms.map(alg => keystore.get({ alg }));
-    const verifications = algorithms.map(alg => inheritedKeystore.get({ alg }));
+    const signatures = algorithms.map((alg) => keystore.get({ alg }));
+    const verifications = algorithms.map((alg) =>
+      inheritedKeystore.get({ alg }),
+    );
 
     signatures.forEach((sign, i) => {
       const test = JWT.sign(jwt, sign);
