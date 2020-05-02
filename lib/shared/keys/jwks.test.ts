@@ -6,14 +6,19 @@ import {
   JWS,
   supportedAlgorithms,
 } from '~/lib/shared/config/jwks';
-import getKeystore from '~/lib/shared/keys/jwks';
 
 describe('JWKS', () => {
+  beforeEach(() => {
+    jest.resetModules();
+  });
+
   it('should throw on malformatted Keystore', async () => {
+    const { default: getKeystore } = await import('~/lib/shared/keys/jwks');
     await expect(getKeystore({ keys: null })).rejects.toThrowError();
   });
 
   it('creates a new Keystore', async () => {
+    const { default: getKeystore } = await import('~/lib/shared/keys/jwks');
     const jwks = (await getKeystore()).toJWKS();
 
     expect(jwks).toHaveProperty('keys');
@@ -21,6 +26,8 @@ describe('JWKS', () => {
   });
 
   it('reuses an existing Keystore', async () => {
+    const { default: getKeystore } = await import('~/lib/shared/keys/jwks');
+
     const jwt = { sub: 'test' };
     const algorithms = ['HS256', 'RS256', 'ES256'];
     const keystore = new JWKS.KeyStore();
