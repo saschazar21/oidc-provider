@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "jest --coverage"
+    "test:lint": "eslint --ext .ts,.tsx ./",
+    "test:jest": "jest --coverage",
+    "test": "yarn test:lint && yarn test:jest"
   },
   "dependencies": {
     "bcrypt": "^4.0.1",
@@ -31,7 +33,13 @@
     "@types/mongoose": "^5.7.12",
     "@types/node": "^13.13.0",
     "@types/react": "^16.9.34",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
     "babel-plugin-module-resolver": "^4.0.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^4.0.0",
     "jest": "^25.4.0",
     "mock-req-res": "^1.1.4",
     "sinon": "^9.0.2",
