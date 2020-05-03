@@ -14,7 +14,6 @@ const middleware = async (
     const { location, status = 302 } = options;
     res.status(status);
     res.setHeader('Location', location);
-    res.end();
     return resolve();
   });
 
