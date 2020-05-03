@@ -42,7 +42,7 @@ describe('Keys', () => {
     expect(model.get('bin').length).toBeGreaterThan(0);
   });
 
-  it('should return previously created keas', async () => {
+  it('should return previously created keys', async () => {
     await expect(getKeys()).resolves.toMatchObject(keys);
   });
 });
