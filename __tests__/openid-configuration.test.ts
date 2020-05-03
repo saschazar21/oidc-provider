@@ -47,6 +47,24 @@ describe('/.well-known/openid-configuration', () => {
     expect(res.end).not.toHaveBeenCalled();
   });
 
+  it('should return status 405, if method != GET', async () => {
+    const { default: fetchConfiguration } = await import(
+      '~/pages/api/well-known/openid-configuration'
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await fetchConfiguration({ ...req, method: 'POST' } as any, res);
+
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'X-Robots-Tag',
+      'noindex, nofollow',
+    );
+    expect(res.setHeader).toHaveBeenCalledTimes(2);
+    expect(res.setHeader).toHaveBeenCalledWith('Allow', 'HEAD, OPTIONS, GET');
+    expect(res.json).not.toHaveBeenCalled();
+    expect(res.end).toHaveBeenCalled();
+  });
+
   it('should return status 500 upon failure', async () => {
     process.env = {
       ...process.env,

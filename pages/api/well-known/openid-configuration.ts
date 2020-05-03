@@ -1,10 +1,20 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import getConfiguration from '~/lib/shared/config/openid-configuration';
+import methods from '~/lib/shared/middleware/methods';
+import { METHOD } from '~/lib/shared/types/method';
 import logError from '~/lib/shared/util/log_error';
 
-export default (req: NextApiRequest, res: NextApiResponse): void => {
+export default async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+): Promise<void> => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+
+  if (!(await methods(req, res, [METHOD.GET]))) {
+    return res.end();
+  }
+
   try {
     const configuration = getConfiguration();
 
