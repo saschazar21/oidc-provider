@@ -19,7 +19,7 @@ describe('Keys', () => {
   });
 
   beforeAll(async () => {
-    masterkey = Buffer.from(randomBytes(32)).toString('base64');
+    masterkey = 'testkey';
   });
 
   it('should throw without masterkey', async () => {

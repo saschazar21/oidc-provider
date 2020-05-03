@@ -1,18 +1,22 @@
+import mongoose from 'mongoose';
 import { mockRequest, mockResponse } from 'mock-req-res';
 import { NextApiRequest, NextApiResponse } from 'next';
-import KeyModel from '~/lib/shared/db/schemata/key';
+
+import connect, { KeyModel } from '~/lib/shared/db';
 
 describe('/api/jwks', () => {
   let req: NextApiRequest;
   let res: NextApiResponse;
 
   afterAll(async () => {
-    KeyModel.findByIdAndDelete('master');
+    await KeyModel.findByIdAndDelete('master');
+    mongoose.connection.close();
   });
 
   beforeEach(async () => {
     jest.resetModules();
 
+    await connect();
     console.error = console.log;
 
     const json = jest.fn().mockName('mockJSON');
