@@ -10,26 +10,27 @@ import AuthorizationModel, {
 } from '~/lib/shared/db/schemata/authorization';
 import { METHOD } from '~/lib/shared/types/method';
 import logError from '~/lib/shared/util/log_error';
+import { LoginForm } from '~/lib/shared/types/login';
 
 // TODO: move to a general config space;
 const MAX_AGE = 1000 * 60 * 5; // 5 minutes between login & authorization
 
 export default async (
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ): Promise<boolean> => {
+  let authorizationId: string;
   const cookies = await cookieParser(req, res);
-  const authRequest: {
-    email?: string;
-    password?: string;
-  } & AuthorizationSchema = req.method === METHOD.POST ? req.body : req.query;
+  const authRequest: LoginForm & AuthorizationSchema =
+    req.method === METHOD.POST ? req.body : req.query;
 
   if (!cookies.get('authorization')) {
     try {
       const authorization = await connect().then(() =>
-        AuthorizationModel.create(authRequest),
+        AuthorizationModel.create(authRequest)
       );
-      cookies.set('authorization', authorization.get('_id'), {
+      authorizationId = authorization.get('_id');
+      cookies.set('authorization', authorizationId, {
         expires: new Date(Date.now() + MAX_AGE),
         httpOnly: true,
         maxAge: MAX_AGE,
@@ -38,7 +39,7 @@ export default async (
       });
     } catch (e) {
       const { method, url: path } = req;
-      const { redirect_uri, state } = authRequest;
+      const { redirect_uri = '', state } = authRequest;
       const redirectUri = parse(redirect_uri, true);
       const responseQuery = Object.assign(
         {},
@@ -47,7 +48,7 @@ export default async (
           // TODO: add types for error codes
           error: 'invalid_request',
         },
-        state ? { state } : null,
+        state ? { state } : null
       );
       const location = format({
         ...redirectUri,
@@ -65,7 +66,9 @@ export default async (
     }
   }
 
-  if (!cookies.get('user') && !(authRequest.email && authRequest.password)) {
+  const { email, password } = authRequest;
+
+  if (!cookies.get('user') && !(email && password)) {
     const status = req.method === METHOD.POST ? 303 : 307;
     const querystring = query.encode({
       redirect_to: '/api/authorization',
