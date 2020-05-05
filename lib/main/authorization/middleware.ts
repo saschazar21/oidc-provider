@@ -2,6 +2,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import query from 'querystring';
 import { format, parse } from 'url';
 
+import { mapAuthRequest } from '~/lib/main/authorization/helper';
+import {
+  validateResponseType,
+  validateScope,
+} from '~/lib/main/authorization/validator';
 import cookieParser from '~/lib/shared/middleware/cookies';
 import redirect from '~/lib/shared/middleware/redirect';
 import connect from '~/lib/shared/db';
@@ -10,7 +15,6 @@ import AuthorizationModel, {
 } from '~/lib/shared/db/schemata/authorization';
 import { METHOD } from '~/lib/shared/types/method';
 import logError from '~/lib/shared/util/log_error';
-import { LoginForm } from '~/lib/shared/types/login';
 
 // TODO: move to a general config space;
 const MAX_AGE = 1000 * 60 * 5; // 5 minutes between login & authorization
@@ -21,11 +25,16 @@ export default async (
 ): Promise<boolean> => {
   let authorizationId: string;
   const cookies = await cookieParser(req, res);
-  const authRequest: LoginForm & AuthorizationSchema =
-    req.method === METHOD.POST ? req.body : req.query;
+  const authRequest: AuthorizationSchema = mapAuthRequest(
+    req.method === METHOD.POST ? req.body : req.query
+  );
 
   if (!cookies.get('authorization')) {
     try {
+      await Promise.all([
+        validateResponseType(authRequest),
+        validateScope(authRequest),
+      ]);
       const authorization = await connect().then(() =>
         AuthorizationModel.create(authRequest)
       );
@@ -66,9 +75,7 @@ export default async (
     }
   }
 
-  const { email, password } = authRequest;
-
-  if (!cookies.get('user') && !(email && password)) {
+  if (!cookies.get('user')) {
     const status = req.method === METHOD.POST ? 303 : 307;
     const querystring = query.encode({
       redirect_to: '/api/authorization',
