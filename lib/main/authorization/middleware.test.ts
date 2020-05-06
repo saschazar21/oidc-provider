@@ -80,7 +80,26 @@ describe('Authorization Middleware', () => {
     }) as any;
   });
 
-  it('should redirect to /api/login without cookie', async () => {
+  it('should redirect to client on malformed request', async () => {
+    const updatedReq = {
+      ...req,
+      query: {
+        ...req.query,
+        scope: 'profile',
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    const result = await authorizationMiddleware(updatedReq, res);
+
+    expect(result).toBeFalsy();
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Location',
+      `${client.redirect_uris[0]}/?error=invalid_request`
+    );
+  });
+
+  it('should redirect to /api/login without sub cookie', async () => {
     const result = await authorizationMiddleware(req, res);
 
     expect(result).toBeFalsy();
