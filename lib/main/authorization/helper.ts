@@ -27,7 +27,7 @@ export const mapAuthRequest = (request: {
   const keys = Object.keys(obj);
   const values = Object.values(obj);
   const mapped = values.reduce((worked, current, idx) => {
-    const arr = current.split(/\s+/);
+    const arr = current.split(/\s+/).filter((val: string) => val.length);
     return Object.assign(
       {},
       {

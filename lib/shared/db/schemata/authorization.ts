@@ -16,6 +16,7 @@ export interface AuthorizationSchema {
   _id?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  active?: boolean;
   consent?: boolean;
   user?: string;
   scope: SCOPE[];
@@ -52,6 +53,10 @@ const authSchema = new Schema({
     type: Date,
   },
   updatedAt: Date,
+  active: {
+    default: false,
+    type: Boolean,
+  },
   consent: {
     default: false,
     type: Boolean,
@@ -128,6 +133,12 @@ const authSchema = new Schema({
 authSchema.pre('validate', async function () {
   if (this.get('_id')) {
     throw new Error('ERROR: Custom ID is not allowed!');
+  }
+  if (this.get('consent')) {
+    throw new Error('ERROR: Custom consent is not allowed!');
+  }
+  if (this.get('active')) {
+    throw new Error('ERROR: Custom active state is not allowed!');
   }
   this.set({ _id: await generateId() });
 });
