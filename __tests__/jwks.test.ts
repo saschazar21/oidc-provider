@@ -8,9 +8,12 @@ describe('/api/jwks', () => {
   let req: NextApiRequest;
   let res: NextApiResponse;
 
-  afterAll(async () => {
-    await KeyModel.findByIdAndDelete('master');
-    mongoose.connection.close();
+  afterEach(async () => {
+    try {
+      await KeyModel.findByIdAndDelete('master');
+    } finally {
+      mongoose.connection.close();
+    }
   });
 
   beforeEach(async () => {
@@ -51,7 +54,7 @@ describe('/api/jwks', () => {
 
     expect(res.setHeader).toHaveBeenCalledWith(
       'X-Robots-Tag',
-      'noindex, nofollow',
+      'noindex, nofollow'
     );
     expect(res.json).not.toHaveBeenCalled();
     expect(res.end).toHaveBeenCalledWith('Internal Server Error');
@@ -86,7 +89,7 @@ describe('/api/jwks', () => {
 
     expect(res.setHeader).toHaveBeenCalledWith(
       'X-Robots-Tag',
-      'noindex, nofollow',
+      'noindex, nofollow'
     );
     expect(res.json).toHaveBeenCalled();
     expect(res.end).not.toHaveBeenCalled();

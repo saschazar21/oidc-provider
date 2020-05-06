@@ -8,9 +8,10 @@ import getKeys, { KeyStructure, clearKeys } from '~/lib/shared/keys';
 import connection, { KeyModel } from '~/lib/shared/db';
 import { encrypt } from '~/lib/shared/util/aes';
 
+const MASTER_KEY = 'testkey';
+
 describe('Keys', () => {
   let keys: KeyStructure;
-  let masterkey: string;
 
   afterAll(async () => {
     await KeyModel.findByIdAndDelete('master');
@@ -18,18 +19,19 @@ describe('Keys', () => {
     clearKeys();
   });
 
-  beforeAll(async () => {
-    masterkey = 'testkey';
-  });
-
   it('should throw without masterkey', async () => {
+    process.env = {
+      ...process.env,
+      MASTER_KEY: undefined,
+    };
+
     await expect(getKeys()).rejects.toThrowError(
-      'ERROR: Masterkey is missing!',
+      'ERROR: Masterkey is missing!'
     );
   });
 
   it('should create a key set', async () => {
-    keys = await getKeys(masterkey);
+    keys = await getKeys(MASTER_KEY);
 
     expect(keys).toHaveProperty('keystore');
     expect(keys).toHaveProperty('keygrip');
@@ -50,7 +52,6 @@ describe('Keys', () => {
 describe('Existing Keys', () => {
   let cookies: string[];
   let keystore: JWKS.KeyStore;
-  let masterkey: string;
 
   afterAll(async () => {
     await KeyModel.findByIdAndDelete('master');
@@ -59,8 +60,6 @@ describe('Existing Keys', () => {
   });
 
   beforeAll(async () => {
-    masterkey = Buffer.from(randomBytes(32)).toString('base64');
-
     cookies = await createCookieSecrets();
     keystore = new JWKS.KeyStore();
     JWKSConfig.map(({ kty, size, options }) =>
@@ -76,8 +75,8 @@ describe('Existing Keys', () => {
           | 'secp256k1'
           | 'P-384'
           | 'P-521',
-        options,
-      ),
+        options
+      )
     );
 
     const keys = {
@@ -85,31 +84,40 @@ describe('Existing Keys', () => {
       cookies,
     };
 
-    const bin = await encrypt(masterkey, JSON.stringify(keys));
+    const bin = await encrypt(MASTER_KEY, JSON.stringify(keys));
 
     await connection().then(() =>
       KeyModel.create({
         _id: 'master',
         bin,
-      }),
+      })
     );
   });
 
   it('should throw without masterkey', async () => {
+    process.env = {
+      ...process.env,
+      MASTER_KEY: undefined,
+    };
+
     await expect(getKeys()).rejects.toThrowError(
-      'ERROR: Masterkey is missing!',
+      'ERROR: Masterkey is missing!'
     );
   });
 
   it('should throw without correct masterkey', async () => {
     const wrongKey = Buffer.from(randomBytes(32)).toString('base64');
     await expect(getKeys(wrongKey)).rejects.toThrowError(
-      'Unsupported state or unable to authenticate data',
+      'Unsupported state or unable to authenticate data'
     );
   });
 
   it('should retrieve existing keys from DB', async () => {
-    process.env.MASTER_KEY = masterkey;
+    process.env = {
+      ...process.env,
+      MASTER_KEY,
+    };
+
     const { keystore: fetchedKeystore }: KeyStructure = await getKeys();
 
     expect(fetchedKeystore.toJWKS(true)).toMatchObject(keystore.toJWKS(true));
