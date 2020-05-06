@@ -35,7 +35,7 @@ describe('TokenModel', () => {
   const baseAuthorization = {
     scope: [SCOPE.OPENID],
     response_type: [RESPONSE_TYPE.CODE],
-    client: client_id,
+    client_id,
     redirect_uri: baseClient.redirect_uris[0],
   };
 
@@ -63,7 +63,7 @@ describe('TokenModel', () => {
         return AuthorizationModel.create({
           ...baseAuthorization,
           user: sub,
-          client: client_id,
+          client_id,
         });
       })
       .then(authorization => {
@@ -91,7 +91,7 @@ describe('TokenModel', () => {
     expect(access_token).toHaveLength(ALPHABET_LENGTH.LONG);
     expect(token.get('type')).toEqual('AccessToken');
     expect(token.get('authorization')).toHaveProperty('_id', authorization_id);
-    expect(token.get('authorization').get('client')).toEqual(client_id);
+    expect(token.get('authorization').get('client_id')).toEqual(client_id);
     expect(Date.parse(token.get('expires'))).toEqual(
       Date.parse(token.get('createdAt')) + LIFETIME.ACCESS_TOKEN * 1000
     );
@@ -108,7 +108,7 @@ describe('TokenModel', () => {
     expect(access_token).toHaveLength(ALPHABET_LENGTH.LONG);
     expect(token.get('type')).toEqual('RefreshToken');
     expect(token.get('authorization')).toHaveProperty('_id', authorization_id);
-    expect(token.get('authorization').get('client')).toEqual(client_id);
+    expect(token.get('authorization').get('client_id')).toEqual(client_id);
     expect(Date.parse(token.get('expires'))).toEqual(
       Date.parse(token.get('createdAt')) + LIFETIME.REFRESH_TOKEN * 1000
     );

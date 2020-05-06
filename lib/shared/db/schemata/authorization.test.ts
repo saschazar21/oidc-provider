@@ -35,7 +35,7 @@ describe('AuthorizationModel', () => {
   let baseAuthorization: AuthorizationSchema = {
     scope: [SCOPE.OPENID],
     response_type: [RESPONSE_TYPE.CODE],
-    client: client_id,
+    client_id,
     redirect_uri: baseClient.redirect_uris[0],
     state: 'random state',
     response_mode: RESPONSE_MODE.QUERY,
@@ -63,15 +63,15 @@ describe('AuthorizationModel', () => {
   beforeAll(async () => {
     await connect()
       .then(() => UserModel.create(baseUser))
-      .then((user) => {
+      .then(user => {
         sub = user.get('sub');
         return ClientModel.create({ ...baseClient, owner: sub });
       })
-      .then((client) => {
+      .then(client => {
         client_id = client.get('client_id');
         baseAuthorization = {
           ...baseAuthorization,
-          client: client_id,
+          client_id,
           user: sub,
         };
       });
@@ -81,6 +81,24 @@ describe('AuthorizationModel', () => {
     const data = {
       ...baseAuthorization,
       _id: 'custom ID',
+    };
+
+    await expect(AuthorizationModel.create(data)).rejects.toThrowError();
+  });
+
+  it('should throw when custom consent is given', async () => {
+    const data = {
+      ...baseAuthorization,
+      consent: true,
+    };
+
+    await expect(AuthorizationModel.create(data)).rejects.toThrowError();
+  });
+
+  it('should throw when custom active is given', async () => {
+    const data = {
+      ...baseAuthorization,
+      active: true,
     };
 
     await expect(AuthorizationModel.create(data)).rejects.toThrowError();
@@ -98,12 +116,12 @@ describe('AuthorizationModel', () => {
     const authorization = await AuthorizationModel.create(baseAuthorization);
     await AuthorizationModel.populate(authorization, [
       { path: 'user' },
-      { path: 'client', populate: { path: 'owner' } },
+      { path: 'client_id', populate: { path: 'owner' } },
     ]);
     authorization_id = authorization.get('_id');
 
     expect(authorization.get('user').get('email')).toEqual(baseUser.email);
-    expect(authorization.get('client').get('name')).toEqual(baseClient.name);
+    expect(authorization.get('client_id').get('name')).toEqual(baseClient.name);
   });
 
   it('should update AuthorizationModel', async () => {
@@ -114,7 +132,7 @@ describe('AuthorizationModel', () => {
     const updated = await AuthorizationModel.findByIdAndUpdate(
       authorization_id,
       data,
-      { new: true },
+      { new: true }
     );
 
     expect(updated).toBeDefined();
@@ -129,7 +147,7 @@ describe('AuthorizationModel', () => {
     };
 
     await expect(
-      AuthorizationModel.findByIdAndUpdate(authorization_id, data),
+      AuthorizationModel.findByIdAndUpdate(authorization_id, data)
     ).rejects.toThrowError();
   });
 });

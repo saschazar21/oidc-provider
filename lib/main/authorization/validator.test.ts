@@ -13,7 +13,7 @@ describe('Authorization Validators', () => {
     authReq = {
       scope: [SCOPE.OPENID, SCOPE.PROFILE],
       response_type: [RESPONSE_TYPE.CODE],
-      client: 'some client ID',
+      client_id: 'some client ID',
       redirect_uri: 'https://some.redirect.ui',
     };
   });

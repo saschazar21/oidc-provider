@@ -1,13 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cookies from 'cookies';
 
-import getKeygrip from '~/lib/shared/keys/keygrip';
+import getKeys from '~/lib/shared/keys';
 
 const middleware = async (
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<Cookies> => {
-  const keys = await getKeygrip();
+  const { keygrip: keys } = await getKeys();
   const cookies = new Cookies(req, res, { keys });
 
   return cookies;

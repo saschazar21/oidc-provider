@@ -21,7 +21,7 @@ export interface AuthorizationSchema {
   user?: string;
   scope: SCOPE[];
   response_type: RESPONSE_TYPE[];
-  client: string;
+  client_id: string;
   redirect_uri: string;
   state?: string;
   response_mode?: RESPONSE_MODE;
@@ -82,7 +82,7 @@ const authSchema = new Schema({
     required: true,
     type: [String],
   },
-  client: {
+  client_id: {
     ref: 'Client',
     required: true,
     trim: true,
@@ -94,7 +94,7 @@ const authSchema = new Schema({
     type: String,
     validate: {
       validator: async function (value: string): Promise<boolean> {
-        const client = await ClientModel.findById(this.get('client'));
+        const client = await ClientModel.findById(this.get('client_id'));
         const redirect_uris: string[] = client.get('redirect_uris') || [];
         return redirect_uris.indexOf(value) > -1;
       },
