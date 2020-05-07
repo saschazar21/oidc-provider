@@ -75,7 +75,7 @@ export default async (
     }
   }
 
-  if (!cookies.get('user')) {
+  if (!cookies.get('sub')) {
     const status = req.method === METHOD.POST ? 303 : 307;
     const querystring = query.encode({
       redirect_to: '/api/authorization',

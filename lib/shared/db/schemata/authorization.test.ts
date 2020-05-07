@@ -112,6 +112,14 @@ describe('AuthorizationModel', () => {
     await expect(AuthorizationModel.create(data)).rejects.toThrowError();
   });
 
+  it('should throw when invalid client is given', async () => {
+    const data = {
+      ...baseAuthorization,
+      client_id: 'some client id',
+    };
+    await expect(AuthorizationModel.create(data)).rejects.toThrowError();
+  });
+
   it('should create an Authorization', async () => {
     const authorization = await AuthorizationModel.create(baseAuthorization);
     await AuthorizationModel.populate(authorization, [

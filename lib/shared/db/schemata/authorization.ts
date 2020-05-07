@@ -95,7 +95,9 @@ const authSchema = new Schema({
     validate: {
       validator: async function (value: string): Promise<boolean> {
         const client = await ClientModel.findById(this.get('client_id'));
-        const redirect_uris: string[] = client.get('redirect_uris') || [];
+        const redirect_uris: string[] = client
+          ? client.get('redirect_uris')
+          : [];
         return redirect_uris.indexOf(value) > -1;
       },
       message: ({ value }): string =>
