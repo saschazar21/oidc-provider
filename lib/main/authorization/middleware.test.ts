@@ -38,13 +38,18 @@ describe('Authorization Middleware', () => {
   });
 
   beforeEach(async () => {
+    process.env = {
+      ...process.env,
+      MASTER_KEY: 'testkey',
+    };
+
     await connect()
       .then(() => UserModel.create(user))
-      .then(user => {
+      .then((user) => {
         sub = user.get('sub');
         return ClientModel.create({ ...client, owner: sub });
       })
-      .then(client => {
+      .then((client) => {
         client_id = client.get('client_id');
       });
 
