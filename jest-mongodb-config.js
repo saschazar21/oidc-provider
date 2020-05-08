@@ -1,8 +1,7 @@
+// eslint-disable-next-line no-undef
 module.exports = {
   mongodbMemoryServerOptions: {
-    instance: {
-      dbName: 'jest',
-    },
+    instance: {},
     binary: {
       version: '4.2.6',
       skipMD5: true,
