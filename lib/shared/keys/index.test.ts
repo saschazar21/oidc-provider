@@ -57,7 +57,7 @@ describe('Keys', () => {
   });
 });
 
-xdescribe('Existing Keys', () => {
+describe('Existing Keys', () => {
   let cookies: string[];
   let keystore: JWKS.KeyStore;
 
