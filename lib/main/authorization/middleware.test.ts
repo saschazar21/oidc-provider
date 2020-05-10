@@ -2,12 +2,16 @@ import { connection } from 'mongoose';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { mockRequest, mockResponse } from 'mock-req-res';
 
-import authorizationMiddleware from '~/lib/main/authorization/middleware';
-import connect, { AuthorizationModel } from '~/lib/shared/db';
-import ClientModel, { ClientSchema } from '~/lib/shared/db/schemata/client';
-import UserModel, { UserSchema } from '~/lib/shared/db/schemata/user';
+// import authorizationMiddleware from '~/lib/main/authorization/middleware';
+// import connect, { AuthorizationModel } from '~/lib/shared/db';
+import { ClientSchema } from '~/lib/shared/db/schemata/client';
+import { UserSchema } from '~/lib/shared/db/schemata/user';
 
 describe('Authorization Middleware', () => {
+  let AuthorizationModel;
+  let ClientModel;
+  let UserModel;
+
   let authorizationId: string;
   let client_id: string;
   let req: NextApiRequest;
@@ -38,10 +42,14 @@ describe('Authorization Middleware', () => {
   });
 
   beforeEach(async () => {
-    process.env = {
-      ...process.env,
-      MASTER_KEY: 'testkey',
-    };
+    jest.resetModules();
+
+    const dbImports = await import('~/lib/shared/db');
+    const connect = dbImports.default;
+
+    AuthorizationModel = dbImports.AuthorizationModel;
+    ClientModel = dbImports.ClientModel;
+    UserModel = dbImports.UserModel;
 
     await connect()
       .then(() => UserModel.create(user))
@@ -95,6 +103,9 @@ describe('Authorization Middleware', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
+    const { default: authorizationMiddleware } = await import(
+      '~/lib/main/authorization/middleware'
+    );
     const result = await authorizationMiddleware(updatedReq, res);
 
     expect(result).toBeFalsy();
@@ -105,6 +116,9 @@ describe('Authorization Middleware', () => {
   });
 
   it('should redirect to /api/login without sub cookie', async () => {
+    const { default: authorizationMiddleware } = await import(
+      '~/lib/main/authorization/middleware'
+    );
     const result = await authorizationMiddleware(req, res);
 
     expect(result).toBeFalsy();

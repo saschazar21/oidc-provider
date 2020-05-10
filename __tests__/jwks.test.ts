@@ -2,44 +2,42 @@ import mongoose from 'mongoose';
 import { mockRequest, mockResponse } from 'mock-req-res';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import connect, { KeyModel } from '~/lib/shared/db';
-
 describe('/api/jwks', () => {
   let req: NextApiRequest;
   let res: NextApiResponse;
 
   afterEach(async () => {
-    try {
-      await KeyModel.findByIdAndDelete('master');
-    } finally {
-      mongoose.connection.close();
-    }
+    mongoose.connection.close();
   });
 
   beforeEach(async () => {
     jest.resetModules();
 
-    await connect();
-    console.error = console.log;
+    try {
+      const { default: connect, KeyModel } = await import('~/lib/shared/db');
+      await connect().then(() => KeyModel.findByIdAndDelete('master'));
+    } finally {
+      console.error = console.log;
 
-    const json = jest.fn().mockName('mockJSON');
-    const setHeader = jest.fn().mockName('mockSetHeader');
-    const status = jest.fn().mockName('mockStatus');
-    const end = jest.fn().mockName('mockEnd');
+      const json = jest.fn().mockName('mockJSON');
+      const setHeader = jest.fn().mockName('mockSetHeader');
+      const status = jest.fn().mockName('mockStatus');
+      const end = jest.fn().mockName('mockEnd');
 
-    req = mockRequest({
-      method: 'GET',
-      url: '/api/jwks',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any;
+      req = mockRequest({
+        method: 'GET',
+        url: '/api/jwks',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as any;
 
-    res = mockResponse({
-      json,
-      setHeader,
-      status,
-      end,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any;
+      res = mockResponse({
+        json,
+        setHeader,
+        status,
+        end,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as any;
+    }
   });
 
   it('should return 500, when no MASTER_KEY is set', async () => {
