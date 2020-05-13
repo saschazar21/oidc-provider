@@ -20,13 +20,9 @@ export interface KeyStructure {
 
 let keys: KeyStructure;
 
-export const clearKeys = (): void => {
-  keys = undefined;
-};
-
 const createKeys = async (
   cookieSecrets: string[],
-  jwks?: JSONWebKeySet,
+  jwks?: JSONWebKeySet
 ): Promise<KeyStructure> => ({
   keygrip: await getKeygrip(cookieSecrets),
   keystore: await getKeystore(jwks),
@@ -40,11 +36,11 @@ const saveKeys = async (bin: Buffer): Promise<Document> =>
     KeyModel.create({
       _id: 'master',
       bin,
-    }),
+    })
   );
 
 const getKeys = async (
-  masterkey: string = process.env.MASTER_KEY,
+  masterkey: string = process.env.MASTER_KEY
 ): Promise<KeyStructure> => {
   if (keys) {
     return keys;
@@ -60,7 +56,7 @@ const getKeys = async (
       throw new Error('NOT_FOUND');
     }
     const { cookies, keys: jwks } = JSON.parse(
-      await decrypt(masterkey, retrieved.get('bin')),
+      await decrypt(masterkey, retrieved.get('bin'))
     );
     keys = await createKeys(cookies, { keys: jwks });
     return keys;
@@ -77,7 +73,7 @@ const getKeys = async (
       JSON.stringify({
         ...keys.keystore.toJWKS(true),
         cookies: cookieSecrets,
-      }),
+      })
     )) as Buffer;
 
     await saveKeys(encrypted);

@@ -29,7 +29,7 @@ describe('ClientModel', () => {
     sub = user.get('_id');
     baseData = {
       logo: 'https://source.unsplash.com/random/512x512',
-      name: 'Test Client',
+      name: 'Old Test Client',
       owner: sub,
       redirect_uris: ['https://test.com/cb'],
     };
@@ -49,7 +49,7 @@ describe('ClientModel', () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { name, ...data } = baseData;
     await expect(ClientModel.create(data)).rejects.toThrowError(
-      'Client name is mandatory!',
+      'Client name is mandatory!'
     );
   });
 
@@ -120,7 +120,7 @@ describe('ClientModel', () => {
     const updated = await ClientModel.findByIdAndUpdate(
       client_id,
       { $set: data },
-      { new: true },
+      { new: true }
     );
 
     expect(updated.get('client_id')).toEqual(client_id);
@@ -136,7 +136,7 @@ describe('ClientModel', () => {
     const updated = ClientModel.findByIdAndUpdate(
       client_id,
       { ...data },
-      { new: true },
+      { new: true }
     );
     await expect(updated).rejects.toThrowError();
   });

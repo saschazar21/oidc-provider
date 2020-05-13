@@ -3,18 +3,27 @@ import { mockRequest, mockResponse } from 'mock-req-res';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 describe('/api/jwks', () => {
+  let KeyModel;
+  let connect;
   let req: NextApiRequest;
   let res: NextApiResponse;
 
   afterEach(async () => {
-    mongoose.connection.close();
+    try {
+      await connect().then(() => KeyModel.findByIdAndDelete('master'));
+    } finally {
+      mongoose.connection.close();
+    }
   });
 
   beforeEach(async () => {
     jest.resetModules();
 
+    const importedDb = await import('~/lib/shared/db');
+    connect = importedDb.default;
+    KeyModel = importedDb.KeyModel;
+
     try {
-      const { default: connect, KeyModel } = await import('~/lib/shared/db');
       await connect().then(() => KeyModel.findByIdAndDelete('master'));
     } finally {
       console.error = console.log;
