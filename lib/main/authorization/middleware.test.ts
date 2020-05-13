@@ -10,6 +10,7 @@ import { UserSchema } from '~/lib/shared/db/schemata/user';
 describe('Authorization Middleware', () => {
   let AuthorizationModel;
   let ClientModel;
+  let KeyModel;
   let UserModel;
 
   let authorizationId: string;
@@ -35,6 +36,7 @@ describe('Authorization Middleware', () => {
         AuthorizationModel.findByIdAndDelete(authorizationId),
         ClientModel.findByIdAndDelete(client_id),
         UserModel.findByIdAndDelete(sub),
+        KeyModel.findByIdAndDelete('master'),
       ]);
     } finally {
       connection.close();
@@ -49,15 +51,22 @@ describe('Authorization Middleware', () => {
 
     AuthorizationModel = dbImports.AuthorizationModel;
     ClientModel = dbImports.ClientModel;
+    KeyModel = dbImports.KeyModel;
     UserModel = dbImports.UserModel;
+
+    try {
+      await connect().then(() => KeyModel.findByIdAndDelete('master'));
+    } catch (e) {
+      console.log(e);
+    }
 
     await connect()
       .then(() => UserModel.create(user))
-      .then((user) => {
+      .then(user => {
         sub = user.get('sub');
         return ClientModel.create({ ...client, owner: sub });
       })
-      .then((client) => {
+      .then(client => {
         client_id = client.get('client_id');
       });
 
