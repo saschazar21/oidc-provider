@@ -20,7 +20,6 @@ describe('/api/jwks', () => {
     connect = importedDb.default;
     KeyModel = importedDb.KeyModel;
 
-    await connect().then(() => KeyModel.findByIdAndDelete('master'));
     console.error = console.log;
 
     const json = jest.fn().mockName('mockJSON');
@@ -86,6 +85,7 @@ describe('/api/jwks', () => {
 
     const { default: fetchJWKS } = await import('~/pages/api/jwks');
 
+    await connect().then(() => KeyModel.findByIdAndDelete('master'));
     await fetchJWKS(req, res);
 
     expect(res.setHeader).toHaveBeenCalledWith(

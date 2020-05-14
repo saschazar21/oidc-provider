@@ -118,12 +118,14 @@ describe('Existing Keys', () => {
   });
 
   it('should fetch existing keys from DB', async () => {
-    await connection().then(() =>
-      KeyModel.create({
-        _id: 'master',
-        bin,
-      })
-    );
+    await connection()
+      .then(() => KeyModel.findByIdAndDelete('master'))
+      .then(() =>
+        KeyModel.create({
+          _id: 'master',
+          bin,
+        })
+      );
 
     const original = keys.keys;
     const { keystore } = await getKeys(MASTER_KEY);

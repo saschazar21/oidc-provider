@@ -97,8 +97,6 @@ describe('Authorization Middleware', () => {
       end,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
-
-    await connect().then(() => KeyModel.findByIdAndDelete('master'));
   });
 
   it('should redirect to client on malformed request', async () => {
@@ -114,6 +112,8 @@ describe('Authorization Middleware', () => {
     const { default: authorizationMiddleware } = await import(
       '~/lib/main/authorization/middleware'
     );
+
+    await connect().then(() => KeyModel.findByIdAndDelete('master'));
     const result = await authorizationMiddleware(updatedReq, res);
 
     expect(result).toBeFalsy();
@@ -127,6 +127,8 @@ describe('Authorization Middleware', () => {
     const { default: authorizationMiddleware } = await import(
       '~/lib/main/authorization/middleware'
     );
+
+    await connect().then(() => KeyModel.findByIdAndDelete('master'));
     const result = await authorizationMiddleware(req, res);
 
     expect(result).toBeFalsy();
