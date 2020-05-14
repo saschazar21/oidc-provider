@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { JWKS, keyType } from 'jose';
+import retry from 'jest-retries';
 
 const MASTER_KEY = 'testkey';
 
@@ -10,11 +11,8 @@ describe('Keys', () => {
   let keys;
 
   afterEach(async () => {
-    try {
-      await connection().then(() => KeyModel.findByIdAndDelete('master'));
-    } finally {
-      mongoose.connection.close();
-    }
+    await connection().then(() => KeyModel.findByIdAndDelete('master'));
+    mongoose.connection.close();
   });
 
   beforeEach(async () => {
@@ -27,12 +25,6 @@ describe('Keys', () => {
     getKeys = importedKeys.default;
     connection = importedDb.default;
     KeyModel = importedDb.KeyModel;
-
-    try {
-      await connection().then(() => KeyModel.findByIdAndDelete('master'));
-    } catch (e) {
-      console.log(e);
-    }
   });
 
   it('should throw without masterkey', async () => {
@@ -46,7 +38,8 @@ describe('Keys', () => {
     );
   });
 
-  it('should create a key set', async () => {
+  retry('should create a key set', 10, async () => {
+    await connection().then(() => KeyModel.findByIdAndDelete('master'));
     keys = await getKeys(MASTER_KEY);
 
     expect(keys).toHaveProperty('keystore');
