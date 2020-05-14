@@ -8,7 +8,7 @@ describe('KeyModel', () => {
   const _id = 'testmaster';
 
   afterAll(async () => {
-    await KeyModel.findByIdAndDelete('master');
+    await KeyModel.findByIdAndDelete('testmaster');
     mongoose.connection.close();
   });
 

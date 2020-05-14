@@ -64,11 +64,8 @@ describe('Existing Keys', () => {
   let keys;
 
   afterEach(async () => {
-    try {
-      await connection().then(() => KeyModel.findByIdAndDelete('master'));
-    } finally {
-      mongoose.connection.close();
-    }
+    await connection().then(() => KeyModel.findByIdAndDelete('master'));
+    mongoose.connection.close();
   });
 
   beforeAll(async () => {
@@ -113,11 +110,7 @@ describe('Existing Keys', () => {
     connection = importedDb.default;
     KeyModel = importedDb.KeyModel;
 
-    try {
-      await connection().then(() => KeyModel.findByIdAndDelete('master'));
-    } catch (e) {
-      console.log(e);
-    }
+    await connection().then(() => KeyModel.findByIdAndDelete('master'));
   });
 
   xit('should throw when wrong MASTER_KEY given', async () => {

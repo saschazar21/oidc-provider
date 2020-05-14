@@ -15,6 +15,7 @@ describe('Authorization Middleware', () => {
 
   let authorizationId: string;
   let client_id: string;
+  let connect;
   let req: NextApiRequest;
   let res: NextApiResponse;
   let sub: string;
@@ -32,12 +33,14 @@ describe('Authorization Middleware', () => {
 
   afterEach(async () => {
     try {
-      await Promise.all([
-        AuthorizationModel.findByIdAndDelete(authorizationId),
-        ClientModel.findByIdAndDelete(client_id),
-        UserModel.findByIdAndDelete(sub),
-        KeyModel.findByIdAndDelete('master'),
-      ]);
+      await connect().then(() =>
+        Promise.all([
+          AuthorizationModel.findByIdAndDelete(authorizationId),
+          ClientModel.findByIdAndDelete(client_id),
+          UserModel.findByIdAndDelete(sub),
+          KeyModel.findByIdAndDelete('master'),
+        ])
+      );
     } finally {
       connection.close();
     }
@@ -47,18 +50,12 @@ describe('Authorization Middleware', () => {
     jest.resetModules();
 
     const dbImports = await import('~/lib/shared/db');
-    const connect = dbImports.default;
+    connect = dbImports.default;
 
     AuthorizationModel = dbImports.AuthorizationModel;
     ClientModel = dbImports.ClientModel;
     KeyModel = dbImports.KeyModel;
     UserModel = dbImports.UserModel;
-
-    try {
-      await connect().then(() => KeyModel.findByIdAndDelete('master'));
-    } catch (e) {
-      console.log(e);
-    }
 
     await connect()
       .then(() => UserModel.create(user))
@@ -100,6 +97,8 @@ describe('Authorization Middleware', () => {
       end,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
+
+    await connect().then(() => KeyModel.findByIdAndDelete('master'));
   });
 
   it('should redirect to client on malformed request', async () => {
