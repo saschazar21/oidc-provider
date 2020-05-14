@@ -1,6 +1,7 @@
 import { connection } from 'mongoose';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { mockRequest, mockResponse } from 'mock-req-res';
+import retry from 'jest-retries';
 
 // import authorizationMiddleware from '~/lib/main/authorization/middleware';
 // import connect, { AuthorizationModel } from '~/lib/shared/db';
@@ -99,7 +100,7 @@ describe('Authorization Middleware', () => {
     }) as any;
   });
 
-  it('should redirect to client on malformed request', async () => {
+  retry('should redirect to client on malformed request', 10, async () => {
     const updatedReq = {
       ...req,
       query: {
@@ -123,7 +124,7 @@ describe('Authorization Middleware', () => {
     );
   });
 
-  it('should redirect to /api/login without sub cookie', async () => {
+  retry('should redirect to /api/login without sub cookie', 10, async () => {
     const { default: authorizationMiddleware } = await import(
       '~/lib/main/authorization/middleware'
     );

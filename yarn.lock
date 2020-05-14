@@ -5104,6 +5104,11 @@ jest-resolve@^25.5.0:
     resolve "^1.17.0"
     slash "^3.0.0"
 
+jest-retries@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/jest-retries/-/jest-retries-1.0.1.tgz#b60eac2c6f6ee7033fbc9a3cb6f3016a63b82822"
+  integrity sha512-tR9tCXs9+Vqw/2toQEOg+CpzOwUqReppcZH2550EnuEhw4F8TR+NbICPUJexegjN9xnuF4ABSGPgzCgAFZI0Ng==
+
 jest-runner@^25.5.0:
   version "25.5.0"
   resolved "https://registry.yarnpkg.com/jest-runner/-/jest-runner-25.5.0.tgz#a32546675cbcf4e32086138f6c56c8423add6234"

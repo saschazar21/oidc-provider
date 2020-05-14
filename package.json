@@ -41,6 +41,7 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^4.0.0",
     "jest": "^25.4.0",
+    "jest-retries": "^1.0.1",
     "mock-req-res": "^1.1.4",
     "sinon": "^9.0.2",
     "test-jest": "^1.0.1",

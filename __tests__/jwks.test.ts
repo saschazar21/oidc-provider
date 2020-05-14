@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { mockRequest, mockResponse } from 'mock-req-res';
 import { NextApiRequest, NextApiResponse } from 'next';
+import retry from 'jest-retries';
 
 describe('/api/jwks', () => {
   let KeyModel;
@@ -77,7 +78,7 @@ describe('/api/jwks', () => {
     expect(res.end).toHaveBeenCalled();
   });
 
-  it('should return 200, when MASTER_KEY is set', async () => {
+  retry('should return 200, when MASTER_KEY is set', 10, async () => {
     process.env = {
       ...process.env,
       MASTER_KEY: 'testkey',
