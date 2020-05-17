@@ -6,7 +6,7 @@ import { METHOD } from '~/lib/shared/types/method';
 
 export default async (
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ): Promise<void> => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   if (!(await methods(req, res, [METHOD.GET, METHOD.POST]))) {
@@ -18,7 +18,8 @@ export default async (
     return res.end();
   }
 
-  if (!(await authorizationMiddleware(req, res))) {
+  const authorizationId = await authorizationMiddleware(req, res);
+  if (!authorizationId) {
     return res.end();
   }
 

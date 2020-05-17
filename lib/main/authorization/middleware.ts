@@ -22,8 +22,8 @@ const MAX_AGE = 1000 * 60 * 5; // 5 minutes between login & authorization
 export default async (
   req: NextApiRequest,
   res: NextApiResponse
-): Promise<boolean> => {
-  let authorizationId: string;
+): Promise<AuthorizationSchema> => {
+  let authorizationObject: AuthorizationSchema;
   const cookies = await cookieParser(req, res);
   const authRequest: AuthorizationSchema = mapAuthRequest(
     req.method === METHOD.POST ? req.body : req.query
@@ -38,7 +38,8 @@ export default async (
       const authorization = await connect().then(() =>
         AuthorizationModel.create(authRequest)
       );
-      authorizationId = authorization.get('_id');
+      authorizationObject = authorization.toJSON();
+      const authorizationId = authorization.get('_id');
       cookies.set('authorization', authorizationId, {
         expires: new Date(Date.now() + MAX_AGE),
         httpOnly: true,
@@ -71,7 +72,7 @@ export default async (
         path,
         statusCode: 302,
       });
-      return false;
+      return null;
     }
   }
 
@@ -81,8 +82,8 @@ export default async (
       redirect_to: '/api/authorization',
     });
     await redirect(req, res, { location: `/login?${querystring}`, status });
-    return false;
+    return null;
   }
 
-  return true;
+  return authorizationObject;
 };
