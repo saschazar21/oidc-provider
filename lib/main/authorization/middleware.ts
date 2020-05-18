@@ -23,22 +23,22 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<AuthorizationSchema> => {
-  let authorizationObject: AuthorizationSchema;
+  let authorization;
   const cookies = await cookieParser(req, res);
+  const authorizationId = cookies.get('authorization');
   const authRequest: AuthorizationSchema = mapAuthRequest(
     req.method === METHOD.POST ? req.body : req.query
   );
 
-  if (!cookies.get('authorization')) {
-    try {
+  try {
+    if (!authorizationId) {
       await Promise.all([
         validateResponseType(authRequest),
         validateScope(authRequest),
       ]);
-      const authorization = await connect().then(() =>
+      authorization = await connect().then(() =>
         AuthorizationModel.create(authRequest)
       );
-      authorizationObject = authorization.toJSON();
       const authorizationId = authorization.get('_id');
       cookies.set('authorization', authorizationId, {
         expires: new Date(Date.now() + MAX_AGE),
@@ -47,33 +47,37 @@ export default async (
         sameSite: true,
         secure: true,
       });
-    } catch (e) {
-      const { method, url: path } = req;
-      const { redirect_uri = '', state } = authRequest;
-      const redirectUri = parse(redirect_uri, true);
-      const responseQuery = Object.assign(
-        {},
-        { ...redirectUri.query },
-        {
-          // TODO: add types for error codes
-          error: 'invalid_request',
-        },
-        state ? { state } : null
+    } else {
+      authorization = await connect().then(() =>
+        AuthorizationModel.findById(authorizationId)
       );
-      const location = format({
-        ...redirectUri,
-        query: responseQuery,
-      });
-      await redirect(req, res, { location, status: 302 });
-
-      logError({
-        message: e.message || e,
-        method,
-        path,
-        statusCode: 302,
-      });
-      return null;
     }
+  } catch (e) {
+    const { method, url: path } = req;
+    const { redirect_uri = '', state } = authRequest;
+    const redirectUri = parse(redirect_uri, true);
+    const responseQuery = Object.assign(
+      {},
+      { ...redirectUri.query },
+      {
+        // TODO: add types for error codes
+        error: 'invalid_request',
+      },
+      state ? { state } : null
+    );
+    const location = format({
+      ...redirectUri,
+      query: responseQuery,
+    });
+    await redirect(req, res, { location, status: 302 });
+
+    logError({
+      message: e.message || e,
+      method,
+      path,
+      statusCode: 302,
+    });
+    return null;
   }
 
   if (!cookies.get('sub')) {
@@ -85,5 +89,5 @@ export default async (
     return null;
   }
 
-  return authorizationObject;
+  return authorization.toJSON();
 };
