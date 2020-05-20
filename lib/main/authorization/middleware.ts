@@ -18,6 +18,7 @@ import logError from '~/lib/shared/util/log_error';
 
 // TODO: move to a general config space;
 const MAX_AGE = 1000 * 60 * 5; // 5 minutes between login & authorization
+const IS_TEST = process.env.NODE_ENV === 'test';
 
 export default async (
   req: NextApiRequest,
@@ -25,7 +26,7 @@ export default async (
 ): Promise<AuthorizationSchema> => {
   let authorization;
   const cookies = await cookieParser(req, res);
-  const authorizationId = cookies.get('authorization');
+  const authorizationId = cookies.get('authorization', { signed: !IS_TEST });
   const authRequest: AuthorizationSchema = mapAuthRequest(
     req.method === METHOD.POST ? req.body : req.query
   );
@@ -80,7 +81,7 @@ export default async (
     return null;
   }
 
-  if (!cookies.get('sub')) {
+  if (!cookies.get('sub', { signed: !IS_TEST })) {
     const status = req.method === METHOD.POST ? 303 : 307;
     const querystring = query.encode({
       redirect_to: '/api/authorization',
@@ -89,5 +90,6 @@ export default async (
     return null;
   }
 
+  cookies.set('authorization');
   return authorization.toJSON();
 };

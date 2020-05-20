@@ -3,10 +3,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { mockRequest, mockResponse } from 'mock-req-res';
 import retry from 'jest-retries';
 
-// import authorizationMiddleware from '~/lib/main/authorization/middleware';
-// import connect, { AuthorizationModel } from '~/lib/shared/db';
 import { ClientSchema } from '~/lib/shared/db/schemata/client';
 import { UserSchema } from '~/lib/shared/db/schemata/user';
+import { RESPONSE_TYPE } from '~/lib/shared/types/response_type';
+import { SCOPE } from '~/lib/shared/types/scope';
 
 describe('Authorization Middleware', () => {
   let AuthorizationModel;
@@ -66,6 +66,15 @@ describe('Authorization Middleware', () => {
       })
       .then(client => {
         client_id = client.get('client_id');
+        return AuthorizationModel.create({
+          scope: [SCOPE.OPENID],
+          response_type: [RESPONSE_TYPE.CODE],
+          client_id,
+          redirect_uri: client.redirect_uris[0],
+        });
+      })
+      .then(authorization => {
+        authorizationId = authorization.get('_id');
       });
 
     console.error = console.log;
@@ -137,6 +146,61 @@ describe('Authorization Middleware', () => {
       'Location',
       '/login?redirect_to=%2Fapi%2Fauthorization'
     );
-    expect(res.json).not.toHaveBeenCalled();
   });
+
+  retry(
+    `should redirect to /api/login even when authorization cookie present`,
+    10,
+    async () => {
+      const updatedReq = {
+        ...req,
+        headers: {
+          ...req.headers,
+          cookie: `authorization=${authorizationId}`,
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+
+      const { default: authorizationMiddleware } = await import(
+        '~/lib/main/authorization/middleware'
+      );
+
+      await connect().then(() => KeyModel.findByIdAndDelete('master'));
+      const result = await authorizationMiddleware(updatedReq, res);
+
+      expect(result).toBeFalsy();
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'Location',
+        '/login?redirect_to=%2Fapi%2Fauthorization'
+      );
+    }
+  );
+
+  retry(
+    `should redirect to ${client.redirect_uris[0]} when sub cookie is set`,
+    10,
+    async () => {
+      const updatedReq = {
+        ...req,
+        headers: {
+          ...req.headers,
+          cookie: `sub=${sub}`,
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+
+      const { default: authorizationMiddleware } = await import(
+        '~/lib/main/authorization/middleware'
+      );
+
+      await connect().then(() => KeyModel.findByIdAndDelete('master'));
+      const result = await authorizationMiddleware(updatedReq, res);
+
+      expect(result).toBeTruthy();
+      expect(res.setHeader).not.toHaveBeenCalledWith(
+        'Location',
+        '/login?redirect_to=%2Fapi%2Fauthorization'
+      );
+    }
+  );
 });
