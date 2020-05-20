@@ -86,8 +86,9 @@ describe('/api/jwks', () => {
 
     const { default: fetchJWKS } = await import('~/pages/api/jwks');
 
-    await connect().then(() => KeyModel.findByIdAndDelete('master'));
-    await fetchJWKS(req, res);
+    await connect()
+      .then(() => KeyModel.findByIdAndDelete('master'))
+      .then(() => fetchJWKS(req, res));
 
     expect(res.setHeader).toHaveBeenCalledWith(
       'X-Robots-Tag',
