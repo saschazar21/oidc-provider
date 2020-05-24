@@ -149,6 +149,32 @@ describe('Authorization Middleware', () => {
   });
 
   retry(
+    'should redirect POST to /api/login without sub cookie',
+    10,
+    async () => {
+      const updatedReq = {
+        ...req,
+        body: { ...req.query },
+        method: 'POST',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+
+      const { default: authorizationMiddleware } = await import(
+        '~/lib/main/authorization/middleware'
+      );
+
+      await connect().then(() => KeyModel.findByIdAndDelete('master'));
+      const result = await authorizationMiddleware(updatedReq, res);
+
+      expect(result).toBeFalsy();
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'Location',
+        '/login?redirect_to=%2Fapi%2Fauthorization'
+      );
+    }
+  );
+
+  retry(
     `should redirect to /api/login even when authorization cookie present`,
     10,
     async () => {
