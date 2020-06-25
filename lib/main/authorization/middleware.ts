@@ -81,7 +81,10 @@ export default async (
     return null;
   }
 
-  if (!cookies.get('sub', { signed: !IS_TEST })) {
+  if (
+    !cookies.get('user', { signed: !IS_TEST }) &&
+    !cookies.get('sub', { signed: !IS_TEST })
+  ) {
     const status = req.method === METHOD.POST ? 303 : 307;
     const querystring = query.encode({
       redirect_to: '/api/authorization',
@@ -91,5 +94,6 @@ export default async (
   }
 
   cookies.set('authorization');
+  cookies.set('sub');
   return authorization.toJSON();
 };
