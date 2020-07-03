@@ -19,7 +19,7 @@ export default async (
   const key = session ? 'user' : 'sub';
   cookies.set('sub');
 
-  if (!email.length || !password.length) {
+  if (!email?.length || !password?.length) {
     throw new Error('E-Mail and/or Password missing!');
   }
 

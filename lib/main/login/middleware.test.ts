@@ -3,6 +3,7 @@ import { connection } from 'mongoose';
 import { mockRequest, mockResponse } from 'mock-req-res';
 
 import { UserSchema } from '~/lib/shared/db/schemata/user';
+import { loginMiddleware } from '~/lib/main/login';
 
 describe('Login Middleware', () => {
   let UserModel;
@@ -39,13 +40,15 @@ describe('Login Middleware', () => {
       });
 
     console.error = console.log;
-
+    
+    const getHeader = jest.fn().mockName('mockGetHeader');
     const json = jest.fn().mockName('mockJSON');
     const setHeader = jest.fn().mockName('mockSetHeader');
     const status = jest.fn().mockName('mockStatus');
     const end = jest.fn().mockName('mockEnd');
 
-    req = mockRequest({
+    req = {
+      ...mockRequest,
       connection: {
         encrypted: true,
       },
@@ -57,19 +60,65 @@ describe('Login Middleware', () => {
         session: false,
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any;
+    } as any;
 
-    res = mockResponse({
+    res = {
+      ...mockResponse,
       json,
+      getHeader,
       set: null,
       setHeader,
       status,
       end,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any;
+    } as any;
   });
 
-  it('should successfully authenticate user', () => {
-    expect(true).toBeTruthy();
+  it('should successfully authenticate user', async () => {
+    await loginMiddleware(req, res);
+
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Location',
+      '/'
+    );
+    expect(res.status).toHaveBeenCalledWith(303);
+  });
+  
+  it('should fail when no user given', async () => {
+    const { email, ...body } = req.body;
+
+    const updatedReq = {
+      ...req,
+      body,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError('E-Mail and/or Password missing!');
+  });
+  
+  it('should fail when no password given', async () => {
+    const { password, ...body } = req.body;
+
+    const updatedReq = {
+      ...req,
+      body,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError('E-Mail and/or Password missing!');
+  });
+  
+  xit('should fail when wrong password given', async () => {
+    const updatedReq = {
+      ...req,
+      body: {
+        ...req.body,
+        user: user.email,
+        password: `not-${user.password}`,
+      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError();
   });
 });
