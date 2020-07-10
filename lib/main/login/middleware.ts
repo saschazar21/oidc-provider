@@ -27,7 +27,7 @@ export default async (
     () => UserModel.findOne({ email })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   )) as any;
-  if (!user || !user.comparePassword(password)) {
+  if (!user || !(await user.comparePassword(password))) {
     throw new Error('Wrong Password given!');
   }
 

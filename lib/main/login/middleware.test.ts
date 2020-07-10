@@ -85,6 +85,7 @@ describe('Login Middleware', () => {
   });
   
   it('should fail when no user given', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { email, ...body } = req.body;
 
     const updatedReq = {
@@ -97,6 +98,7 @@ describe('Login Middleware', () => {
   });
   
   it('should fail when no password given', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...body } = req.body;
 
     const updatedReq = {
@@ -108,13 +110,14 @@ describe('Login Middleware', () => {
     await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError('E-Mail and/or Password missing!');
   });
   
-  xit('should fail when wrong password given', async () => {
+  it('should fail when wrong password given', async () => {
     const updatedReq = {
       ...req,
       body: {
         ...req.body,
         user: user.email,
         password: `not-${user.password}`,
+        session: true,
       }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
