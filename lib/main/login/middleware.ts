@@ -31,7 +31,6 @@ export default async (
     throw new Error('Wrong Password given!');
   }
 
-  // TODO: create session cookie, if desired
   cookies.set(key, user._id, {
     expires: new Date(Date.now() + MAX_AGE[key]),
     httpOnly: true,
@@ -40,7 +39,6 @@ export default async (
     secure: true,
   });
 
-  // TODO: redirect to given URL
   const location = redirect_to || '/';
   await redirect(req, res, { location, status: 303 });
 };

@@ -42,6 +42,7 @@ export interface UserSchema {
   phone_number_verified?: boolean;
   address?: AddressSchema;
   acr?: string;
+  consents?: string[];
 }
 
 const generateId = id(ALPHABET_LENGTH.SHORT);
@@ -189,6 +190,12 @@ const userSchema = new Schema({
     enum: Object.values(ACR_VALUES),
     type: String,
   },
+  consents: [
+    {
+      ref: 'Client',
+      type: String,
+    },
+  ],
 });
 
 userSchema
@@ -242,7 +249,7 @@ userSchema.pre('findOneAndUpdate', async function () {
         $set: {
           password: await hashPassword(nestedPassword),
         },
-      },
+      }
     );
   }
 
