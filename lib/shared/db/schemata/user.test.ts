@@ -169,13 +169,21 @@ describe('UserModel', () => {
 
     const user = await UserModel.findByIdAndUpdate(
       sub,
-      { $push: { consents: client._id } },
+      { $addToSet: { consents: client._id } },
       { new: true }
     );
     await UserModel.populate(user, { path: 'consents' });
 
     expect(user.get('consents')).toHaveLength(1);
     expect(user.get('consents')[0]).toHaveProperty('owner', client.owner);
+
+    const userUpdate = await UserModel.findByIdAndUpdate(
+      sub,
+      { $addToSet: { consents: client._id } },
+      { new: true }
+    );
+
+    expect(userUpdate.get('consents')).toHaveLength(1);
 
     await Promise.all([
       UserModel.findByIdAndDelete(client.owner),
