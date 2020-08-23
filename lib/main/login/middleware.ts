@@ -41,5 +41,5 @@ export default async (
 
   // TODO: implement cookie-based redirect logic
   const location = redirect_to || '/';
-  await redirect(req, res, { location, status: 303 });
+  return redirect(req, res, { location, status: 303 });
 };
