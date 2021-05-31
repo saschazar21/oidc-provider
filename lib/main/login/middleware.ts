@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import connect, { UserModel } from '~/lib/shared/db';
-import cookieParser from '~/lib/shared/middleware/cookies';
-import redirect from '~/lib/shared/middleware/redirect';
-import { LoginForm } from '~/lib/shared/types/login';
+import connect, { UserModel } from 'database/lib';
+import cookieParser from 'utils/lib/middleware/cookies';
+import redirect from 'utils/lib/middleware/redirect';
+import { LoginForm } from 'utils/lib/types/login';
 
 const MAX_AGE = {
   sub: 1000 * 60 * 5, // 5 minutes, only for authorization, no session is persisted

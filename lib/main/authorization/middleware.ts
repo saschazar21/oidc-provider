@@ -7,14 +7,14 @@ import {
   validateResponseType,
   validateScope,
 } from '~/lib/main/authorization/validator';
-import cookieParser from '~/lib/shared/middleware/cookies';
-import redirect from '~/lib/shared/middleware/redirect';
-import connect from '~/lib/shared/db';
+import cookieParser from 'utils/lib/middleware/cookies';
+import redirect from 'utils/lib/middleware/redirect';
+import connect from 'database/lib';
 import AuthorizationModel, {
   AuthorizationSchema,
-} from '~/lib/shared/db/schemata/authorization';
-import { METHOD } from '~/lib/shared/types/method';
-import logError from '~/lib/shared/util/log_error';
+} from 'database/lib/schemata/authorization';
+import { METHOD } from 'utils/lib/types/method';
+import logError from 'utils/lib/util/log_error';
 
 // TODO: move to a general config space;
 const MAX_AGE = 1000 * 60 * 5; // 5 minutes between login & authorization

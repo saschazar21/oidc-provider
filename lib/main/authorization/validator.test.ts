@@ -2,9 +2,9 @@ import {
   validateScope,
   validateResponseType,
 } from '~/lib/main/authorization/validator';
-import { AuthorizationSchema } from '~/lib/shared/db/schemata/authorization';
-import { SCOPE } from '~/lib/shared/types/scope';
-import { RESPONSE_TYPE } from '~/lib/shared/types/response_type';
+import { AuthorizationSchema } from 'database/lib/schemata/authorization';
+import { SCOPE } from 'utils/lib/types/scope';
+import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 
 describe('Authorization Validators', () => {
   let authReq: AuthorizationSchema;

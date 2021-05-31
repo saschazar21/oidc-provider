@@ -1,0 +1,32 @@
+{
+  "name": "database",
+  "version": "0.0.0",
+  "description": "The database module containing models & queries for OpenID Connect authentication'",
+  "author": "Sascha Zarhuber <sascha.zarhuber@gmail.com>",
+  "homepage": "https://github.com/saschazar21/now-oidc-provider#readme",
+  "license": "MIT",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saschazar21/now-oidc-provider.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/saschazar21/now-oidc-provider/issues"
+  },
+  "dependencies": {
+    "mongoose": "^5.12.12"
+  },
+  "devDependencies": {
+    "@shelf/jest-mongodb": "^1.2.5",
+    "@types/mongoose": "^5.10.5"
+  }
+}

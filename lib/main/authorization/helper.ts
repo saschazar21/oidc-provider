@@ -8,7 +8,7 @@
  * - acr_values
  */
 
-import { AuthorizationSchema } from '~/lib/shared/db/schemata/authorization';
+import { AuthorizationSchema } from 'database/lib/schemata/authorization';
 
 export const mapAuthRequest = (request: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

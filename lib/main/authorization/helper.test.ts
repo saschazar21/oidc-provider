@@ -1,9 +1,9 @@
 import { mapAuthRequest } from '~/lib/main/authorization/helper';
-import { SCOPE } from '~/lib/shared/types/scope';
-import { RESPONSE_TYPE } from '~/lib/shared/types/response_type';
-import { DISPLAY } from '~/lib/shared/types/display';
-import { PROMPT } from '~/lib/shared/types/prompt';
-import { ACR_VALUES } from '~/lib/shared/types/acr';
+import { SCOPE } from 'utils/lib/types/scope';
+import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
+import { DISPLAY } from 'utils/lib/types/display';
+import { PROMPT } from 'utils/lib/types/prompt';
+import { ACR_VALUES } from 'utils/lib/types/acr';
 
 describe('Authorization Helpers', () => {
   let authReq: { [key: string]: string };
@@ -20,14 +20,8 @@ describe('Authorization Helpers', () => {
   });
 
   it('should map space-delimited values to array', () => {
-    const {
-      scope,
-      response_type,
-      display,
-      prompt,
-      ui_locales,
-      acr_values,
-    } = mapAuthRequest(authReq);
+    const { scope, response_type, display, prompt, ui_locales, acr_values } =
+      mapAuthRequest(authReq);
 
     expect(scope).toHaveLength(2);
     expect(response_type).toHaveLength(1);

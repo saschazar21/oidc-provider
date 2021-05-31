@@ -3,10 +3,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { mockRequest, mockResponse } from 'mock-req-res';
 import retry from 'jest-retries';
 
-import { ClientSchema } from '~/lib/shared/db/schemata/client';
-import { UserSchema } from '~/lib/shared/db/schemata/user';
-import { RESPONSE_TYPE } from '~/lib/shared/types/response_type';
-import { SCOPE } from '~/lib/shared/types/scope';
+import { ClientSchema } from 'database/lib/schemata/client';
+import { UserSchema } from 'database/lib/schemata/user';
+import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
+import { SCOPE } from 'utils/lib/types/scope';
 
 describe('Authorization Middleware', () => {
   let AuthorizationModel;
@@ -50,7 +50,7 @@ describe('Authorization Middleware', () => {
   beforeEach(async () => {
     jest.resetModules();
 
-    const dbImports = await import('~/lib/shared/db');
+    const dbImports = await import('database/lib');
     connect = dbImports.default;
 
     AuthorizationModel = dbImports.AuthorizationModel;
@@ -60,11 +60,11 @@ describe('Authorization Middleware', () => {
 
     await connect()
       .then(() => UserModel.create(user))
-      .then(user => {
+      .then((user) => {
         sub = user.get('sub');
         return ClientModel.create({ ...client, owner: sub });
       })
-      .then(client => {
+      .then((client) => {
         client_id = client.get('client_id');
         return AuthorizationModel.create({
           scope: [SCOPE.OPENID],
@@ -73,7 +73,7 @@ describe('Authorization Middleware', () => {
           redirect_uri: client.redirect_uris[0],
         });
       })
-      .then(authorization => {
+      .then((authorization) => {
         authorizationId = authorization.get('_id');
       });
 

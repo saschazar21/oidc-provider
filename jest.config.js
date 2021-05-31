@@ -1,8 +1,7 @@
 // eslint-disable-next-line no-undef
 module.exports = {
-  moduleNameMapper: {
-    '^~/(.*)': '<rootDir>/$1',
-  },
   preset: '@shelf/jest-mongodb',
+  roots: ['<rootDir>/lib', '<rootDir>/packages'],
   setupFiles: ['<rootDir>/lib/test/setup.js'],
+  testMatch: ['**/*.test.ts'],
 };

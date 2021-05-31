@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import connect, { UserModel, AuthorizationModel } from '~/lib/shared/db';
-import cookieParser from '~/lib/shared/middleware/cookies';
-import redirect from '~/lib/shared/middleware/redirect';
+import connect, { UserModel, AuthorizationModel } from 'database/lib';
+import cookieParser from 'utils/lib/middleware/cookies';
+import redirect from 'utils/lib/middleware/redirect';
 
 const IS_TEST = process.env.NODE_ENV === 'test';
 

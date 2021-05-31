@@ -2,6 +2,9 @@
   "name": "now-oidc-provider",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -16,35 +19,31 @@
     "cors": "^2.8.5",
     "jose": "^1.27.1",
     "keygrip": "^1.1.0",
-    "mongoose": "^5.9.18",
-    "nanoid": "^3.1.9",
-    "next": "^9.4.4",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "nanoid": "^3.1.9"
   },
   "devDependencies": {
-    "@shelf/jest-mongodb": "^1.1.5",
+    "@babel/core": "^7.14.3",
+    "@babel/preset-env": "^7.14.4",
+    "@babel/preset-typescript": "^7.13.0",
     "@types/bcrypt": "^3.0.0",
     "@types/cookies": "^0.7.4",
     "@types/cors": "^2.8.6",
-    "@types/jest": "^25.2.1",
+    "@types/jest": "^26.0.23",
     "@types/keygrip": "^1.0.2",
     "@types/mock-req-res": "^1.1.1",
-    "@types/mongoose": "^5.7.22",
     "@types/node": "^13.13.0",
-    "@types/react": "^16.9.35",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
-    "babel-plugin-module-resolver": "^4.0.0",
+    "babel-jest": "^27.0.2",
     "eslint": "^6.8.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^4.0.0",
-    "jest": "^25.4.0",
+    "jest": "^27.0.3",
     "jest-retries": "^1.0.1",
+    "lerna": "^4.0.0",
     "mock-req-res": "^1.1.4",
     "sinon": "^9.0.2",
-    "test-jest": "^1.0.1",
-    "typescript": "^3.8.3"
+    "typescript": "^4.3.2"
   }
 }

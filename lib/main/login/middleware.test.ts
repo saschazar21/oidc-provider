@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { connection } from 'mongoose';
 import { mockRequest, mockResponse } from 'mock-req-res';
 
-import { UserSchema } from '~/lib/shared/db/schemata/user';
+import { UserSchema } from 'database/lib/schemata/user';
 import { loginMiddleware } from '~/lib/main/login';
 
 describe('Login Middleware', () => {
@@ -29,18 +29,18 @@ describe('Login Middleware', () => {
   beforeEach(async () => {
     jest.resetModules();
 
-    const dbImports = await import('~/lib/shared/db');
+    const dbImports = await import('database/lib');
     connect = dbImports.default;
     UserModel = dbImports.UserModel;
 
     await connect()
       .then(() => UserModel.create(user))
-      .then(u => {
+      .then((u) => {
         sub = u.get('sub');
       });
 
     console.error = console.log;
-    
+
     const getHeader = jest.fn().mockName('mockGetHeader');
     const json = jest.fn().mockName('mockJSON');
     const setHeader = jest.fn().mockName('mockSetHeader');
@@ -77,13 +77,10 @@ describe('Login Middleware', () => {
   it('should successfully authenticate user', async () => {
     await loginMiddleware(req, res);
 
-    expect(res.setHeader).toHaveBeenCalledWith(
-      'Location',
-      '/'
-    );
+    expect(res.setHeader).toHaveBeenCalledWith('Location', '/');
     expect(res.status).toHaveBeenCalledWith(303);
   });
-  
+
   it('should fail when no user given', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { email, ...body } = req.body;
@@ -91,12 +88,14 @@ describe('Login Middleware', () => {
     const updatedReq = {
       ...req,
       body,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
-    await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError('E-Mail and/or Password missing!');
+    await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError(
+      'E-Mail and/or Password missing!'
+    );
   });
-  
+
   it('should fail when no password given', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...body } = req.body;
@@ -104,12 +103,14 @@ describe('Login Middleware', () => {
     const updatedReq = {
       ...req,
       body,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
-    await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError('E-Mail and/or Password missing!');
+    await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError(
+      'E-Mail and/or Password missing!'
+    );
   });
-  
+
   it('should fail when wrong password given', async () => {
     const updatedReq = {
       ...req,
@@ -118,8 +119,8 @@ describe('Login Middleware', () => {
         user: user.email,
         password: `not-${user.password}`,
         session: true,
-      }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError();
