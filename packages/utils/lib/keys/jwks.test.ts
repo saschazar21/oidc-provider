@@ -1,11 +1,6 @@
 import { JWKS, JWT, keyType } from 'jose';
 
-import {
-  JWKS as config,
-  JWE,
-  JWS,
-  supportedAlgorithms,
-} from 'utils/lib/config/jwks';
+import { JWKS as config, JWE, JWS, supportedAlgorithms } from 'config/lib/jwks';
 
 describe('JWKS', () => {
   beforeEach(() => {

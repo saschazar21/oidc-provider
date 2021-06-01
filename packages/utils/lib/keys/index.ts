@@ -4,7 +4,7 @@ import Keygrip from 'keygrip';
 
 import connect, { KeyModel } from 'database/lib';
 import getKeystore from 'utils/lib/keys/jwks';
-import createCookieSecrets from 'utils/lib/config/keygrip';
+import createCookieSecrets from 'config/lib/keygrip';
 import getKeygrip from 'utils/lib/keys/keygrip';
 import { decrypt, encrypt } from 'utils/lib/util/aes';
 

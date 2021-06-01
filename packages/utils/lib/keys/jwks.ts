@@ -1,5 +1,5 @@
 import { JWKS, JSONWebKeySet, keyType } from 'jose';
-import config, { JWKSConfig } from 'utils/lib/config/jwks';
+import config, { JWKSConfig } from 'config/lib/jwks';
 
 let keystore: JWKS.KeyStore;
 

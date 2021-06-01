@@ -1,5 +1,5 @@
-import { supportedAlgorithms } from 'utils/lib/config/jwks';
-import getUrl from 'utils/lib/config/url';
+import { supportedAlgorithms } from 'config/lib/jwks';
+import getUrl from 'config/lib/url';
 import { SCOPE } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { RESPONSE_MODE } from 'utils/lib/types/response_mode';

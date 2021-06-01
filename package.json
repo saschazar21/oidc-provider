@@ -6,6 +6,7 @@
     "packages/*"
   ],
   "scripts": {
+    "postinstall": "lerna bootstrap",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

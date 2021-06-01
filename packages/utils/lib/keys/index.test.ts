@@ -63,10 +63,8 @@ describe('Existing Keys', () => {
 
   beforeAll(async () => {
     const { encrypt } = await import('utils/lib/util/aes');
-    const { default: JWKSConfig } = await import('utils/lib/config/jwks');
-    const { default: createCookieSecrets } = await import(
-      'utils/lib/config/keygrip'
-    );
+    const { default: JWKSConfig } = await import('config/lib/jwks');
+    const { default: createCookieSecrets } = await import('config/lib/keygrip');
     const cookies = await createCookieSecrets();
     const keystore = new JWKS.KeyStore();
     JWKSConfig.map(({ kty, size, options }) =>

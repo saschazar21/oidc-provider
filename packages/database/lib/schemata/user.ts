@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, UpdateQuery } from 'mongoose';
 
 import { ACR_VALUES } from 'utils/lib/types/acr';
-import { ALPHABET_LENGTH } from 'utils/lib/config/id';
+import { ALPHABET_LENGTH } from 'config/lib/id';
 import { EMAIL_REGEX } from 'utils/lib/types/email';
 import { URL_REGEX } from 'utils/lib/types/url';
 import id, { id as idSync } from 'utils/lib/util/id';

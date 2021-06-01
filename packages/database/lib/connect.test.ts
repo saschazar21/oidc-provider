@@ -65,7 +65,7 @@ describe('MongoDB Configuration', () => {
       user: OLD_ENV.MONGO_USER,
     };
 
-    const { default: connectionDetails } = await import('utils/lib/config/db');
+    const { default: connectionDetails } = await import('config/lib/db');
 
     expect(connectionDetails()).toMatchObject(mapping);
   });
@@ -75,7 +75,7 @@ describe('MongoDB Configuration', () => {
       ...OLD_ENV,
       MONGO_PASSWORD: undefined,
     };
-    const { default: connectionDetails } = await import('utils/lib/config/db');
+    const { default: connectionDetails } = await import('config/lib/db');
 
     expect(process.env.MONGO_PASSWORD).not.toBeDefined();
     expect(connectionDetails).toThrowError();
@@ -86,7 +86,7 @@ describe('MongoDB Configuration', () => {
       ...OLD_ENV,
       MONGO_USER: undefined,
     };
-    const { default: connectionDetails } = await import('utils/lib/config/db');
+    const { default: connectionDetails } = await import('config/lib/db');
 
     expect(process.env.MONGO_USER).not.toBeDefined();
     expect(connectionDetails).toThrowError();
@@ -97,7 +97,7 @@ describe('MongoDB Configuration', () => {
       ...OLD_ENV,
       MONGO_URL: undefined,
     };
-    const { default: connectionDetails } = await import('utils/lib/config/db');
+    const { default: connectionDetails } = await import('config/lib/db');
 
     expect(process.env.MONGO_URL).not.toBeDefined();
     expect(connectionDetails).toThrowError();

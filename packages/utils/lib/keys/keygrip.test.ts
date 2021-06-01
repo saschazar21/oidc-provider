@@ -1,4 +1,4 @@
-import createKeys, { KEYGRIP_LENGTH } from 'utils/lib/config/keygrip';
+import createKeys, { KEYGRIP_LENGTH } from 'config/lib/keygrip';
 import keygrip from 'utils/lib/keys/keygrip';
 
 const TEST_STRING = 'hello world';

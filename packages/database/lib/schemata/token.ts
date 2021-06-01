@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-import { ALPHABET_LENGTH } from 'utils/lib/config/id';
+import { ALPHABET_LENGTH } from 'config/lib/id';
 import { LIFETIME } from 'utils/lib/types/lifetime';
 import id from 'utils/lib/util/id';
 

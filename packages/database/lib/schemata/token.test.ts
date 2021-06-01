@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import { ALPHABET_LENGTH } from 'utils/lib/config/id';
+import { ALPHABET_LENGTH } from 'config/lib/id';
 import connect, {
   AuthorizationModel,
   ClientModel,

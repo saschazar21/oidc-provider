@@ -1,6 +1,6 @@
 import Keygrip from 'keygrip';
 
-import createKeys from 'utils/lib/config/keygrip';
+import createKeys from 'config/lib/keygrip';
 
 let keys: Keygrip;
 
