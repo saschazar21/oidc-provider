@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Document, Schema, UpdateQuery } from 'mongoose';
 
 import { ALPHABET_LENGTH } from 'utils/lib/config/id';
 import { ClientModel } from '../';
@@ -38,7 +38,7 @@ export type AuthorizationSchema = {
 
 const generateId = id(ALPHABET_LENGTH.LONG);
 
-const authSchema = new Schema({
+const authSchema = new Schema<AuthorizationSchema>({
   _id: {
     required: true,
     trim: true,
@@ -146,17 +146,19 @@ authSchema.pre('validate', async function () {
 });
 
 authSchema.pre('findOneAndUpdate', async function () {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const self = this as any;
-  const { _id = '', $set: { _id: nestedId = '' } = {} } = this.getUpdate();
+  const { _id, $set: { _id: nestedId } = {} } =
+    this.getUpdate() as UpdateQuery<AuthorizationSchema>;
 
-  if (_id.length || nestedId.length) {
+  if (_id || nestedId) {
     throw new Error('ERROR: Custom ID is not allowed!');
   }
 
-  self.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
+  await this.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
 });
 
-export const AuthorizationModel = mongoose.model('Authorization', authSchema);
+export const AuthorizationModel = mongoose.model<AuthorizationSchema>(
+  'Authorization',
+  authSchema
+);
 
 export default AuthorizationModel;

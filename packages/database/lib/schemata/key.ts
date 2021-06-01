@@ -1,6 +1,13 @@
 import mongoose, { Schema } from 'mongoose';
 
-export const keySchema = new Schema({
+export type KeySchema = {
+  _id?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  bin: Buffer;
+};
+
+export const keySchema = new Schema<KeySchema>({
   _id: String,
   createdAt: {
     default: Date.now,
@@ -13,11 +20,10 @@ export const keySchema = new Schema({
   },
 });
 
-keySchema.post('findOneAndUpdate', async function() {
-  const model = await this.model.findOne(this.getQuery());
-  return model.update({ updatedAt: new Date(), $inc: { __v: 1 } });
+keySchema.post('findOneAndUpdate', async function () {
+  await this.update({ updatedAt: new Date(), $inc: { __v: 1 } });
 });
 
-export const KeyModel = mongoose.model('Key', keySchema);
+export const KeyModel = mongoose.model<KeySchema>('Key', keySchema);
 
 export default KeyModel;

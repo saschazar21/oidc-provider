@@ -112,7 +112,7 @@ describe('UserModel', () => {
     const address = {
       country: 'United States of America',
       locality: 'Sacramento',
-      postal_code: 95814,
+      postal_code: '95814',
       region: 'CA',
       street_address: '1474 Timber Ridge Road',
     };
@@ -164,7 +164,7 @@ describe('UserModel', () => {
         ClientModel.create({ ...dummyClient, owner: user.get('sub') })
       )
       .then((c) => {
-        client = c.toJSON();
+        client = c.toJSON<ClientSchema>();
       });
 
     const user = await UserModel.findByIdAndUpdate(

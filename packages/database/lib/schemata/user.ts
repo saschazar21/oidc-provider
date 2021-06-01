@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Document, Schema, UpdateQuery } from 'mongoose';
 
 import { ACR_VALUES } from 'utils/lib/types/acr';
 import { ALPHABET_LENGTH } from 'utils/lib/config/id';
@@ -49,7 +49,7 @@ const generateId = id(ALPHABET_LENGTH.SHORT);
 
 const rightPad = (val: string): string => (val ? `${val} ` : '');
 
-const addressSchema = new Schema({
+const addressSchema = new Schema<Document<AddressSchema>>({
   _id: {
     default: idSync(),
     type: String,
@@ -82,7 +82,7 @@ ${rightPad(this.postal_code)}${rightPad(this.locality)}${this.region}
 ${this.country}`;
 });
 
-const userSchema = new Schema({
+const userSchema = new Schema<Document<UserSchema>>({
   _id: {
     alias: 'sub',
     required: true,
@@ -226,13 +226,11 @@ userSchema.pre('save', async function () {
 });
 
 userSchema.pre('findOneAndUpdate', async function () {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const self = this as any;
   const {
     _id = '',
     password = '',
     $set: { _id: nestedId = '', password: nestedPassword = '' } = {},
-  } = this.getUpdate();
+  } = this.getUpdate() as UpdateQuery<UserSchema>;
 
   if (_id.length || nestedId.length) {
     throw new Error('ERROR: Custom ID is forbidden!');
@@ -253,9 +251,9 @@ userSchema.pre('findOneAndUpdate', async function () {
     );
   }
 
-  self.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
+  await this.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
 });
 
-export const UserModel = mongoose.model('User', userSchema);
+export const UserModel = mongoose.model<UserSchema>('User', userSchema);
 
 export default UserModel;

@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, UpdateQuery } from 'mongoose';
 
 import { ALPHABET_LENGTH } from 'utils/lib/config/id';
 import { UserSchema } from './user';
@@ -20,7 +20,7 @@ export type ClientSchema = {
 const generateClientId = generateId();
 const generateClientSecret = generateId(ALPHABET_LENGTH.LONG);
 
-const clientSchema = new Schema({
+const clientSchema = new Schema<ClientSchema>({
   _id: {
     alias: 'client_id',
     required: true,
@@ -108,24 +108,18 @@ clientSchema.pre('validate', async function () {
 
 clientSchema.pre('findOneAndUpdate', async function () {
   const {
-    $set: { _id: nestedId = '', client_secret: nestedClientSecret = '' } = {},
-    _id = '',
-    client_secret = '',
-  } = this.getUpdate();
+    $set: { _id: nestedId, client_secret: nestedClientSecret } = {},
+    _id,
+    client_secret,
+  } = this.getUpdate() as UpdateQuery<ClientSchema>;
 
-  if (
-    _id.length ||
-    client_secret.length ||
-    nestedId.length ||
-    nestedClientSecret.length
-  ) {
+  if (_id || client_secret || nestedId || nestedClientSecret) {
     throw new Error('ERROR: Updating client_id or client_secret is forbidden!');
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const self = this as any;
-  return self.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
+
+  await this.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
 });
 
-export const ClientModel = mongoose.model('Client', clientSchema);
+export const ClientModel = mongoose.model<ClientSchema>('Client', clientSchema);
 
 export default ClientModel;

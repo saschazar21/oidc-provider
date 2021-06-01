@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
 import { ALPHABET_LENGTH } from 'utils/lib/config/id';
 import { LIFETIME } from 'utils/lib/types/lifetime';
@@ -28,7 +28,7 @@ const discriminatorOptions = {
   discriminatorKey: 'type',
 };
 
-const baseTokenSchema = new Schema(
+const baseTokenSchema = new Schema<Document<BaseTokenSchema>>(
   {
     _id: {
       required: true,
@@ -53,7 +53,7 @@ const baseTokenSchema = new Schema(
   discriminatorOptions
 );
 
-const accessTokenSchema = new Schema(
+const accessTokenSchema = new Schema<Document<AccessTokenSchema>>(
   {
     createdAt: {
       default: Date.now,
@@ -71,7 +71,7 @@ const accessTokenSchema = new Schema(
   discriminatorOptions
 );
 
-const refreshTokenSchema = new Schema(
+const refreshTokenSchema = new Schema<Document<RefreshTokenSchema>>(
   {
     createdAt: {
       default: Date.now,
@@ -96,7 +96,10 @@ baseTokenSchema.pre('validate', async function () {
   this.set({ _id: await generateId() });
 });
 
-const BaseTokenModel = mongoose.model('BaseToken', baseTokenSchema);
+const BaseTokenModel = mongoose.model<BaseTokenSchema>(
+  'BaseToken',
+  baseTokenSchema
+);
 
 export const AccessTokenModel = BaseTokenModel.discriminator(
   'AccessToken',
