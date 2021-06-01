@@ -19,8 +19,8 @@ describe('Keys', () => {
     jest.resetModules();
 
     const [importedDb, importedKeys] = await Promise.all([
-      import('~/lib/shared/db'),
-      import('~/lib/shared/keys'),
+      import('database/lib'),
+      import('utils/lib/keys'),
     ]);
     getKeys = importedKeys.default;
     connection = importedDb.default;
@@ -62,10 +62,10 @@ describe('Existing Keys', () => {
   });
 
   beforeAll(async () => {
-    const { encrypt } = await import('~/lib/shared/util/aes');
-    const { default: JWKSConfig } = await import('~/lib/shared/config/jwks');
+    const { encrypt } = await import('utils/lib/util/aes');
+    const { default: JWKSConfig } = await import('utils/lib/config/jwks');
     const { default: createCookieSecrets } = await import(
-      '~/lib/shared/config/keygrip'
+      'utils/lib/config/keygrip'
     );
     const cookies = await createCookieSecrets();
     const keystore = new JWKS.KeyStore();
@@ -96,8 +96,8 @@ describe('Existing Keys', () => {
     jest.resetModules();
 
     const [importedDb, importedKeys] = await Promise.all([
-      import('~/lib/shared/db'),
-      import('~/lib/shared/keys'),
+      import('database/lib'),
+      import('utils/lib/keys'),
     ]);
     getKeys = importedKeys.default;
     connection = importedDb.default;

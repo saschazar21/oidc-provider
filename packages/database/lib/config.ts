@@ -1,10 +1,10 @@
 export const { MONGO_PASSWORD, MONGO_URL, MONGO_USER } = process.env;
 
-export interface MongoConnectionDetails {
+export type MongoConnectionDetails = {
   password: string;
   url: string;
   user: string;
-}
+};
 
 const mapping = ['password', 'url', 'user'];
 

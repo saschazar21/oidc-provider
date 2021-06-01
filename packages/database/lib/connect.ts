@@ -1,6 +1,6 @@
 import mongoose, { Mongoose, ConnectionOptions } from 'mongoose';
 
-import connectionDetails from 'utils/lib/config/db';
+import connectionDetails from 'database/lib/config';
 
 const { password: pass, url, user } = connectionDetails();
 

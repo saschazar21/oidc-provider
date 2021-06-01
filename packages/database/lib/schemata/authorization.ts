@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, UpdateQuery } from 'mongoose';
 
+import { ClientModel } from 'database/lib';
 import { ALPHABET_LENGTH } from 'utils/lib/config/id';
-import { ClientModel } from '../';
 import { ACR_VALUES } from 'utils/lib/types/acr';
 import { DISPLAY } from 'utils/lib/types/display';
 import { LIFETIME } from 'utils/lib/types/lifetime';
@@ -38,7 +38,7 @@ export type AuthorizationSchema = {
 
 const generateId = id(ALPHABET_LENGTH.LONG);
 
-const authSchema = new Schema<AuthorizationSchema>({
+const authSchema = new Schema<Document<AuthorizationSchema>>({
   _id: {
     required: true,
     trim: true,

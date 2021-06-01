@@ -10,7 +10,7 @@ import { TOKEN_ENDPOINT_AUTH_METHODS } from 'utils/lib/types/auth_methods';
 import { DISPLAY } from 'utils/lib/types/display';
 import { CLAIM } from 'utils/lib/types/claim';
 
-export interface OpenIDConfiguration {
+export type OpenIDConfiguration = {
   issuer: string;
   authorization_endpoint: string;
   token_endpoint: string;
@@ -46,7 +46,7 @@ export interface OpenIDConfiguration {
   require_request_uri_registration?: boolean;
   op_policy_uri?: string;
   op_tos_uri?: string;
-}
+};
 
 let openidConfiguration: OpenIDConfiguration;
 

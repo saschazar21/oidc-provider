@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 
-import { decrypt, encrypt } from '~/lib/shared/util/aes';
+import { decrypt, encrypt } from 'utils/lib/util/aes';
 
 let masterkey: string;
 

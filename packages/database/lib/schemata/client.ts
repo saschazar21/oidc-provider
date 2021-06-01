@@ -1,7 +1,7 @@
 import mongoose, { Schema, UpdateQuery } from 'mongoose';
 
+import { UserSchema } from 'database/lib/schemata/user';
 import { ALPHABET_LENGTH } from 'utils/lib/config/id';
-import { UserSchema } from './user';
 import { HTTPS_REGEX, URL_REGEX } from 'utils/lib/types/url';
 import generateId from 'utils/lib/util/id';
 

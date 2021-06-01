@@ -1,4 +1,4 @@
-import { comparePassword, hashPassword } from '~/lib/shared/util/password';
+import { comparePassword, hashPassword } from 'utils/lib/util/password';
 
 describe('Password', () => {
   let hashed: string;

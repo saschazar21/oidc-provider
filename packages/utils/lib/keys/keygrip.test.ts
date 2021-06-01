@@ -1,5 +1,5 @@
-import createKeys, { KEYGRIP_LENGTH } from '~/lib/shared/config/keygrip';
-import keygrip from '~/lib/shared/keys/keygrip';
+import createKeys, { KEYGRIP_LENGTH } from 'utils/lib/config/keygrip';
+import keygrip from 'utils/lib/keys/keygrip';
 
 const TEST_STRING = 'hello world';
 
