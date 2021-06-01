@@ -1,11 +1,11 @@
 import { mockRequest, mockResponse } from 'mock-req-res';
-import { NextApiResponse, NextApiRequest } from 'next';
+import type { ServerResponse, IncomingMessage } from 'http';
 
 const REDIRECT_PATH = '/test/redirect';
 
 describe('Redirect middleware', () => {
-  let req: NextApiRequest;
-  let res: NextApiResponse;
+  let req: IncomingMessage;
+  let res: ServerResponse;
 
   let setHeader;
   let status;
@@ -30,9 +30,7 @@ describe('Redirect middleware', () => {
   });
 
   it(`redirects to ${REDIRECT_PATH}`, async () => {
-    const { default: redirect } = await import(
-      '~/lib/shared/middleware/redirect'
-    );
+    const { default: redirect } = await import('utils/lib/middleware/redirect');
 
     const options = {
       location: REDIRECT_PATH,

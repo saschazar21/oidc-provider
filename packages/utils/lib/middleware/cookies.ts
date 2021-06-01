@@ -1,11 +1,11 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { IncomingMessage, ServerResponse } from 'http';
 import Cookies from 'cookies';
 
-import getKeys from '~/lib/shared/keys';
+import getKeys from 'utils/lib/keys';
 
 const middleware = async (
-  req: NextApiRequest,
-  res: NextApiResponse
+  req: IncomingMessage,
+  res: ServerResponse
 ): Promise<Cookies> => {
   const { keygrip: keys } = await getKeys();
   const cookies = new Cookies(req, res, { keys });

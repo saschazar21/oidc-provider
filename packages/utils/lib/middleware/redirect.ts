@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { IncomingMessage, ServerResponse } from 'http';
 
 export interface RedirectOptions {
   location: string;
@@ -6,13 +6,13 @@ export interface RedirectOptions {
 }
 
 const middleware = async (
-  req: NextApiRequest,
-  res: NextApiResponse,
-  options: RedirectOptions,
+  req: IncomingMessage,
+  res: ServerResponse,
+  options: RedirectOptions
 ): Promise<void> =>
   new Promise((resolve) => {
     const { location, status = 302 } = options;
-    res.status(status);
+    res.statusCode = status;
     res.setHeader('Location', location);
     return resolve();
   });
