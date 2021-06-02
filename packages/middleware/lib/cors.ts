@@ -1,6 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import crossOrigin, { CorsOptions, CorsOptionsDelegate } from 'cors';
 
+import { STATUS_CODE } from 'utils/lib/types/status_code';
+
 const middleware = async (
   req: IncomingMessage,
   res: ServerResponse,
@@ -8,10 +10,9 @@ const middleware = async (
 ): Promise<boolean> =>
   new Promise((resolve) => {
     const cors = crossOrigin(options);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    cors(req as any, res as any, (err: any) => {
+    cors(req, res, (err: any) => {
       if (err instanceof Error) {
-        res.statusCode = 500;
+        res.statusCode = STATUS_CODE.INTERNAL_SERVER_ERROR;
         res.statusMessage = 'CORS failed!';
         return resolve(false);
       }

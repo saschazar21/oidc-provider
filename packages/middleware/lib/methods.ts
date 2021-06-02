@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 
 import { METHOD } from 'utils/lib/types/method';
+import { STATUS_CODE } from 'utils/lib/types/status_code';
 
 const middleware = async (
   req: IncomingMessage,
@@ -10,8 +11,8 @@ const middleware = async (
   new Promise((resolve) => {
     const methods = [METHOD.HEAD, METHOD.OPTIONS, ...allowed];
     if (methods.indexOf(req.method as METHOD) < 0) {
+      res.statusCode = STATUS_CODE.METHOD_NOT_ALLOWED;
       res.setHeader('Allow', methods.join(', '));
-      res.statusCode = 405;
       return resolve(false);
     }
     return resolve(true);

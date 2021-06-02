@@ -1,4 +1,5 @@
 export interface ErrorLog {
+  id?: string;
   method: string;
   path: string;
   statusCode: number;
@@ -6,12 +7,13 @@ export interface ErrorLog {
 }
 
 const logError = (error: ErrorLog): void => {
-  const msg = `
+  const msg = `\n\n
+                   ID: ${error.id ?? '<None>'}
 ---------------------------------------------------
 ${error.method}  ${error.path}  ${error.statusCode}
 ---------------------------------------------------
 
-${error.message}
+${error.message}\n\n
   `;
 
   console.error(msg);
