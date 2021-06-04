@@ -11,7 +11,7 @@ class HTTPError extends Error implements Error {
   private _path: string;
   private _statusCode: number;
 
-  public static ID_LENGTH = 5;
+  public static readonly ID_LENGTH = 5;
   public static generateID(): string {
     return id(HTTPError.ID_LENGTH)();
   }
