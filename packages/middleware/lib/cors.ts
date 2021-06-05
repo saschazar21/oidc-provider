@@ -20,6 +20,7 @@ export type CorsOptions = {
   hosts?: string[];
   maxAge?: number;
   methods?: STATUS_CODE[];
+  mirrorOrigin?: boolean;
 };
 
 enum CORS_HEADERS {
@@ -40,7 +41,7 @@ const middleware = async (
   options: CorsOptions
 ): Promise<boolean> =>
   new Promise((resolve) => {
-    // TODO: handle CORS_HEADERS.ALLOW_ORIGIN header!
+    const [fallbackOrigin] = ALLOWED_ORIGINS;
 
     const headers = new Map<CORS_HEADERS, number | string>([
       [CORS_HEADERS.MAX_AGE, options.maxAge ?? MAX_AGE],
@@ -54,6 +55,17 @@ const middleware = async (
       ],
     ]);
     options.credentials && headers.set(CORS_HEADERS.ALLOW_CREDENTIALS, 'true');
+    options.mirrorOrigin || !fallbackOrigin?.length
+      ? headers.set(
+          CORS_HEADERS.ALLOW_ORIGIN,
+          req.headers[CORS_HEADERS.ORIGIN] as string
+        )
+      : ALLOWED_ORIGINS.includes(req.headers[CORS_HEADERS.ORIGIN] as string)
+      ? headers.set(
+          CORS_HEADERS.ALLOW_ORIGIN,
+          req.headers[CORS_HEADERS.ORIGIN] as string
+        )
+      : headers.set(CORS_HEADERS.ORIGIN, fallbackOrigin);
 
     if (req.method !== METHOD.OPTIONS) {
       return resolve(false);
