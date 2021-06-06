@@ -17,7 +17,7 @@ export type CorsOptions = {
   mirrorOrigin?: boolean;
 };
 
-enum CORS_HEADERS {
+export enum CORS_HEADERS {
   ALLOW_ORIGIN = 'access-control-allow-origin',
   ALLOW_CREDENTIALS = 'access-control-allow-credentials',
   ALLOW_HEADERS = 'access-control-allow-headers',
@@ -30,23 +30,31 @@ enum CORS_HEADERS {
   VARY = 'vary',
 }
 
-const middleware = async (
+const cors = async (
   req: IncomingMessage,
   res: ServerResponse,
-  options: CorsOptions
-): Promise<boolean> =>
-  new Promise((resolve) => {
-    const vary: string[] = [];
+  options: CorsOptions = {}
+): Promise<boolean> => {
+  const configureAllowHeaders = (): string[] => {
+    let arr = options.headers ?? [];
 
-    const requestHeaders = req.headers[CORS_HEADERS.REQUEST_HEADERS] as string;
-    const requestHeadersArray: string[] = Array.isArray(requestHeaders)
-      ? requestHeaders
-      : requestHeaders?.length > 0
-      ? requestHeaders
-          .split(',')
-          .map((header: string) => header.trim())
-          .filter((header: string) => header.length > 0)
-      : [];
+    if (!arr.length) {
+      const requestHeaders = req.headers[CORS_HEADERS.REQUEST_HEADERS];
+      arr = Array.isArray(requestHeaders)
+        ? requestHeaders
+        : requestHeaders?.length > 0
+        ? (requestHeaders as string)
+            .split(',')
+            .map((header: string) => header.trim())
+            .filter((header: string) => header.length > 0)
+        : [];
+    }
+
+    return arr;
+  };
+
+  return new Promise((resolve) => {
+    const vary: string[] = [];
 
     const headers = new Map<CORS_HEADERS, number | string>([
       [CORS_HEADERS.MAX_AGE, options.maxAge ?? MAX_AGE],
@@ -72,11 +80,9 @@ const middleware = async (
 
     headers.get(CORS_HEADERS.ALLOW_ORIGIN) && vary.push(CORS_HEADERS.ORIGIN);
 
-    (options.headers ?? requestHeadersArray).length > 0 &&
-      headers.set(
-        CORS_HEADERS.ALLOW_HEADERS,
-        (options.methods || requestHeadersArray).join(', ')
-      ) &&
+    const allowHeaders = configureAllowHeaders();
+    allowHeaders.length > 0 &&
+      headers.set(CORS_HEADERS.ALLOW_HEADERS, allowHeaders.join(', ')) &&
       vary.push(CORS_HEADERS.REQUEST_HEADERS);
 
     headers.set(CORS_HEADERS.VARY, vary.join(', '));
@@ -107,5 +113,6 @@ const middleware = async (
 
     return resolve(true);
   });
+};
 
-export default middleware;
+export default cors;
