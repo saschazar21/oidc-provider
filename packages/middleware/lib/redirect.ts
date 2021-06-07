@@ -7,16 +7,15 @@ export interface RedirectOptions {
   statusCode?: STATUS_CODE;
 }
 
-const middleware = async (
+const redirect = async (
   _req: IncomingMessage,
   res: ServerResponse,
   options: RedirectOptions
 ): Promise<void> =>
   new Promise((resolve) => {
     const { location, statusCode = STATUS_CODE.FOUND } = options;
-    res.statusCode = statusCode;
-    res.setHeader('Location', location);
+    res.writeHead(statusCode, { location });
     return resolve();
   });
 
-export default middleware;
+export default redirect;
