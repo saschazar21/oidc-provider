@@ -3,7 +3,6 @@ import type { IncomingMessage, ServerResponse } from 'http';
 import { ALLOWED_ORIGINS } from 'config/lib/origin';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 import { METHOD } from 'utils/lib/types/method';
-import HTTPError from 'utils/lib/util/http_error';
 
 const MAX_AGE = 86400;
 const ALLOW_METHODS = [METHOD.GET, METHOD.HEAD];
