@@ -100,18 +100,13 @@ const cors = async (
       !req.headers[CORS_HEADERS.REQUEST_METHOD] ||
       !req.headers[CORS_HEADERS.ORIGIN]
     ) {
+      res.flushHeaders();
       res.setHeader('Allow', headers.get(CORS_HEADERS.ALLOW_METHODS));
-      throw new HTTPError(
-        'Missing Access-Control-Request-Method and/or Origin in CORS preflight request!',
-        STATUS_CODE.METHOD_NOT_ALLOWED,
-        req.method,
-        req.url
-      );
     }
 
     res.writeHead(STATUS_CODE.NO_CONTENT, { 'Content-Length': 0 });
 
-    return resolve(true);
+    return resolve(!!res.getHeader(CORS_HEADERS.ALLOW_ORIGIN));
   });
 };
 
