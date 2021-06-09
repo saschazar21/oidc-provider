@@ -1,5 +1,8 @@
-import { mockRequest, mockResponse } from 'mock-req-res';
+import MockRequest from 'mock-req';
+import MockResponse from 'mock-res';
 import type { ServerResponse, IncomingMessage } from 'http';
+
+import { STATUS_CODE } from 'utils/lib/types/status_code';
 
 const REDIRECT_PATH = '/test/redirect';
 
@@ -7,30 +10,16 @@ describe('Redirect middleware', () => {
   let req: IncomingMessage;
   let res: ServerResponse;
 
-  let setHeader;
-  let status;
-
   beforeEach(async () => {
     jest.resetModules();
 
-    setHeader = jest.fn().mockName('mockSetHeader');
-    status = jest.fn().mockName('mockStatus');
+    req = new MockRequest();
 
-    req = {
-      ...mockRequest,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
-
-    res = {
-      ...mockResponse,
-      setHeader,
-      status,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
+    res = new MockResponse();
   });
 
   it(`redirects to ${REDIRECT_PATH}`, async () => {
-    const { default: redirect } = await import('utils/lib/middleware/redirect');
+    const { default: redirect } = await import('middleware/lib/redirect');
 
     const options = {
       location: REDIRECT_PATH,
@@ -38,7 +27,7 @@ describe('Redirect middleware', () => {
 
     await redirect(req, res, options);
 
-    expect(status).toHaveBeenCalledWith(302);
-    expect(setHeader).toHaveBeenCalledWith('Location', REDIRECT_PATH);
+    expect(res.statusCode).toEqual(STATUS_CODE.FOUND);
+    expect(res.getHeader('location')).toEqual(REDIRECT_PATH);
   });
 });

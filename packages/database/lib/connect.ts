@@ -18,4 +18,7 @@ export const config: ConnectionOptions = Object.assign(
 const connection = async (custom?: ConnectionOptions): Promise<Mongoose> =>
   mongoose.connect(url, custom || config);
 
+export const disconnect = async (force?: boolean): Promise<void> =>
+  mongoose.connection.close(force);
+
 export default connection;

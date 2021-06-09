@@ -12,7 +12,7 @@ describe('Keys', () => {
 
   afterEach(async () => {
     await connection().then(() => KeyModel.findByIdAndDelete('master'));
-    mongoose.connection.close();
+    await mongoose.connection.close();
   });
 
   beforeEach(async () => {
@@ -39,7 +39,9 @@ describe('Keys', () => {
   });
 
   retry('should create a key set', 10, async () => {
-    await connection().then(() => KeyModel.findByIdAndDelete('master'));
+    await connection()
+      .then(() => KeyModel.findByIdAndDelete('master'))
+      .then(() => mongoose.connection.close());
     keys = await getKeys(MASTER_KEY);
 
     expect(keys).toHaveProperty('keystore');
@@ -57,7 +59,9 @@ describe('Existing Keys', () => {
   let keys;
 
   afterEach(async () => {
-    await connection().then(() => KeyModel.findByIdAndDelete('master'));
+    await connection()
+      .then(() => KeyModel.findByIdAndDelete('master'))
+      .then(() => mongoose.connection.close());
     mongoose.connection.close();
   });
 
@@ -84,7 +88,7 @@ describe('Existing Keys', () => {
       )
     );
     keys = {
-      ...keystore.toJWKS(true),
+      ...keystore.toJWKS(),
       cookies,
     };
     bin = await encrypt(MASTER_KEY, JSON.stringify(keys));
@@ -101,10 +105,12 @@ describe('Existing Keys', () => {
     connection = importedDb.default;
     KeyModel = importedDb.KeyModel;
 
-    await connection().then(() => KeyModel.findByIdAndDelete('master'));
+    await connection()
+      .then(() => KeyModel.findByIdAndDelete('master'))
+      .then(() => mongoose.connection.close());
   });
 
-  xit('should throw when wrong MASTER_KEY given', async () => {
+  it.skip('should throw when wrong MASTER_KEY given', async () => {
     await expect(getKeys('WRONG KEY')).rejects.toThrowError();
   });
 
@@ -116,11 +122,12 @@ describe('Existing Keys', () => {
           _id: 'master',
           bin,
         })
-      );
+      )
+      .then(() => mongoose.connection.close());
 
     const original = keys.keys;
     const { keystore } = await getKeys(MASTER_KEY);
 
-    expect(keystore.toJWKS(true)).toMatchObject({ keys: original });
+    expect(keystore.toJWKS()).toMatchObject({ keys: original });
   });
 });

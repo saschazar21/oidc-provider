@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, UpdateQuery } from 'mongoose';
+import mongoose, { Document, Model, Schema, UpdateQuery } from 'mongoose';
 
 import { ACR_VALUES } from 'utils/lib/types/acr';
 import { ALPHABET_LENGTH } from 'config/lib/id';
@@ -45,11 +45,16 @@ export type UserSchema = {
   consents?: string[];
 };
 
+type User = Document<UserSchema> &
+  UserSchema & {
+    comparePassword: (plain: string) => Promise<boolean>;
+  };
+
 const generateId = id(ALPHABET_LENGTH.SHORT);
 
 const rightPad = (val: string): string => (val ? `${val} ` : '');
 
-const addressSchema = new Schema<Document<AddressSchema>>({
+const addressSchema = new Schema<AddressSchema>({
   _id: {
     default: idSync(),
     type: String,
@@ -82,7 +87,7 @@ ${rightPad(this.postal_code)}${rightPad(this.locality)}${this.region}
 ${this.country}`;
 });
 
-const userSchema = new Schema<Document<UserSchema>>({
+const userSchema = new Schema<User>({
   _id: {
     alias: 'sub',
     required: true,
@@ -208,9 +213,11 @@ userSchema
     this.set({ given_name, family_name });
   });
 
-userSchema.method('comparePassword', async function (plain: string) {
+userSchema.methods.comparePassword = async function (
+  plain: string
+): Promise<boolean> {
   return comparePassword(plain, this.get('password'));
-});
+};
 
 userSchema.pre('validate', async function () {
   if (this.get('_id')) {
@@ -254,6 +261,6 @@ userSchema.pre('findOneAndUpdate', async function () {
   await this.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
 });
 
-export const UserModel = mongoose.model<UserSchema>('User', userSchema);
+const User = mongoose.model<User>('User', userSchema);
 
-export default UserModel;
+export default User;

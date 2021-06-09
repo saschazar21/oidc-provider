@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { mockRequest, mockResponse } from 'mock-req-res';
+import MockRequest from 'mock-req';
+import MockResponse from 'mock-res';
 
 import { CorsOptions, CORS_HEADERS } from 'middleware/lib/cors';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
@@ -13,37 +14,15 @@ describe('CORS', () => {
   ) => Promise<boolean>;
   const ORIGIN = 'http://example.com';
 
-  let headersSent = false;
-  let statusCode: number;
-  const headers = new Map<CORS_HEADERS, string | number>();
-
-  const req = mockRequest({
+  const req = new MockRequest({
     headers: {
       [CORS_HEADERS.ORIGIN]: ORIGIN,
     },
   });
 
-  const res = mockResponse({
-    headersSent,
-    statusCode,
-    flushHeaders: jest.fn(() => headers.clear()),
-    getHeader: jest.fn((key: CORS_HEADERS) => headers.get(key)),
-    setHeader: jest.fn((key: CORS_HEADERS, value: string | number) =>
-      headers.set(key, value)
-    ),
-    writeHead: jest.fn(
-      (
-        status: STATUS_CODE,
-        header: { [key in CORS_HEADERS]: string | number }
-      ) => {
-        res.headersSent = true;
-        (res.statusCode = status),
-          Object.keys(header).forEach(
-            (key: CORS_HEADERS, value: string | number) =>
-              headers.set(key, value)
-          );
-      }
-    ),
+  const res = new MockResponse();
+  const flushHeaders = jest.fn(function () {
+    this._header = this._headers = {};
   });
 
   beforeEach(async () => {
@@ -52,51 +31,35 @@ describe('CORS', () => {
     process.env.ALLOWED_ORIGINS = ORIGIN;
 
     cors = await (await import('middleware/lib/cors')).default;
-
-    headers.clear();
-    headersSent = false;
-    statusCode = undefined;
   });
 
   it('responds to a simple GET request', async () => {
-    const customReq = mockRequest({});
+    const customReq = new MockRequest({});
 
     const isPreflight = await cors(customReq, res);
 
     expect(isPreflight).toBeFalsy();
-    expect(res.setHeader).not.toHaveBeenCalled();
+    expect(res.getHeaders()).toMatchObject({});
   });
 
   it('responds to a simple GET request with mirrorOrigin enabled', async () => {
     const isPreflight = await cors(req, res, { mirrorOrigin: true });
 
     expect(isPreflight).toBeFalsy();
-    expect(res.setHeader).toHaveBeenCalledWith(
-      CORS_HEADERS.ALLOW_ORIGIN,
-      ORIGIN
-    );
-    expect(res.setHeader).toHaveBeenCalledWith(
-      CORS_HEADERS.VARY,
-      CORS_HEADERS.ORIGIN
-    );
+    expect(res.getHeader(CORS_HEADERS.ALLOW_ORIGIN)).toEqual(ORIGIN);
+    expect(res.getHeader(CORS_HEADERS.VARY)).toEqual(CORS_HEADERS.ORIGIN);
   });
 
   it('responds to a simple GET request when ALLOWED_ORIGINS is set', async () => {
     const isPreflight = await cors(req, res);
 
     expect(isPreflight).toBeFalsy();
-    expect(res.setHeader).toHaveBeenCalledWith(
-      CORS_HEADERS.ALLOW_ORIGIN,
-      ORIGIN
-    );
-    expect(res.setHeader).toHaveBeenCalledWith(
-      CORS_HEADERS.VARY,
-      CORS_HEADERS.ORIGIN
-    );
+    expect(res.getHeader(CORS_HEADERS.ALLOW_ORIGIN)).toEqual(ORIGIN);
+    expect(res.getHeader(CORS_HEADERS.VARY)).toEqual(CORS_HEADERS.ORIGIN);
   });
 
   it('responds to a CORS preflight request', async () => {
-    const customReq = mockRequest({
+    const customReq = new MockRequest({
       headers: {
         [CORS_HEADERS.ORIGIN]: ORIGIN,
         [CORS_HEADERS.REQUEST_METHOD]: METHOD.GET,
@@ -107,17 +70,12 @@ describe('CORS', () => {
     const isPreflight = await cors(customReq, res, { mirrorOrigin: true });
 
     expect(isPreflight).toBeTruthy();
-    expect(res.setHeader).toHaveBeenCalledWith(
-      CORS_HEADERS.ALLOW_ORIGIN,
-      ORIGIN
-    );
-    expect(res.setHeader).toHaveBeenCalledWith(
-      CORS_HEADERS.ALLOW_METHODS,
+    expect(res.getHeader(CORS_HEADERS.ALLOW_ORIGIN)).toEqual(ORIGIN);
+    expect(res.getHeader(CORS_HEADERS.ALLOW_METHODS)).toEqual(
       [METHOD.GET, METHOD.HEAD].join(', ')
     );
-    expect(res.writeHead).toHaveBeenCalledWith(STATUS_CODE.NO_CONTENT, {
-      'Content-Length': 0,
-    });
+    expect(res.getHeader('content-length')).toEqual(0);
+    expect(res.statusCode).toEqual(STATUS_CODE.NO_CONTENT);
   });
 
   it('returns predefined Access-Control-Allow-Headers HTTP header', async () => {
@@ -127,18 +85,12 @@ describe('CORS', () => {
     });
 
     expect(isPreflight).toBeFalsy();
-    expect(res.setHeader).toHaveBeenCalledWith(
-      CORS_HEADERS.ALLOW_HEADERS,
-      'Content-Type'
-    );
-    expect(res.setHeader).toHaveBeenCalledWith(
-      CORS_HEADERS.ALLOW_CREDENTIALS,
-      'true'
-    );
+    expect(res.getHeader(CORS_HEADERS.ALLOW_HEADERS)).toEqual('Content-Type');
+    expect(res.getHeader(CORS_HEADERS.ALLOW_CREDENTIALS)).toEqual('true');
   });
 
   it('responds to Access-Control-Request-Headers HTTP header', async () => {
-    const customReq = mockRequest({
+    const customReq = new MockRequest({
       headers: {
         [CORS_HEADERS.ORIGIN]: ORIGIN,
         [CORS_HEADERS.REQUEST_METHOD]: METHOD.GET,
@@ -150,22 +102,21 @@ describe('CORS', () => {
     const isPreflight = await cors(customReq, res);
 
     expect(isPreflight).toBeTruthy();
-    expect(res.setHeader).toHaveBeenCalledWith(
-      CORS_HEADERS.ALLOW_HEADERS,
+    expect(res.getHeader(CORS_HEADERS.ALLOW_HEADERS)).toEqual(
       customReq.headers[CORS_HEADERS.REQUEST_HEADERS]
     );
-    expect(res.setHeader).toHaveBeenCalledWith(
-      CORS_HEADERS.VARY,
+    expect(res.getHeader(CORS_HEADERS.VARY)).toEqual(
       [CORS_HEADERS.ORIGIN, CORS_HEADERS.REQUEST_HEADERS].join(', ')
     );
   });
 
   it('responds to Access-Control-Request-Headers HTTP header set as array', async () => {
-    const customReq = mockRequest({
+    const requestHeaders = ['Content-Type', 'Content-Language'];
+    const customReq = new MockRequest({
       headers: {
         [CORS_HEADERS.ORIGIN]: ORIGIN,
         [CORS_HEADERS.REQUEST_METHOD]: METHOD.GET,
-        [CORS_HEADERS.REQUEST_HEADERS]: ['Content-Type', 'Content-Language'],
+        [CORS_HEADERS.REQUEST_HEADERS]: requestHeaders,
       },
       method: METHOD.OPTIONS,
     });
@@ -173,23 +124,23 @@ describe('CORS', () => {
     const isPreflight = await cors(customReq, res);
 
     expect(isPreflight).toBeTruthy();
-    expect(res.setHeader).toHaveBeenCalledWith(
-      CORS_HEADERS.ALLOW_HEADERS,
-      (customReq.headers[CORS_HEADERS.REQUEST_HEADERS] as string[]).join(', ')
+    expect(res.getHeader(CORS_HEADERS.ALLOW_HEADERS)).toEqual(
+      requestHeaders.join(', ')
     );
   });
 
   it('responds to non-preflight OPTIONS request with Allow header', async () => {
-    const customReq = mockRequest({
+    const customReq = new MockRequest({
       method: METHOD.OPTIONS,
     });
+
+    res.flushHeaders = flushHeaders;
 
     const isPreflight = await cors(customReq, res, { mirrorOrigin: true });
 
     expect(isPreflight).toBeFalsy();
     expect(res.flushHeaders).toHaveBeenCalledTimes(1);
-    expect(res.setHeader).toHaveBeenCalledWith(
-      'Allow',
+    expect(res.getHeader('Allow')).toEqual(
       [METHOD.GET, METHOD.HEAD].join(', ')
     );
   });

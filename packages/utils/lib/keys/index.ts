@@ -1,8 +1,9 @@
-import { DocumentQuery, Document } from 'mongoose';
+import { Document } from 'mongoose';
 import { JWKS, JSONWebKeySet } from 'jose';
 import Keygrip from 'keygrip';
 
-import connect, { KeyModel } from 'database/lib';
+import connect, { disconnect, KeyModel } from 'database/lib';
+import { KeySchema } from 'database/lib/schemata/key';
 import getKeystore from 'utils/lib/keys/jwks';
 import createCookieSecrets from 'config/lib/keygrip';
 import getKeygrip from 'utils/lib/keys/keygrip';
@@ -28,16 +29,20 @@ const createKeys = async (
   keystore: await getKeystore(jwks),
 });
 
-const fetchKeys = async (): DocumentQuery<Document, Document, {}> =>
-  connect().then(() => KeyModel.findById('master', 'bin'));
+const fetchKeys = async (): Promise<Document<KeySchema>> => {
+  await connect();
+  const keys = await KeyModel.findById('master', 'bin');
+  return disconnect().then(() => keys);
+};
 
-const saveKeys = async (bin: Buffer): Promise<Document> =>
-  connect().then(async () =>
-    KeyModel.create({
-      _id: 'master',
-      bin,
-    })
-  );
+const saveKeys = async (bin: Buffer): Promise<Document<KeySchema>> => {
+  await connect();
+  const key = await KeyModel.create({
+    _id: 'master',
+    bin,
+  });
+  return disconnect().then(() => key);
+};
 
 const getKeys = async (
   masterkey: string = process.env.MASTER_KEY

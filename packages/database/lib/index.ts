@@ -1,7 +1,10 @@
-export { default } from './connect';
+export { default, disconnect } from 'database/lib/connect';
 
-export { AuthorizationModel } from './schemata/authorization';
-export { ClientModel } from './schemata/client';
-export { KeyModel } from './schemata/key';
-export { AccessTokenModel, RefreshTokenModel } from './schemata/token';
-export { UserModel } from './schemata/user';
+export { default as AuthorizationModel } from 'database/lib/schemata/authorization';
+export { default as ClientModel } from 'database/lib/schemata/client';
+export { default as KeyModel } from 'database/lib/schemata/key';
+export {
+  AccessTokenModel,
+  RefreshTokenModel,
+} from 'database/lib/schemata/token';
+export { default as UserModel } from 'database/lib/schemata/user';
