@@ -48,8 +48,7 @@ const login = async (
     );
   }
 
-  await connect();
-  const user = await UserModel.findOne({ email });
+  const user = await connect().then(() => UserModel.findOne({ email }));
   await disconnect();
   if (!user || !(await user.comparePassword(password))) {
     throw new HTTPError(

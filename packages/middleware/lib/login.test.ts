@@ -42,7 +42,7 @@ describe('Login Middleware', () => {
     try {
       await connect().then(() => UserModel.findByIdAndDelete(sub));
     } finally {
-      connection.close();
+      await connection.close();
     }
   });
 

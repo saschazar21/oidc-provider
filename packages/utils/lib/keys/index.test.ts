@@ -10,21 +10,22 @@ describe('Keys', () => {
   let getKeys;
   let keys;
 
-  afterEach(async () => {
-    await connection().then(() => KeyModel.findByIdAndDelete('master'));
-    await mongoose.connection.close();
+  afterAll(async () => mongoose.connection.close());
+
+  afterEach(async () => KeyModel.findByIdAndDelete('master'));
+
+  beforeAll(async () => {
+    const importedDb = await import('database/lib');
+    connection = importedDb.default;
+    KeyModel = importedDb.KeyModel;
+    await connection();
   });
 
   beforeEach(async () => {
     jest.resetModules();
 
-    const [importedDb, importedKeys] = await Promise.all([
-      import('database/lib'),
-      import('utils/lib/keys'),
-    ]);
+    const importedKeys = await import('utils/lib/keys');
     getKeys = importedKeys.default;
-    connection = importedDb.default;
-    KeyModel = importedDb.KeyModel;
   });
 
   it('should throw without masterkey', async () => {
@@ -39,9 +40,7 @@ describe('Keys', () => {
   });
 
   retry('should create a key set', 10, async () => {
-    await connection()
-      .then(() => KeyModel.findByIdAndDelete('master'))
-      .then(() => mongoose.connection.close());
+    await KeyModel.findByIdAndDelete('master');
     keys = await getKeys(MASTER_KEY);
 
     expect(keys).toHaveProperty('keystore');
@@ -58,12 +57,9 @@ describe('Existing Keys', () => {
   let getKeys;
   let keys;
 
-  afterEach(async () => {
-    await connection()
-      .then(() => KeyModel.findByIdAndDelete('master'))
-      .then(() => mongoose.connection.close());
-    mongoose.connection.close();
-  });
+  afterAll(async () => mongoose.connection.close());
+
+  afterEach(async () => await KeyModel.findByIdAndDelete('master'));
 
   beforeAll(async () => {
     const { encrypt } = await import('utils/lib/util/aes');
@@ -92,38 +88,40 @@ describe('Existing Keys', () => {
       cookies,
     };
     bin = await encrypt(MASTER_KEY, JSON.stringify(keys));
+
+    const importedDb = await import('database/lib');
+    connection = importedDb.default;
+    KeyModel = importedDb.KeyModel;
+    await connection();
   });
 
   beforeEach(async () => {
     jest.resetModules();
 
-    const [importedDb, importedKeys] = await Promise.all([
-      import('database/lib'),
-      import('utils/lib/keys'),
-    ]);
+    const importedKeys = await import('utils/lib/keys');
     getKeys = importedKeys.default;
-    connection = importedDb.default;
-    KeyModel = importedDb.KeyModel;
 
-    await connection()
-      .then(() => KeyModel.findByIdAndDelete('master'))
-      .then(() => mongoose.connection.close());
+    await KeyModel.findByIdAndDelete('master');
   });
 
-  it.skip('should throw when wrong MASTER_KEY given', async () => {
+  it('should throw when wrong MASTER_KEY given', async () => {
+    await KeyModel.findByIdAndDelete('master').then(() =>
+      KeyModel.create({
+        _id: 'master',
+        bin,
+      })
+    );
+
     await expect(getKeys('WRONG KEY')).rejects.toThrowError();
   });
 
   it('should fetch existing keys from DB', async () => {
-    await connection()
-      .then(() => KeyModel.findByIdAndDelete('master'))
-      .then(() =>
-        KeyModel.create({
-          _id: 'master',
-          bin,
-        })
-      )
-      .then(() => mongoose.connection.close());
+    await KeyModel.findByIdAndDelete('master').then(() =>
+      KeyModel.create({
+        _id: 'master',
+        bin,
+      })
+    );
 
     const original = keys.keys;
     const { keystore } = await getKeys(MASTER_KEY);
