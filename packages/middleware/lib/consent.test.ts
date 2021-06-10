@@ -1,13 +1,15 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { connection } from 'mongoose';
-import { mockRequest, mockResponse } from 'mock-req-res';
+import MockRequest from 'mock-req';
+import MockResponse from 'mock-res';
 
-import { AuthorizationSchema } from '~/lib/shared/db/schemata/authorization';
-import { ClientSchema } from '~/lib/shared/db/schemata/client';
-import { UserSchema } from '~/lib/shared/db/schemata/user';
-import { consentMiddleware } from '~/lib/main/consent';
-import { SCOPE } from '~/lib/shared/types/scope';
-import { RESPONSE_TYPE } from '~/lib/shared/types/response_type';
+import { disconnect } from 'database/lib';
+import { ClientSchema } from 'database/lib/schemata/client';
+import { UserSchema } from 'database/lib/schemata/user';
+import consentMiddleware from 'middleware/lib/consent';
+import { SCOPE } from 'utils/lib/types/scope';
+import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
+import { STATUS_CODE } from 'utils/lib/types/status_code';
+import objToUrlEncoded from 'utils/lib/util/obj-to-urlencoded';
 
 describe('Consent', () => {
   let AuthorizationModel;
@@ -17,8 +19,8 @@ describe('Consent', () => {
   let authorizationId: string;
   let client_id: string;
   let connect;
-  let req: NextApiRequest;
-  let res: NextApiResponse;
+  let req;
+  let res;
   let sub: string;
 
   const client: ClientSchema = {
@@ -31,6 +33,13 @@ describe('Consent', () => {
     email: 'someone-consent@test.com',
     password: 'some test password',
   };
+
+  const body = {
+    consent: true,
+    redirect_to: '/',
+  };
+
+  afterAll(async () => disconnect());
 
   afterEach(async () => {
     try {
@@ -49,7 +58,7 @@ describe('Consent', () => {
   beforeEach(async () => {
     jest.resetModules();
 
-    const dbImports = await import('~/lib/shared/db');
+    const dbImports = await import('database/lib');
     connect = dbImports.default;
     AuthorizationModel = dbImports.AuthorizationModel;
     ClientModel = dbImports.ClientModel;
@@ -76,39 +85,18 @@ describe('Consent', () => {
 
     console.error = console.log;
 
-    const getHeader = jest.fn().mockName('mockGetHeader');
-    const json = jest.fn().mockName('mockJSON');
-    const setHeader = jest.fn().mockName('mockSetHeader');
-    const status = jest.fn().mockName('mockStatus');
-    const end = jest.fn().mockName('mockEnd');
+    req = (config: { [key: string]: string | number }) =>
+      new MockRequest({
+        headers: {
+          cookie: `authorization=${authorizationId}; sub=${sub}`,
+        },
+        method: 'POST',
+        url: '/api/consent',
+        protocol: 'https',
+        ...config,
+      });
 
-    req = {
-      ...mockRequest,
-      connection: {
-        encrypted: true,
-      },
-      headers: {
-        cookie: `authorization=${authorizationId}; sub=${sub}`,
-      },
-      method: 'POST',
-      url: '/api/consent',
-      body: {
-        consent: true,
-        redirect_to: '/',
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
-
-    res = {
-      ...mockResponse,
-      json,
-      getHeader,
-      set: null,
-      setHeader,
-      status,
-      end,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
+    res = new MockResponse();
   });
 
   it('validates a consent', async () => {
@@ -119,10 +107,14 @@ describe('Consent', () => {
     expect(user.get('consents')).not.toContain(client_id);
     expect(authorization.get('consent')).toBeFalsy();
 
-    await consentMiddleware(req, res);
+    const r = req();
+    r.write(objToUrlEncoded(body));
+    r.end();
 
-    expect(res.setHeader).toHaveBeenCalledWith('Location', '/');
-    expect(res.status).toHaveBeenCalledWith(303);
+    await consentMiddleware(r, res);
+
+    expect(res.getHeader('location')).toEqual('/');
+    expect(res.statusCode).toEqual(STATUS_CODE.SEE_OTHER);
 
     authorization = await connect().then(() =>
       AuthorizationModel.findById(authorizationId)
@@ -134,64 +126,57 @@ describe('Consent', () => {
   });
 
   it('redirects to / when redirect_to is missing', async () => {
-    const updatedReq = {
-      ...req,
-      body: {
-        ...req.body,
+    const updatedReq = req();
+    updatedReq.write(
+      objToUrlEncoded({
+        ...body,
         redirect_to: undefined,
-      },
-    } as any;
+      })
+    );
+    updatedReq.end();
 
     await consentMiddleware(updatedReq, res);
 
-    expect(res.setHeader).toHaveBeenCalledWith('Location', '/');
-    expect(res.status).toHaveBeenCalledWith(303);
+    expect(res.getHeader('location')).toEqual('/');
+    expect(res.statusCode).toEqual(STATUS_CODE.SEE_OTHER);
   });
 
   it('fails when no consent is given', async () => {
-    const updatedReq = {
-      ...req,
-      body: {
-        ...req.body,
-        consent: false,
-      },
-    } as any;
+    const updatedReq = req();
+    updatedReq.write({
+      ...body,
+      consent: false,
+    });
 
     expect(consentMiddleware(updatedReq, res)).rejects.toThrowError();
   });
 
   it('fails when user is not logged in', async () => {
-    const updatedReq = {
-      ...req,
+    const updatedReq = req({
       headers: {
-        ...req.headers,
         cookie: `authorization=${authorizationId}`,
       },
-    } as any;
+    });
 
     expect(consentMiddleware(updatedReq, res)).rejects.toThrowError();
   });
 
   it('fails when no authorization cookie is set', async () => {
-    const updatedReq = {
-      ...req,
+    const updatedReq = req({
       headers: {
-        ...req.headers,
         cookie: `sub=${sub}`,
       },
-    } as any;
+    });
 
     expect(consentMiddleware(updatedReq, res)).rejects.toThrowError();
   });
 
   it('fails when invalid authorization cookie is set', async () => {
-    const updatedReq = {
-      ...req,
+    const updatedReq = req({
       headers: {
-        ...req.headers,
         cookie: `authorization=not_da_real_authorization; sub=${sub}`,
       },
-    } as any;
+    });
 
     expect(consentMiddleware(updatedReq, res)).rejects.toThrowError();
   });
