@@ -6,6 +6,7 @@ import { UserSchema } from 'database/lib/schemata/user';
 import loginMiddleware from 'middleware/lib/login';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 import { LoginForm } from 'utils/lib/types/login';
+import objToUrlEncoded from 'utils/lib/util/obj-to-urlencoded';
 
 const createReq = (configuration?: { [key: string]: string | number }) =>
   new MockReq({
@@ -17,12 +18,6 @@ const createReq = (configuration?: { [key: string]: string | number }) =>
     url: '/api/login',
     ...configuration,
   });
-
-const payloadToUrlEncoded = (payload: LoginForm): string =>
-  Object.keys(payload).reduce((str: string, key: string) => {
-    const s = `${encodeURIComponent(key)}=${encodeURIComponent(payload[key])}`;
-    return str.length ? `${str}&${s}` : s;
-  }, '');
 
 describe('Login Middleware', () => {
   let UserModel;
@@ -68,7 +63,9 @@ describe('Login Middleware', () => {
     };
 
     req = createReq();
-    req.write(payloadToUrlEncoded(payload));
+    req.write(
+      objToUrlEncoded(payload as { [key: string]: string | number | boolean })
+    );
     req.end();
 
     res = new MockRes();
@@ -83,7 +80,7 @@ describe('Login Middleware', () => {
   it('should fail when no user given', async () => {
     const { email, ...body } = payload;
     const updatedReq = createReq();
-    updatedReq.write(payloadToUrlEncoded({ ...body }));
+    updatedReq.write(objToUrlEncoded({ ...body }));
     updatedReq.end();
 
     await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError(
@@ -95,7 +92,7 @@ describe('Login Middleware', () => {
     const { password, ...body } = payload;
 
     const updatedReq = createReq();
-    updatedReq.write(payloadToUrlEncoded({ ...body }));
+    updatedReq.write(objToUrlEncoded({ ...body }));
     updatedReq.end();
 
     await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError(
@@ -110,7 +107,7 @@ describe('Login Middleware', () => {
     };
 
     const updatedReq = createReq();
-    updatedReq.write(payloadToUrlEncoded(updatedPayload));
+    updatedReq.write(objToUrlEncoded(updatedPayload));
     updatedReq.end();
 
     await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError();
