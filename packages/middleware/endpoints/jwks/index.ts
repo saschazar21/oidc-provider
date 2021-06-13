@@ -1,33 +1,27 @@
-import { IncomingMessage, ServerResponse } from 'http';
+import type { IncomingMessage, ServerResponse } from 'http';
 
-import getConfiguration from 'config/lib/openid-configuration';
 import methods from 'middleware/lib/methods';
 import { METHOD } from 'utils/lib/types/method';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
 import HTTPError from 'utils/lib/util/http_error';
+import { STATUS_CODE } from 'utils/lib/types/status_code';
+import getKeys from 'utils/lib/keys';
 
-const openidconfiguration = async (
+const jwks = async (
   req: IncomingMessage,
   res: ServerResponse
 ): Promise<void> => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
 
-  if (!(await methods(req, res, [METHOD.GET]))) {
-    throw new HTTPError(
-      'Method Not Allowed',
-      STATUS_CODE.METHOD_NOT_ALLOWED,
-      req.method,
-      req.url
-    );
-  }
+  await methods(req, res, [METHOD.GET]);
 
   // TODO: HEAD & OPTIONS handling
 
   try {
-    const configuration = getConfiguration();
+    const { keystore } = await getKeys();
+    const keys = keystore.toJWKS();
 
     res.writeHead(STATUS_CODE.OK, { 'Content-Type': 'application/json' });
-    res.write(JSON.stringify(configuration));
+    res.write(JSON.stringify(keys));
   } catch (e) {
     throw new HTTPError(
       e.message,
@@ -38,4 +32,4 @@ const openidconfiguration = async (
   }
 };
 
-export default openidconfiguration;
+export default jwks;

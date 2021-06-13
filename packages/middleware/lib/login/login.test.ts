@@ -6,6 +6,7 @@ import { UserSchema } from 'database/lib/schemata/user';
 import loginMiddleware from 'middleware/lib/login';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 import { LoginForm } from 'utils/lib/types/login';
+import payloadToUrlEncoded from 'utils/lib/util/obj-to-urlencoded';
 
 const createReq = (configuration?: { [key: string]: string | number }) =>
   new MockReq({
@@ -17,12 +18,6 @@ const createReq = (configuration?: { [key: string]: string | number }) =>
     url: '/api/login',
     ...configuration,
   });
-
-const payloadToUrlEncoded = (payload: LoginForm): string =>
-  Object.keys(payload).reduce((str: string, key: string) => {
-    const s = `${encodeURIComponent(key)}=${encodeURIComponent(payload[key])}`;
-    return str.length ? `${str}&${s}` : s;
-  }, '');
 
 describe('Login Middleware', () => {
   let UserModel;
@@ -68,7 +63,11 @@ describe('Login Middleware', () => {
     };
 
     req = createReq();
-    req.write(payloadToUrlEncoded(payload));
+    req.write(
+      payloadToUrlEncoded(
+        payload as { [key: string]: string | number | boolean }
+      )
+    );
     req.end();
 
     res = new MockRes();
