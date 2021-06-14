@@ -1,6 +1,5 @@
 import { connection } from 'mongoose';
 import MockRequest from 'mock-req';
-import MockResponse from 'mock-res';
 
 import { disconnect } from 'database/lib';
 import { ClientSchema } from 'database/lib/schemata/client';
@@ -10,7 +9,7 @@ import { ENDPOINT } from 'utils/lib/types/endpoint';
 import { SCOPE } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
-import objToUrlEncoded from 'utils/lib/util/obj-to-urlencoded';
+import { mockResponse, objToUrlEncoded } from 'utils/lib/util/test-utils';
 
 describe('Consent', () => {
   let AuthorizationModel;
@@ -97,7 +96,7 @@ describe('Consent', () => {
         ...config,
       });
 
-    res = new MockResponse();
+    res = mockResponse();
   });
 
   it('validates a consent', async () => {

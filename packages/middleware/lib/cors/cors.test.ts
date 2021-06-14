@@ -1,10 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import MockRequest from 'mock-req';
-import MockResponse from 'mock-res';
 
 import { CorsOptions, CORS_HEADERS } from 'middleware/lib/cors';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 import { METHOD } from 'utils/lib/types/method';
+import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('CORS', () => {
   let cors: (
@@ -20,10 +20,7 @@ describe('CORS', () => {
     },
   });
 
-  const res = new MockResponse();
-  const flushHeaders = jest.fn(function () {
-    this._header = this._headers = {};
-  });
+  const res = mockResponse();
 
   beforeEach(async () => {
     jest.resetModules();
@@ -133,8 +130,6 @@ describe('CORS', () => {
     const customReq = new MockRequest({
       method: METHOD.OPTIONS,
     });
-
-    res.flushHeaders = flushHeaders;
 
     const isPreflight = await cors(customReq, res, { mirrorOrigin: true });
 

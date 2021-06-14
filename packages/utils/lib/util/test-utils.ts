@@ -1,4 +1,16 @@
-const objToUrlencoded = (payload: {
+import MockRes from 'mock-res';
+
+export const flushHeaders = jest.fn(function flushHeaders(): void {
+  this._header = this._headers = {};
+});
+
+export const mockResponse = () => {
+  const res = new MockRes();
+  res.flushHeaders = flushHeaders;
+  return res;
+};
+
+export const objToUrlEncoded = (payload: {
   [key: string]: string | number | boolean;
 }): string =>
   Object.keys(payload).reduce((url: string, key: string) => {
@@ -11,5 +23,3 @@ const objToUrlencoded = (payload: {
     )}`;
     return url.length > 0 ? `${url}&${segment}` : segment;
   }, '');
-
-export default objToUrlencoded;

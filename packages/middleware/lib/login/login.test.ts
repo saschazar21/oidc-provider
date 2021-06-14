@@ -1,13 +1,12 @@
 import { Mongoose, connection } from 'mongoose';
 import MockReq from 'mock-req';
-import MockRes from 'mock-res';
 
 import { UserSchema } from 'database/lib/schemata/user';
 import loginMiddleware from 'middleware/lib/login';
 import { ENDPOINT } from 'utils/lib/types/endpoint';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 import { LoginForm } from 'utils/lib/types/login';
-import payloadToUrlEncoded from 'utils/lib/util/obj-to-urlencoded';
+import { mockResponse, objToUrlEncoded } from 'utils/lib/util/test-utils';
 
 const createReq = (configuration?: { [key: string]: string | number }) =>
   new MockReq({
@@ -65,13 +64,11 @@ describe('Login Middleware', () => {
 
     req = createReq();
     req.write(
-      payloadToUrlEncoded(
-        payload as { [key: string]: string | number | boolean }
-      )
+      objToUrlEncoded(payload as { [key: string]: string | number | boolean })
     );
     req.end();
 
-    res = new MockRes();
+    res = mockResponse();
   });
 
   it('should successfully authenticate user', async () => {
@@ -83,7 +80,7 @@ describe('Login Middleware', () => {
   it('should fail when no user given', async () => {
     const { email, ...body } = payload;
     const updatedReq = createReq();
-    updatedReq.write(payloadToUrlEncoded({ ...body }));
+    updatedReq.write(objToUrlEncoded({ ...body }));
     updatedReq.end();
 
     await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError(
@@ -95,7 +92,7 @@ describe('Login Middleware', () => {
     const { password, ...body } = payload;
 
     const updatedReq = createReq();
-    updatedReq.write(payloadToUrlEncoded({ ...body }));
+    updatedReq.write(objToUrlEncoded({ ...body }));
     updatedReq.end();
 
     await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError(
@@ -110,7 +107,7 @@ describe('Login Middleware', () => {
     };
 
     const updatedReq = createReq();
-    updatedReq.write(payloadToUrlEncoded(updatedPayload));
+    updatedReq.write(objToUrlEncoded(updatedPayload));
     updatedReq.end();
 
     await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError();

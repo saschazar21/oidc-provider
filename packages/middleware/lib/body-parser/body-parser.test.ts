@@ -1,11 +1,11 @@
 import MockReq from 'mock-req';
-import MockRes from 'mock-res';
 
 import bodyParser from 'middleware/lib/body-parser';
 import { METHOD } from 'utils/lib/types/method';
+import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('BodyParser', () => {
-  const res = new MockRes({});
+  const res = mockResponse();
 
   it('parses text-encoded body', async () => {
     const BODY = 'Hello, World!';

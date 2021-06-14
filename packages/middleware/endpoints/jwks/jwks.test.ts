@@ -2,16 +2,15 @@ import { STATUS_CODE } from 'utils/lib/types/status_code';
 import { METHOD } from 'utils/lib/types/method';
 import mongoose from 'mongoose';
 import MockRequest from 'mock-req';
-import MockResponse from 'mock-res';
 import retry from 'jest-retries';
+
+import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('/api/jwks', () => {
   let KeyModel;
   let connect;
   let req;
   let res;
-
-  const writeHead = jest.fn();
 
   afterEach(async () => {
     await connect().then(() => KeyModel.findByIdAndDelete('master'));
@@ -32,7 +31,7 @@ describe('/api/jwks', () => {
       url: '/api/jwks',
     });
 
-    res = new MockResponse();
+    res = mockResponse();
   });
 
   it('should return 500, when no MASTER_KEY is set', async () => {
@@ -68,8 +67,7 @@ describe('/api/jwks', () => {
       MASTER_KEY: 'testkey',
     };
 
-    const customRes = new MockResponse();
-    customRes.writeHead = writeHead;
+    const customRes = mockResponse();
 
     const { default: fetchJWKS } = await import('middleware/endpoints/jwks');
 
@@ -78,9 +76,8 @@ describe('/api/jwks', () => {
       .then(() => fetchJWKS(req, customRes))
       .then(() => mongoose.connection.close());
 
+    expect(customRes.statusCode).toEqual(STATUS_CODE.OK);
     expect(customRes.getHeader('x-robots-tag')).toEqual('noindex, nofollow');
-    expect(customRes.writeHead).toHaveBeenCalledWith(STATUS_CODE.OK, {
-      'Content-Type': 'application/json',
-    });
+    expect(customRes.getHeader('content-type')).toEqual('application/json');
   });
 });

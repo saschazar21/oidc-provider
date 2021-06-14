@@ -1,8 +1,8 @@
 import MockRequest from 'mock-req';
-import MockResponse from 'mock-res';
 import type { ServerResponse, IncomingMessage } from 'http';
 
 import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { mockResponse } from 'utils/lib/util/test-utils';
 
 const REDIRECT_PATH = '/test/redirect';
 
@@ -15,7 +15,7 @@ describe('Redirect middleware', () => {
 
     req = new MockRequest();
 
-    res = new MockResponse();
+    res = mockResponse();
   });
 
   it(`redirects to ${REDIRECT_PATH}`, async () => {
