@@ -6,6 +6,7 @@ import { disconnect } from 'database/lib';
 import { ClientSchema } from 'database/lib/schemata/client';
 import { UserSchema } from 'database/lib/schemata/user';
 import consentMiddleware from 'middleware/lib/consent';
+import { ENDPOINT } from 'utils/lib/types/endpoint';
 import { SCOPE } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
@@ -91,7 +92,7 @@ describe('Consent', () => {
           cookie: `authorization=${authorizationId}; sub=${sub}`,
         },
         method: 'POST',
-        url: '/api/consent',
+        url: ENDPOINT.CONSENT,
         protocol: 'https',
         ...config,
       });

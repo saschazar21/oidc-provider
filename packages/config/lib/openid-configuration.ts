@@ -1,5 +1,6 @@
 import { supportedAlgorithms } from 'config/lib/jwks';
 import getUrl from 'config/lib/url';
+import { ENDPOINT } from 'utils/lib/types/endpoint';
 import { SCOPE } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
@@ -57,10 +58,10 @@ const configuration = (): OpenIDConfiguration => {
 
   openidConfiguration = {
     issuer: getUrl(),
-    authorization_endpoint: getUrl('/api/authorization'),
-    token_endpoint: getUrl('/api/token'),
-    userinfo_endpoint: getUrl('/api/userinfo'),
-    jwks_uri: getUrl('/api/jwks'),
+    authorization_endpoint: getUrl(ENDPOINT.AUTHORIZATION),
+    token_endpoint: getUrl(ENDPOINT.TOKEN),
+    userinfo_endpoint: getUrl(ENDPOINT.USERINFO),
+    jwks_uri: getUrl(ENDPOINT.JWKS),
     // registration_endpoint?: string;
     scopes_supported: Object.values(SCOPE),
     response_types_supported: Object.values(RESPONSE_TYPE),
@@ -84,7 +85,7 @@ const configuration = (): OpenIDConfiguration => {
     display_values_supported: Object.values(DISPLAY),
     // claim_types_supported: string;
     claims_supported: Object.values(CLAIM),
-    service_documentation: getUrl('/docs'),
+    service_documentation: getUrl(ENDPOINT.DOCS),
     // claims_locales_supported: string;
     // ui_locales_supported: string;
     // claims_parameter_supported: string;

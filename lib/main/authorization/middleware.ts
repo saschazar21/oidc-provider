@@ -87,7 +87,7 @@ export default async (
   ) {
     const status = req.method === METHOD.POST ? 303 : 307;
     const querystring = query.encode({
-      redirect_to: '/api/authorization',
+      redirect_to: ENDPOINT.AUTHORIZATION,
     });
     await redirect(req, res, { location: `/login?${querystring}`, status });
     return null;

@@ -5,6 +5,7 @@ import retry from 'jest-retries';
 
 import { ClientSchema } from 'database/lib/schemata/client';
 import { UserSchema } from 'database/lib/schemata/user';
+import { ENDPOINT } from 'utils/lib/types/endpoint';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { SCOPE } from 'utils/lib/types/scope';
 
@@ -89,7 +90,7 @@ describe('Authorization Middleware', () => {
         encrypted: true,
       },
       method: 'GET',
-      url: '/api/authorization',
+      url: ENDPOINT.AUTHORIZATION,
       query: {
         scope: 'openid profile',
         response_type: 'code',
@@ -133,23 +134,27 @@ describe('Authorization Middleware', () => {
     );
   });
 
-  retry('should redirect to /api/login without sub cookie', 10, async () => {
-    const { default: authorizationMiddleware } = await import(
-      '~/lib/main/authorization/middleware'
-    );
+  retry(
+    `should redirect to ${ENDPOINT.LOGIN} without sub cookie`,
+    10,
+    async () => {
+      const { default: authorizationMiddleware } = await import(
+        '~/lib/main/authorization/middleware'
+      );
 
-    await connect().then(() => KeyModel.findByIdAndDelete('master'));
-    const result = await authorizationMiddleware(req, res);
+      await connect().then(() => KeyModel.findByIdAndDelete('master'));
+      const result = await authorizationMiddleware(req, res);
 
-    expect(result).toBeFalsy();
-    expect(res.setHeader).toHaveBeenCalledWith(
-      'Location',
-      '/login?redirect_to=%2Fapi%2Fauthorization'
-    );
-  });
+      expect(result).toBeFalsy();
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'Location',
+        '/login?redirect_to=%2Fapi%2Fauthorization'
+      );
+    }
+  );
 
   retry(
-    'should redirect POST to /api/login without sub cookie',
+    `should redirect POST to ${ENDPOINT.LOGIN} without sub cookie`,
     10,
     async () => {
       const updatedReq = {
@@ -175,7 +180,7 @@ describe('Authorization Middleware', () => {
   );
 
   retry(
-    `should redirect to /api/login even when authorization cookie present`,
+    `should redirect to ${ENDPOINT.LOGIN} even when authorization cookie present`,
     10,
     async () => {
       const updatedReq = {
