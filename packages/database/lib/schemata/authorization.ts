@@ -12,7 +12,7 @@ import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { SCOPE } from 'utils/lib/types/scope';
 import id from 'utils/lib/util/id';
 
-export type AuthorizationSchema = {
+export type Authorization = {
   _id?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -21,8 +21,8 @@ export type AuthorizationSchema = {
   user?: string;
   scope: SCOPE[];
   response_type: RESPONSE_TYPE[];
-  client_id: string;
-  redirect_uri: string;
+  client_id?: string;
+  redirect_uri?: string;
   state?: string;
   response_mode?: RESPONSE_MODE;
   nonce?: string;
@@ -34,6 +34,11 @@ export type AuthorizationSchema = {
   acr_values?: ACR_VALUES[];
   code_challenge?: string;
   code_challenge_method?: string;
+};
+
+export type AuthorizationSchema = Authorization & {
+  client_id: string;
+  redirect_uri: string;
 };
 
 const generateId = id(ALPHABET_LENGTH.LONG);

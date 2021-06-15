@@ -1,7 +1,7 @@
 import {
   validateScope,
   validateResponseType,
-} from '~/lib/main/authorization/validator';
+} from 'middleware/endpoints/authorization/validator';
 import { AuthorizationSchema } from 'database/lib/schemata/authorization';
 import { SCOPE } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';

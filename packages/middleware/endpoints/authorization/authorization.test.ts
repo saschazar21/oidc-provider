@@ -121,7 +121,7 @@ describe('Authorization Middleware', () => {
     } as any;
 
     const { default: authorizationMiddleware } = await import(
-      '~/lib/main/authorization/middleware'
+      '~/packages/middleware/endpoints/authorization'
     );
 
     await connect().then(() => KeyModel.findByIdAndDelete('master'));
@@ -139,7 +139,7 @@ describe('Authorization Middleware', () => {
     10,
     async () => {
       const { default: authorizationMiddleware } = await import(
-        '~/lib/main/authorization/middleware'
+        '~/packages/middleware/endpoints/authorization'
       );
 
       await connect().then(() => KeyModel.findByIdAndDelete('master'));
@@ -165,7 +165,7 @@ describe('Authorization Middleware', () => {
       } as any;
 
       const { default: authorizationMiddleware } = await import(
-        '~/lib/main/authorization/middleware'
+        '~/packages/middleware/endpoints/authorization'
       );
 
       await connect().then(() => KeyModel.findByIdAndDelete('master'));
@@ -193,7 +193,7 @@ describe('Authorization Middleware', () => {
       } as any;
 
       const { default: authorizationMiddleware } = await import(
-        '~/lib/main/authorization/middleware'
+        '~/packages/middleware/endpoints/authorization'
       );
 
       await connect().then(() => KeyModel.findByIdAndDelete('master'));
@@ -221,7 +221,7 @@ describe('Authorization Middleware', () => {
       } as any;
 
       const { default: authorizationMiddleware } = await import(
-        '~/lib/main/authorization/middleware'
+        '~/packages/middleware/endpoints/authorization'
       );
 
       await connect().then(() => KeyModel.findByIdAndDelete('master'));

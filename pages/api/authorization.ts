@@ -1,7 +1,7 @@
 import { URL, URLSearchParams } from 'url';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { authorizationMiddleware } from '~/lib/main/authorization';
+import { authorizationMiddleware } from 'middleware/endpoints/authorization';
 import methods from '~/lib/shared/middleware/methods';
 import redirect from '~/lib/shared/middleware/redirect';
 import { METHOD } from '~/lib/shared/types/method';

@@ -1,35 +1,47 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { IncomingMessage, ServerResponse } from 'http';
+import type Cookies from 'cookies';
 import query from 'querystring';
 import { format, parse } from 'url';
 
-import { mapAuthRequest } from '~/lib/main/authorization/helper';
+import { mapAuthRequest } from 'middleware/endpoints/authorization/helper';
 import {
   validateResponseType,
   validateScope,
-} from '~/lib/main/authorization/validator';
-import cookieParser from 'utils/lib/middleware/cookies';
-import redirect from 'utils/lib/middleware/redirect';
+} from 'middleware/endpoints/authorization/validator';
+import cookieParser from 'middleware/lib/cookies';
+import redirect from 'middleware/lib/redirect';
 import connect from 'database/lib';
 import AuthorizationModel, {
   AuthorizationSchema,
 } from 'database/lib/schemata/authorization';
+import { ENDPOINT } from 'utils/lib/types/endpoint';
 import { METHOD } from 'utils/lib/types/method';
-import logError from 'utils/lib/util/log_error';
+import { STATUS_CODE } from 'utils/lib/types/status_code';
+import HTTPError from 'utils/lib/util/http_error';
 
 // TODO: move to a general config space;
 const MAX_AGE = 1000 * 60 * 5; // 5 minutes between login & authorization
 const IS_TEST = process.env.NODE_ENV === 'test';
 
 export default async (
-  req: NextApiRequest,
-  res: NextApiResponse
+  req: IncomingMessage,
+  res: ServerResponse
 ): Promise<AuthorizationSchema> => {
   let authorization;
-  const cookies = await cookieParser(req, res);
+  let cookies: Cookies;
+  try {
+    cookies = await cookieParser(req, res);
+  } catch (e) {
+    throw new HTTPError(
+      e.message,
+      STATUS_CODE.INTERNAL_SERVER_ERROR,
+      req.method,
+      req.url
+    );
+  }
+
   const authorizationId = cookies.get('authorization', { signed: !IS_TEST });
-  const authRequest: AuthorizationSchema = mapAuthRequest(
-    req.method === METHOD.POST ? req.body : req.query
-  );
+  const authRequest: AuthorizationSchema = await mapAuthRequest(req, res);
 
   try {
     if (!authorizationId) {
@@ -54,7 +66,6 @@ export default async (
       );
     }
   } catch (e) {
-    const { method, url: path } = req;
     const { redirect_uri = '', state } = authRequest;
     const redirectUri = parse(redirect_uri, true);
     const responseQuery = Object.assign(
@@ -70,26 +81,21 @@ export default async (
       ...redirectUri,
       query: responseQuery,
     });
-    await redirect(req, res, { location, status: 302 });
-
-    logError({
-      message: e.message || e,
-      method,
-      path,
-      statusCode: 302,
-    });
-    return null;
+    await redirect(req, res, { location, statusCode: STATUS_CODE.FOUND });
   }
 
   if (
     !cookies.get('user', { signed: !IS_TEST }) &&
     !cookies.get('sub', { signed: !IS_TEST })
   ) {
-    const status = req.method === METHOD.POST ? 303 : 307;
+    const statusCode =
+      req.method === METHOD.POST
+        ? STATUS_CODE.SEE_OTHER
+        : STATUS_CODE.TEMPORARY_REDIRECT;
     const querystring = query.encode({
       redirect_to: ENDPOINT.AUTHORIZATION,
     });
-    await redirect(req, res, { location: `/login?${querystring}`, status });
+    await redirect(req, res, { location: `/login?${querystring}`, statusCode });
     return null;
   }
 

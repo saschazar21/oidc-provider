@@ -1,4 +1,4 @@
-import { mapAuthRequest } from '~/lib/main/authorization/helper';
+import { mapAuthRequest } from '~/packages/middleware/endpoints/authorization/helper';
 import { SCOPE } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { DISPLAY } from 'utils/lib/types/display';
