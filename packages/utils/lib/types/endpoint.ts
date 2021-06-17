@@ -8,3 +8,7 @@ export enum ENDPOINT {
   TOKEN = '/api/token',
   USERINFO = '/api/userinfo',
 }
+
+export enum CLIENT_ENDPOINT {
+  LOGIN = '/login',
+}

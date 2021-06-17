@@ -10,11 +10,11 @@ import {
 } from 'middleware/endpoints/authorization/validator';
 import cookieParser from 'middleware/lib/cookies';
 import redirect from 'middleware/lib/redirect';
-import connect from 'database/lib';
+import connect, { disconnect } from 'database/lib';
 import AuthorizationModel, {
   AuthorizationSchema,
 } from 'database/lib/schemata/authorization';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
+import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
 import { METHOD } from 'utils/lib/types/method';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 import HTTPError from 'utils/lib/util/http_error';
@@ -23,7 +23,7 @@ import HTTPError from 'utils/lib/util/http_error';
 const MAX_AGE = 1000 * 60 * 5; // 5 minutes between login & authorization
 const IS_TEST = process.env.NODE_ENV === 'test';
 
-export default async (
+const authorization = async (
   req: IncomingMessage,
   res: ServerResponse
 ): Promise<AuthorizationSchema> => {
@@ -41,17 +41,17 @@ export default async (
   }
 
   const authorizationId = cookies.get('authorization', { signed: !IS_TEST });
-  const authRequest: AuthorizationSchema = await mapAuthRequest(req, res);
+  const authRequest = await mapAuthRequest(req, res);
 
+  await connect();
   try {
     if (!authorizationId) {
       await Promise.all([
         validateResponseType(authRequest),
         validateScope(authRequest),
       ]);
-      authorization = await connect().then(() =>
-        AuthorizationModel.create(authRequest)
-      );
+      authorization = await AuthorizationModel.create(authRequest);
+
       const authorizationId = authorization.get('_id');
       cookies.set('authorization', authorizationId, {
         expires: new Date(Date.now() + MAX_AGE),
@@ -61,9 +61,7 @@ export default async (
         secure: true,
       });
     } else {
-      authorization = await connect().then(() =>
-        AuthorizationModel.findById(authorizationId)
-      );
+      authorization = await AuthorizationModel.findById(authorizationId);
     }
   } catch (e) {
     const { redirect_uri = '', state } = authRequest;
@@ -82,6 +80,9 @@ export default async (
       query: responseQuery,
     });
     await redirect(req, res, { location, statusCode: STATUS_CODE.FOUND });
+    return null;
+  } finally {
+    await disconnect();
   }
 
   if (
@@ -95,7 +96,10 @@ export default async (
     const querystring = query.encode({
       redirect_to: ENDPOINT.AUTHORIZATION,
     });
-    await redirect(req, res, { location: `/login?${querystring}`, statusCode });
+    await redirect(req, res, {
+      location: `${CLIENT_ENDPOINT.LOGIN}?${querystring}`,
+      statusCode,
+    });
     return null;
   }
 
@@ -103,3 +107,5 @@ export default async (
   cookies.set('sub');
   return authorization.toJSON();
 };
+
+export default authorization;

@@ -1,13 +1,14 @@
 import { connection } from 'mongoose';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { mockRequest, mockResponse } from 'mock-req-res';
-import retry from 'jest-retries';
+import MockRequest from 'mock-req';
+import { encode } from 'querystring';
 
 import { ClientSchema } from 'database/lib/schemata/client';
 import { UserSchema } from 'database/lib/schemata/user';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
+import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
+import { METHOD } from 'utils/lib/types/method';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { SCOPE } from 'utils/lib/types/scope';
+import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('Authorization Middleware', () => {
   let AuthorizationModel;
@@ -18,8 +19,8 @@ describe('Authorization Middleware', () => {
   let authorizationId: string;
   let client_id: string;
   let connect;
-  let req: NextApiRequest;
-  let res: NextApiResponse;
+  let req;
+  let res;
   let sub: string;
 
   const client: ClientSchema = {
@@ -33,6 +34,21 @@ describe('Authorization Middleware', () => {
     password: 'some test password',
   };
 
+  const query = {
+    scope: 'openid profile',
+    response_type: 'code',
+    client_id,
+    redirect_uri: client.redirect_uris[0],
+  };
+
+  const baseRequest = {
+    connection: {
+      encrypted: true,
+    },
+    method: METHOD.GET,
+    url: ENDPOINT.AUTHORIZATION,
+  };
+
   afterEach(async () => {
     try {
       await connect().then(() =>
@@ -44,7 +60,7 @@ describe('Authorization Middleware', () => {
         ])
       );
     } finally {
-      connection.close();
+      await connection.close();
     }
   });
 
@@ -76,162 +92,136 @@ describe('Authorization Middleware', () => {
       })
       .then((authorization) => {
         authorizationId = authorization.get('_id');
-      });
+      })
+      .then(() => connection.close());
 
     console.error = console.log;
 
-    const json = jest.fn().mockName('mockJSON');
-    const setHeader = jest.fn().mockName('mockSetHeader');
-    const status = jest.fn().mockName('mockStatus');
-    const end = jest.fn().mockName('mockEnd');
+    req = new MockRequest(baseRequest);
 
-    req = mockRequest({
-      connection: {
-        encrypted: true,
-      },
-      method: 'GET',
-      url: ENDPOINT.AUTHORIZATION,
-      query: {
-        scope: 'openid profile',
-        response_type: 'code',
-        client_id,
-        redirect_uri: client.redirect_uris[0],
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any;
-
-    res = mockResponse({
-      json,
-      set: null,
-      setHeader,
-      status,
-      end,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any;
+    res = mockResponse();
   });
 
-  retry('should redirect to client on malformed request', 10, async () => {
-    const updatedReq = {
-      ...req,
-      query: {
-        ...req.query,
-        scope: 'profile',
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
+  it('should redirect to client on malformed request', async () => {
+    const customQuery = {
+      ...query,
+      scope: 'profile',
+    };
+
+    const updatedReq = new MockRequest({
+      ...baseRequest,
+      url: `${ENDPOINT.AUTHORIZATION}?${encode(customQuery)}`,
+    });
 
     const { default: authorizationMiddleware } = await import(
-      '~/packages/middleware/endpoints/authorization'
+      'middleware/endpoints/authorization'
     );
 
     await connect().then(() => KeyModel.findByIdAndDelete('master'));
     const result = await authorizationMiddleware(updatedReq, res);
 
     expect(result).toBeFalsy();
-    expect(res.setHeader).toHaveBeenCalledWith(
-      'Location',
+    expect(res.getHeader('location')).toEqual(
       `${client.redirect_uris[0]}/?error=invalid_request`
     );
   });
 
-  retry(
-    `should redirect to ${ENDPOINT.LOGIN} without sub cookie`,
-    10,
-    async () => {
-      const { default: authorizationMiddleware } = await import(
-        '~/packages/middleware/endpoints/authorization'
-      );
+  it(`should redirect to ${CLIENT_ENDPOINT.LOGIN} without sub cookie`, async () => {
+    const updatedReq = new MockRequest({
+      ...baseRequest,
+      method: METHOD.POST,
+    });
+    updatedReq.write(encode({ ...query, client_id }));
+    updatedReq.end();
 
-      await connect().then(() => KeyModel.findByIdAndDelete('master'));
-      const result = await authorizationMiddleware(req, res);
+    const { default: authorizationMiddleware } = await import(
+      'middleware/endpoints/authorization'
+    );
 
-      expect(result).toBeFalsy();
-      expect(res.setHeader).toHaveBeenCalledWith(
-        'Location',
-        '/login?redirect_to=%2Fapi%2Fauthorization'
-      );
-    }
-  );
+    await connect()
+      .then(() => KeyModel.findByIdAndDelete('master'))
+      .then(() => connection.close());
+    const result = await authorizationMiddleware(updatedReq, res);
 
-  retry(
-    `should redirect POST to ${ENDPOINT.LOGIN} without sub cookie`,
-    10,
-    async () => {
-      const updatedReq = {
-        ...req,
-        body: { ...req.query },
-        method: 'POST',
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any;
+    expect(result).toBeFalsy();
+    expect(res.getHeader('location')).toEqual(
+      `${CLIENT_ENDPOINT.LOGIN}?${encode({
+        redirect_to: ENDPOINT.AUTHORIZATION,
+      })}`
+    );
+  });
 
-      const { default: authorizationMiddleware } = await import(
-        '~/packages/middleware/endpoints/authorization'
-      );
+  it(`should redirect POST to ${CLIENT_ENDPOINT.LOGIN} without sub cookie`, async () => {
+    const updatedReq = new MockRequest({
+      ...baseRequest,
+      method: METHOD.POST,
+    });
 
-      await connect().then(() => KeyModel.findByIdAndDelete('master'));
-      const result = await authorizationMiddleware(updatedReq, res);
+    updatedReq.write(encode(query));
+    updatedReq.end();
 
-      expect(result).toBeFalsy();
-      expect(res.setHeader).toHaveBeenCalledWith(
-        'Location',
-        '/login?redirect_to=%2Fapi%2Fauthorization'
-      );
-    }
-  );
+    const { default: authorizationMiddleware } = await import(
+      'middleware/endpoints/authorization'
+    );
 
-  retry(
-    `should redirect to ${ENDPOINT.LOGIN} even when authorization cookie present`,
-    10,
-    async () => {
-      const updatedReq = {
-        ...req,
-        headers: {
-          ...req.headers,
-          cookie: `authorization=${authorizationId}`,
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any;
+    await connect()
+      .then(() => KeyModel.findByIdAndDelete('master'))
+      .then(() => connection.close());
+    const result = await authorizationMiddleware(updatedReq, res);
 
-      const { default: authorizationMiddleware } = await import(
-        '~/packages/middleware/endpoints/authorization'
-      );
+    expect(result).toBeFalsy();
+    expect(res.getHeader('location')).toEqual(
+      `${CLIENT_ENDPOINT.LOGIN}?${encode({
+        redirect_to: ENDPOINT.AUTHORIZATION,
+      })}`
+    );
+  });
 
-      await connect().then(() => KeyModel.findByIdAndDelete('master'));
-      const result = await authorizationMiddleware(updatedReq, res);
+  it(`should redirect to ${CLIENT_ENDPOINT.LOGIN} even when authorization cookie present`, async () => {
+    const updatedReq = new MockRequest({
+      ...baseRequest,
+      headers: {
+        cookie: `authorization=${authorizationId}`,
+      },
+    });
 
-      expect(result).toBeFalsy();
-      expect(res.setHeader).toHaveBeenCalledWith(
-        'Location',
-        '/login?redirect_to=%2Fapi%2Fauthorization'
-      );
-    }
-  );
+    const { default: authorizationMiddleware } = await import(
+      'middleware/endpoints/authorization'
+    );
 
-  retry(
-    `should redirect to ${client.redirect_uris[0]} when sub cookie is set`,
-    10,
-    async () => {
-      const updatedReq = {
-        ...req,
-        headers: {
-          ...req.headers,
-          cookie: `sub=${sub}`,
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any;
+    await connect().then(() => KeyModel.findByIdAndDelete('master'));
+    const result = await authorizationMiddleware(updatedReq, res);
 
-      const { default: authorizationMiddleware } = await import(
-        '~/packages/middleware/endpoints/authorization'
-      );
+    expect(result).toBeFalsy();
+    expect(res.getHeader('location')).toEqual(
+      `${CLIENT_ENDPOINT.LOGIN}?${encode({
+        redirect_to: ENDPOINT.AUTHORIZATION,
+      })}`
+    );
+  });
 
-      await connect().then(() => KeyModel.findByIdAndDelete('master'));
-      const result = await authorizationMiddleware(updatedReq, res);
+  it(`should redirect to ${client.redirect_uris[0]} when sub cookie is set`, async () => {
+    const updatedReq = new MockRequest({
+      ...baseRequest,
+      headers: {
+        cookie: `sub=${sub}`,
+      },
+    });
 
-      expect(result).toBeTruthy();
-      expect(res.setHeader).not.toHaveBeenCalledWith(
-        'Location',
-        '/login?redirect_to=%2Fapi%2Fauthorization'
-      );
-    }
-  );
+    const { default: authorizationMiddleware } = await import(
+      'middleware/endpoints/authorization'
+    );
+
+    await connect()
+      .then(() => KeyModel.findByIdAndDelete('master'))
+      .then(() => connection.close());
+    const result = await authorizationMiddleware(updatedReq, res);
+
+    expect(result).toBeTruthy();
+    expect(res.getHeader('location')).toEqual(
+      `${CLIENT_ENDPOINT.LOGIN}?${encode({
+        redirect_to: ENDPOINT.AUTHORIZATION,
+      })}`
+    );
+  });
 });

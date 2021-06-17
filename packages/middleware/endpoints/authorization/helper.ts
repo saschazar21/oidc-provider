@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import URL from 'url';
 
-import { Authorization } from 'database/lib/schemata/authorization';
+import { AuthorizationSchema } from 'database/lib/schemata/authorization';
 import bodyParser from 'middleware/lib/body-parser';
 import { METHOD } from 'utils/lib/types/method';
 
@@ -14,7 +14,7 @@ import { METHOD } from 'utils/lib/types/method';
  * - ui_locales
  * - acr_values
  */
-export type AuthorizationPayload = {
+export type AuthorizationPayload = AuthorizationSchema & {
   scope?: string;
   response_type?: string;
   display?: string;
@@ -26,11 +26,11 @@ export type AuthorizationPayload = {
 export const mapAuthRequest = async (
   req: IncomingMessage,
   res: ServerResponse
-): Promise<Authorization> => {
+): Promise<AuthorizationSchema> => {
   const request: AuthorizationPayload =
     req.method === METHOD.POST
       ? ((await bodyParser(req, res, 'form')) as AuthorizationPayload)
-      : URL.parse(req.url, true).query;
+      : (URL.parse(req.url, true).query as unknown as AuthorizationPayload);
 
   const {
     scope = '',
@@ -53,10 +53,10 @@ export const mapAuthRequest = async (
       },
       arr.length ? { [keys[idx]]: arr } : null
     );
-  }, {} as Authorization);
+  }, {} as AuthorizationSchema);
 
   return {
     ...request,
     ...mapped,
-  } as Authorization;
+  } as AuthorizationSchema;
 };

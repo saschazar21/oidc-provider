@@ -1,10 +1,10 @@
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
+import { Authorization } from 'database/lib/schemata/authorization';
 import { SCOPE } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 
 export const validateResponseType = (
-  authRequest: AuthorizationSchema
-): AuthorizationSchema => {
+  authRequest: Authorization
+): Authorization => {
   const { response_type = [] } = authRequest;
   if (
     !Array.isArray(response_type) ||
@@ -18,9 +18,7 @@ export const validateResponseType = (
   return authRequest;
 };
 
-export const validateScope = (
-  authRequest: AuthorizationSchema
-): AuthorizationSchema => {
+export const validateScope = (authRequest: Authorization): Authorization => {
   const { scope = [] } = authRequest;
   if (!Array.isArray(scope) || scope.indexOf(SCOPE.OPENID) < 0) {
     throw new Error(`ERROR: scope parameter must contain "${SCOPE.OPENID}"`);

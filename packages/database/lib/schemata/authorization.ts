@@ -103,7 +103,7 @@ const authSchema = new Schema<Document<AuthorizationSchema>>({
         const redirect_uris: string[] = client
           ? client.get('redirect_uris')
           : [];
-        return redirect_uris.indexOf(value) > -1;
+        return redirect_uris.includes(value);
       },
       message: ({ value }): string =>
         `ERROR: ${value} not a redirect URL of client!`,
