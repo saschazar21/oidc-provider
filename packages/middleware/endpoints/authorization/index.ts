@@ -26,7 +26,7 @@ const IS_TEST = process.env.NODE_ENV === 'test';
 const authorization = async (
   req: IncomingMessage,
   res: ServerResponse
-): Promise<AuthorizationSchema | void> => {
+): Promise<void> => {
   let authorization;
   let cookies: Cookies;
   try {
@@ -85,7 +85,6 @@ const authorization = async (
 
     cookies.set('authorization');
     cookies.set('sub');
-    cookies.set('user');
     return redirect(req, res, { location, statusCode: STATUS_CODE.FOUND });
   } finally {
     await disconnect();
@@ -114,7 +113,6 @@ const authorization = async (
 
   cookies.set('authorization');
   cookies.set('sub');
-  cookies.set('user');
   return authorization.toJSON();
 };
 

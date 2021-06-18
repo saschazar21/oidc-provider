@@ -20,5 +20,8 @@
   },
   "bugs": {
     "url": "https://github.com/saschazar21/now-oidc-provider/issues"
+  },
+  "dependencies": {
+    "nanoid": "^3.1.9"
   }
 }

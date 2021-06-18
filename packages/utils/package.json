@@ -22,5 +22,14 @@
   },
   "bugs": {
     "url": "https://github.com/saschazar21/now-oidc-provider/issues"
+  },
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "jose": "^1.27.1",
+    "keygrip": "^1.1.0",
+    "nanoid": "^3.1.9"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^3.0.0"
   }
 }
