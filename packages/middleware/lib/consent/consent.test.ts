@@ -1,3 +1,4 @@
+import { IncomingMessage } from 'http';
 import { connection } from 'mongoose';
 import MockRequest from 'mock-req';
 import { encode } from 'querystring';
@@ -86,7 +87,7 @@ describe('Consent', () => {
 
     console.error = console.log;
 
-    req = (config: { [key: string]: string | number }) =>
+    req = (config: { [key: string]: string | number }): IncomingMessage =>
       new MockRequest({
         headers: {
           cookie: `authorization=${authorizationId}; sub=${sub}`,

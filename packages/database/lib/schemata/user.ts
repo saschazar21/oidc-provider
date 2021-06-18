@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema, UpdateQuery } from 'mongoose';
+import mongoose, { Document, Schema, UpdateQuery } from 'mongoose';
 
 import { ACR_VALUES } from 'utils/lib/types/acr';
 import { ALPHABET_LENGTH } from 'config/lib/id';

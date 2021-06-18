@@ -1,8 +1,8 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import type Cookies from 'cookies';
-import query from 'querystring';
 import { format, parse } from 'url';
 
+import getUrl from 'config/lib/url';
 import { mapAuthRequest } from 'middleware/endpoints/authorization/helper';
 import {
   validateResponseType,
@@ -26,7 +26,7 @@ const IS_TEST = process.env.NODE_ENV === 'test';
 const authorization = async (
   req: IncomingMessage,
   res: ServerResponse
-): Promise<AuthorizationSchema> => {
+): Promise<AuthorizationSchema | void> => {
   let authorization;
   let cookies: Cookies;
   try {
@@ -62,6 +62,9 @@ const authorization = async (
       });
     } else {
       authorization = await AuthorizationModel.findById(authorizationId);
+      if (!authorization) {
+        throw new Error(`Authorization ID ${authorizationId} not found!`);
+      }
     }
   } catch (e) {
     const { redirect_uri = '', state } = authRequest;
@@ -79,8 +82,11 @@ const authorization = async (
       ...redirectUri,
       query: responseQuery,
     });
-    await redirect(req, res, { location, statusCode: STATUS_CODE.FOUND });
-    return null;
+
+    cookies.set('authorization');
+    cookies.set('sub');
+    cookies.set('user');
+    return redirect(req, res, { location, statusCode: STATUS_CODE.FOUND });
   } finally {
     await disconnect();
   }
@@ -93,18 +99,22 @@ const authorization = async (
       req.method === METHOD.POST
         ? STATUS_CODE.SEE_OTHER
         : STATUS_CODE.TEMPORARY_REDIRECT;
-    const querystring = query.encode({
-      redirect_to: ENDPOINT.AUTHORIZATION,
+    const redirectUri = parse(getUrl(CLIENT_ENDPOINT.LOGIN));
+    const location = format({
+      ...redirectUri,
+      query: {
+        redirect_to: getUrl(ENDPOINT.AUTHORIZATION),
+      },
     });
-    await redirect(req, res, {
-      location: `${CLIENT_ENDPOINT.LOGIN}?${querystring}`,
+    return redirect(req, res, {
+      location,
       statusCode,
     });
-    return null;
   }
 
   cookies.set('authorization');
   cookies.set('sub');
+  cookies.set('user');
   return authorization.toJSON();
 };
 

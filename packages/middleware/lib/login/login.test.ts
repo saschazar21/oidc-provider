@@ -9,7 +9,7 @@ import { STATUS_CODE } from 'utils/lib/types/status_code';
 import { LoginForm } from 'utils/lib/types/login';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
-const createReq = (configuration?: { [key: string]: string | number }) =>
+const createReq = (configuration?: { [key: string]: string | number }): any =>
   new MockReq({
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',

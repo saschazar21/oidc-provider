@@ -19,7 +19,7 @@ describe('URL', () => {
     const { getUrl } = await import('config/lib/url');
 
     expect(getUrl).toThrowError(
-      'ERROR: No PROVIDER_URL env set, or no Vercel Deployment detected!'
+      'ERROR: No PROVIDER_URL env set, or no URL set by your deployment provider!'
     );
   });
 });
