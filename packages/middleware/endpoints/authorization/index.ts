@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import type Cookies from 'cookies';
-import { format, parse } from 'url';
+import { URL } from 'url';
+import { encode } from 'querystring';
 
 import getUrl from 'config/lib/url';
 import { mapAuthRequest } from 'middleware/endpoints/authorization/helper';
@@ -26,7 +27,7 @@ const IS_TEST = process.env.NODE_ENV === 'test';
 const authorization = async (
   req: IncomingMessage,
   res: ServerResponse
-): Promise<void> => {
+): Promise<AuthorizationSchema | void> => {
   let authorization;
   let cookies: Cookies;
   try {
@@ -68,24 +69,24 @@ const authorization = async (
     }
   } catch (e) {
     const { redirect_uri = '', state } = authRequest;
-    const redirectUri = parse(redirect_uri, true);
+    const redirectUri = new URL(redirect_uri);
     const responseQuery = Object.assign(
       {},
-      { ...redirectUri.query },
+      { ...redirectUri.searchParams },
       {
         // TODO: add types for error codes
         error: 'invalid_request',
       },
       state ? { state } : null
     );
-    const location = format({
-      ...redirectUri,
-      query: responseQuery,
-    });
+    redirectUri.search = encode(responseQuery);
 
     cookies.set('authorization');
     cookies.set('sub');
-    return redirect(req, res, { location, statusCode: STATUS_CODE.FOUND });
+    return redirect(req, res, {
+      location: redirectUri.toString(),
+      statusCode: STATUS_CODE.FOUND,
+    });
   } finally {
     await disconnect();
   }
@@ -98,15 +99,13 @@ const authorization = async (
       req.method === METHOD.POST
         ? STATUS_CODE.SEE_OTHER
         : STATUS_CODE.TEMPORARY_REDIRECT;
-    const redirectUri = parse(getUrl(CLIENT_ENDPOINT.LOGIN));
-    const location = format({
-      ...redirectUri,
-      query: {
-        redirect_to: getUrl(ENDPOINT.AUTHORIZATION),
-      },
+    const redirectUri = new URL(getUrl(CLIENT_ENDPOINT.LOGIN));
+    redirectUri.search = encode({
+      redirect_to: getUrl(ENDPOINT.AUTHORIZATION),
     });
+
     return redirect(req, res, {
-      location,
+      location: redirectUri.toString(),
       statusCode,
     });
   }

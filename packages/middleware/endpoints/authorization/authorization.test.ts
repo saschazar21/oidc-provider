@@ -1,9 +1,10 @@
 import { connection } from 'mongoose';
 import MockRequest from 'mock-req';
 import { encode } from 'querystring';
-import { format, parse } from 'url';
+import { URL } from 'url';
 
 import getUrl from 'config/lib/url';
+import { AuthorizationSchema } from 'database/lib/schemata/authorization';
 import { ClientSchema } from 'database/lib/schemata/client';
 import { UserSchema } from 'database/lib/schemata/user';
 import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
@@ -200,14 +201,11 @@ describe('Authorization Middleware', () => {
     );
   });
 
-  it.skip(`should redirect to redirect_uri when sub cookie is set`, async () => {
-    const baseUri = parse(getUrl(ENDPOINT.AUTHORIZATION));
-    const location = format({
-      ...baseUri,
-      query: {
-        ...query,
-        client_id,
-      },
+  it(`should return an Authorization model when sub cookie is set`, async () => {
+    const uri = new URL(getUrl(ENDPOINT.AUTHORIZATION));
+    uri.search = encode({
+      ...query,
+      client_id,
     });
 
     const updatedReq = new MockRequest({
@@ -215,22 +213,22 @@ describe('Authorization Middleware', () => {
       headers: {
         cookie: `sub=${sub}`,
       },
-      url: location,
+      url: uri.toString(),
     });
 
     const { default: authorizationMiddleware } = await import(
       'middleware/endpoints/authorization'
     );
 
-    const result = await authorizationMiddleware(updatedReq, res);
+    const result = (await authorizationMiddleware(
+      updatedReq,
+      res
+    )) as AuthorizationSchema;
 
     expect(result).toBeTruthy();
-    expect(res.getHeader('location')).toEqual(
-      getUrl(
-        `${CLIENT_ENDPOINT.LOGIN}?${encode({
-          redirect_to: getUrl(ENDPOINT.AUTHORIZATION),
-        })}`
-      )
-    );
+    expect(result.redirect_uri).toEqual(client.redirect_uris[0]);
+    expect(result.client_id).toEqual(client_id);
+    expect(result.response_type).toEqual([query.response_type]);
+    expect(result.scope).toEqual(query.scope.split(' '));
   });
 });

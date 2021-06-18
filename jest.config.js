@@ -4,4 +4,5 @@ module.exports = {
   roots: ['<rootDir>/lib', '<rootDir>/packages'],
   setupFiles: ['<rootDir>/lib/test/setup.js'],
   testMatch: ['**/*.test.ts'],
+  watchPathIgnorePatterns: ['globalConfig'],
 };
