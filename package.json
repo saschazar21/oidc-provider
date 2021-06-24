@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "test:lint": "eslint --ext .ts,.tsx ./",
-    "test:jest": "jest --coverage --runInBand",
+    "test:jest": "jest --coverage --runInBand --forceExit",
     "test": "yarn test:lint && yarn test:jest"
   },
   "devDependencies": {

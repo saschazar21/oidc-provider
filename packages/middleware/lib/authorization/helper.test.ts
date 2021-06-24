@@ -1,7 +1,7 @@
 import MockRequest from 'mock-req';
 import { encode } from 'querystring';
 
-import { mapAuthRequest } from 'middleware/endpoints/authorization/helper';
+import { mapAuthRequest } from 'middleware/lib/authorization/helper';
 import { ENDPOINT } from 'utils/lib/types/endpoint';
 import { SCOPE } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';

@@ -51,12 +51,12 @@ export type OpenIDConfiguration = {
 
 let openidConfiguration: OpenIDConfiguration;
 
-const configuration = (): OpenIDConfiguration => {
+const configuration = (configuration?: OpenIDConfiguration): OpenIDConfiguration => {
   if (openidConfiguration) {
     return openidConfiguration;
   }
 
-  openidConfiguration = {
+  openidConfiguration = configuration ?? {
     issuer: getUrl(),
     authorization_endpoint: getUrl(ENDPOINT.AUTHORIZATION),
     token_endpoint: getUrl(ENDPOINT.TOKEN),

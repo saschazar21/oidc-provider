@@ -23,7 +23,7 @@ const jwks = async (
     res.writeHead(STATUS_CODE.OK, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify(keys));
   } catch (e) {
-    throw new HTTPError(
+    throw e.name === HTTPError.NAME ? e : new HTTPError(
       e.message,
       STATUS_CODE.INTERNAL_SERVER_ERROR,
       req.method,

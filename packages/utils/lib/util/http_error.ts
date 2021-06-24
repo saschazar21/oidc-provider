@@ -7,11 +7,11 @@ import logError from 'utils/lib/util/log_error';
 class HTTPError extends Error implements Error {
   private _id: string;
   private _method: string;
-  private _name = 'HTTPError';
   private _path: string;
   private _statusCode: number;
 
   public static readonly ID_LENGTH = 5;
+  public static readonly NAME = 'HTTPError';
   public static generateID(): string {
     return id(HTTPError.ID_LENGTH)();
   }
@@ -36,7 +36,7 @@ class HTTPError extends Error implements Error {
   }
 
   get name(): string {
-    return this._name;
+    return HTTPError.NAME;
   }
 
   get statusCode(): number {
