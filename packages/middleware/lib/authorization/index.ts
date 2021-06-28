@@ -77,6 +77,7 @@ const authorization = async (
         // TODO: add types for error codes
         error: 'invalid_request',
       },
+      e.name === HTTPError.NAME ? { error_description: e.message } : null,
       state ? { state } : null
     );
     redirectUri.search = encode(responseQuery);

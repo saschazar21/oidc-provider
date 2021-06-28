@@ -16,7 +16,11 @@
     "resolveJsonModule": true,
     "jsx": "preserve",
     "paths": {
-      "~/*": ["./*"]
+      "config/*": ["packages/config/*"],
+      "database/*": ["packages/database/*"],
+      "functions/*": ["packages/functions/*"],
+      "middleware/*": ["packages/middleware/*"],
+      "utils/*": ["packages/utils/*"]
     }
   },
   "exclude": ["node_modules"],
