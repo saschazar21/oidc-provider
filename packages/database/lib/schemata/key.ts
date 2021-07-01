@@ -7,18 +7,16 @@ export type KeySchema = {
   bin: Buffer;
 };
 
-export const keySchema = new Schema<KeySchema>({
-  _id: String,
-  createdAt: {
-    default: Date.now,
-    type: Date,
+export const keySchema = new Schema<KeySchema>(
+  {
+    _id: String,
+    bin: {
+      required: true,
+      type: Buffer,
+    },
   },
-  updatedAt: Date,
-  bin: {
-    required: true,
-    type: Buffer,
-  },
-});
+  { timestamps: true }
+);
 
 keySchema.post('findOneAndUpdate', async function () {
   await this.update({ updatedAt: new Date(), $inc: { __v: 1 } });

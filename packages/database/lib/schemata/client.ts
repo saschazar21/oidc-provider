@@ -20,61 +20,59 @@ export type ClientSchema = {
 const generateClientId = generateId();
 const generateClientSecret = generateId(ALPHABET_LENGTH.LONG);
 
-const clientSchema = new Schema<ClientSchema>({
-  _id: {
-    alias: 'client_id',
-    required: true,
-    trim: true,
-    type: String,
-  },
-  active: {
-    type: Boolean,
-    default: true,
-  },
-  client_secret: {
-    required: true,
-    trim: true,
-    type: String,
-  },
-  createdAt: {
-    default: Date.now,
-    type: Date,
-  },
-  logo: {
-    lowercase: true,
-    type: String,
-    validate: {
-      validator: (uri: string): boolean => URL_REGEX.test(uri),
-      message: ({ value }): string =>
-        `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
+const clientSchema = new Schema<ClientSchema>(
+  {
+    _id: {
+      alias: 'client_id',
+      required: true,
+      trim: true,
+      type: String,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    client_secret: {
+      required: true,
+      trim: true,
+      type: String,
+    },
+    logo: {
+      lowercase: true,
+      type: String,
+      validate: {
+        validator: (uri: string): boolean => URL_REGEX.test(uri),
+        message: ({ value }): string =>
+          `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
+      },
+    },
+    name: {
+      required: [true, 'Client name is mandatory!'],
+      trim: true,
+      type: String,
+      unique: true,
+    },
+    owner: {
+      ref: 'User',
+      required: true,
+      type: String,
+    },
+    redirect_uris: {
+      lowercase: true,
+      type: [String],
+      validate: {
+        validator: (uris: string[]): boolean =>
+          uris.length > 0 &&
+          uris.filter((uri) => HTTPS_REGEX.test(uri)).length === uris.length,
+        message: ({ value }): string =>
+          `ERROR: One of [${value.join(
+            ', '
+          )}] is an invalid URL! Only 'https://'-prefixes are allowed!`,
+      },
     },
   },
-  name: {
-    required: [true, 'Client name is mandatory!'],
-    trim: true,
-    type: String,
-    unique: true,
-  },
-  owner: {
-    ref: 'User',
-    required: true,
-    type: String,
-  },
-  redirect_uris: {
-    lowercase: true,
-    type: [String],
-    validate: {
-      validator: (uris: string[]): boolean =>
-        uris.length > 0 &&
-        uris.filter((uri) => HTTPS_REGEX.test(uri)).length === uris.length,
-      message: ({ value }): string =>
-        `ERROR: One of [${value.join(
-          ', '
-        )}] is an invalid URL! Only 'https://'-prefixes are allowed!`,
-    },
-  },
-  updatedAt: Date,
-});
+  { timestamps: true }
+);
 
 clientSchema.method(
   'resetSecret',

@@ -87,121 +87,120 @@ ${rightPad(this.postal_code)}${rightPad(this.locality)}${this.region}
 ${this.country}`;
 });
 
-const userSchema = new Schema<User>({
-  _id: {
-    alias: 'sub',
-    required: true,
-    trim: true,
-    type: String,
-  },
-  active: {
-    default: true,
-    type: Boolean,
-  },
-  password: {
-    required: true,
-    trim: true,
-    type: String,
-  },
-  createdAt: {
-    default: Date.now,
-    type: Date,
-  },
-  updatedAt: {
-    alias: 'updated_at',
-    type: Date,
-  },
-  given_name: {
-    trim: true,
-    type: String,
-  },
-  family_name: {
-    trim: true,
-    type: String,
-  },
-  middle_name: {
-    trim: true,
-    type: String,
-  },
-  nickname: {
-    trim: true,
-    type: String,
-  },
-  preferred_username: {
-    trim: true,
-    type: String,
-  },
-  profile: {
-    lowercase: true,
-    validate: {
-      validator: (value: string): boolean => URL_REGEX.test(value),
-      message: ({ value }): string =>
-        `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
-    },
-    trim: true,
-    type: String,
-  },
-  picture: {
-    lowercase: true,
-    validate: {
-      validator: (value: string): boolean => URL_REGEX.test(value),
-      message: ({ value }): string =>
-        `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
-    },
-    trim: true,
-    type: String,
-  },
-  website: {
-    lowercase: true,
-    validate: {
-      validator: (value: string): boolean => URL_REGEX.test(value),
-      message: ({ value }): string =>
-        `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
-    },
-    trim: true,
-    type: String,
-  },
-  email: {
-    lowercase: true,
-    required: true,
-    unique: true,
-    validate: {
-      validator: (value: string): boolean => EMAIL_REGEX.test(value),
-      message: ({ value }): string =>
-        `ERROR: ${value} is an invalid E-Mail Address!`,
-    },
-    trim: true,
-    type: String,
-  },
-  email_verified: {
-    default: false,
-    type: Boolean,
-  },
-  gender: {
-    enum: ['female', 'male', 'other', 'none'],
-    type: String,
-  },
-  birthdate: Date,
-  zoneinfo: String,
-  locale: String,
-  phone_number: String,
-  phone_number_verified: {
-    default: false,
-    type: Boolean,
-  },
-  address: addressSchema,
-  acr: {
-    default: (): string => ACR_VALUES.BASIC,
-    enum: Object.values(ACR_VALUES),
-    type: String,
-  },
-  consents: [
-    {
-      ref: 'Client',
+const userSchema = new Schema<User>(
+  {
+    _id: {
+      alias: 'sub',
+      required: true,
+      trim: true,
       type: String,
     },
-  ],
-});
+    active: {
+      default: true,
+      type: Boolean,
+    },
+    password: {
+      required: true,
+      trim: true,
+      type: String,
+    },
+    updatedAt: {
+      alias: 'updated_at',
+      type: Date,
+    },
+    given_name: {
+      trim: true,
+      type: String,
+    },
+    family_name: {
+      trim: true,
+      type: String,
+    },
+    middle_name: {
+      trim: true,
+      type: String,
+    },
+    nickname: {
+      trim: true,
+      type: String,
+    },
+    preferred_username: {
+      trim: true,
+      type: String,
+    },
+    profile: {
+      lowercase: true,
+      validate: {
+        validator: (value: string): boolean => URL_REGEX.test(value),
+        message: ({ value }): string =>
+          `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
+      },
+      trim: true,
+      type: String,
+    },
+    picture: {
+      lowercase: true,
+      validate: {
+        validator: (value: string): boolean => URL_REGEX.test(value),
+        message: ({ value }): string =>
+          `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
+      },
+      trim: true,
+      type: String,
+    },
+    website: {
+      lowercase: true,
+      validate: {
+        validator: (value: string): boolean => URL_REGEX.test(value),
+        message: ({ value }): string =>
+          `ERROR: ${value} is an invalid URL! Only 'http(s)://'-prefixes are allowed!`,
+      },
+      trim: true,
+      type: String,
+    },
+    email: {
+      lowercase: true,
+      required: true,
+      unique: true,
+      validate: {
+        validator: (value: string): boolean => EMAIL_REGEX.test(value),
+        message: ({ value }): string =>
+          `ERROR: ${value} is an invalid E-Mail Address!`,
+      },
+      trim: true,
+      type: String,
+    },
+    email_verified: {
+      default: false,
+      type: Boolean,
+    },
+    gender: {
+      enum: ['female', 'male', 'other', 'none'],
+      type: String,
+    },
+    birthdate: Date,
+    zoneinfo: String,
+    locale: String,
+    phone_number: String,
+    phone_number_verified: {
+      default: false,
+      type: Boolean,
+    },
+    address: addressSchema,
+    acr: {
+      default: (): string => ACR_VALUES.BASIC,
+      enum: Object.values(ACR_VALUES),
+      type: String,
+    },
+    consents: [
+      {
+        ref: 'Client',
+        type: String,
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 userSchema
   .virtual('name')

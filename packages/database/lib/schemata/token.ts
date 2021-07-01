@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 import { ALPHABET_LENGTH } from 'config/lib/id';
 import { LIFETIME } from 'utils/lib/types/lifetime';
+import { TOKEN_TYPE } from 'utils/lib/types/token_type';
 import id from 'utils/lib/util/id';
 
 export type BaseTokenSchema = {
@@ -13,19 +14,20 @@ export type BaseTokenSchema = {
 };
 
 export type AccessTokenSchema = BaseTokenSchema & {
-  type: 'AccessToken';
-  expires?: Date;
+  type: TOKEN_TYPE.ACCESS_TOKEN;
+  expiresAt?: Date;
 };
 
 export type RefreshTokenSchema = BaseTokenSchema & {
-  type: 'RefreshToken';
-  expires?: Date;
+  type: TOKEN_TYPE.REFRESH_TOKEN;
+  expiresAt?: Date;
 };
 
 const generateId = id(ALPHABET_LENGTH.LONG);
 
 const discriminatorOptions = {
   discriminatorKey: 'type',
+  timestamps: true,
 };
 
 const baseTokenSchema = new Schema<Document<BaseTokenSchema>>(
@@ -34,15 +36,6 @@ const baseTokenSchema = new Schema<Document<BaseTokenSchema>>(
       required: true,
       trim: true,
       type: String,
-    },
-    createdAt: {
-      default: Date.now,
-      type: Date,
-    },
-    updatedAt: Date,
-    active: {
-      default: true,
-      type: Boolean,
     },
     authorization: {
       ref: 'Authorization',
@@ -55,39 +48,25 @@ const baseTokenSchema = new Schema<Document<BaseTokenSchema>>(
 
 const accessTokenSchema = new Schema<Document<AccessTokenSchema>>(
   {
-    createdAt: {
-      default: Date.now,
-      index: {
-        expires: LIFETIME.ACCESS_TOKEN,
-        unique: true,
-      },
-      type: Date,
-    },
-    expires: {
-      default: (): number => Date.now() + LIFETIME.ACCESS_TOKEN * 1000,
+    expiresAt: {
+      default: (): Date => new Date(Date.now() + LIFETIME.ACCESS_TOKEN * 1000),
       type: Date,
     },
   },
   discriminatorOptions
 );
+accessTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const refreshTokenSchema = new Schema<Document<RefreshTokenSchema>>(
   {
-    createdAt: {
-      default: Date.now,
-      index: {
-        expires: LIFETIME.REFRESH_TOKEN,
-        unique: true,
-      },
-      type: Date,
-    },
-    expires: {
-      default: (): number => Date.now() + LIFETIME.REFRESH_TOKEN * 1000,
+    expiresAt: {
+      default: (): Date => new Date(Date.now() + LIFETIME.REFRESH_TOKEN * 1000),
       type: Date,
     },
   },
   discriminatorOptions
 );
+refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 baseTokenSchema.pre('validate', async function () {
   if (this.get('_id')) {
@@ -97,16 +76,16 @@ baseTokenSchema.pre('validate', async function () {
 });
 
 const BaseTokenModel = mongoose.model<BaseTokenSchema>(
-  'BaseToken',
+  TOKEN_TYPE.BASE_TOKEN,
   baseTokenSchema
 );
 
 export const AccessTokenModel = BaseTokenModel.discriminator(
-  'AccessToken',
+  TOKEN_TYPE.ACCESS_TOKEN,
   accessTokenSchema
 );
 
 export const RefreshTokenModel = BaseTokenModel.discriminator(
-  'RefreshToken',
+  TOKEN_TYPE.REFRESH_TOKEN,
   refreshTokenSchema
 );

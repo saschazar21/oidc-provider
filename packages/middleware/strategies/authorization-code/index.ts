@@ -1,34 +1,33 @@
 import AuthStrategy, {
   AuthorizationResponse,
-  AuthorizationCodeResponsePayload,
 } from 'middleware/strategies/AuthStrategy';
-import validateAuthorizationCode from 'middleware/strategies/authorization-code/validator';
 
-class AuthorizationCodeStrategy extends AuthStrategy {
-  public get responsePayload(): AuthorizationResponse {
-    if (!this.model) {
-      throw new Error('No Authorization Model created yet!');
-    }
+export type AuthorizationCodeResponsePayload = {
+  code: string;
+  state?: string;
+};
+
+class AuthorizationCodeStrategy extends AuthStrategy<AuthorizationCodeResponsePayload> {
+  public async responsePayload(): Promise<
+    AuthorizationResponse<AuthorizationCodeResponsePayload>
+  > {
+    await this.validate();
 
     const payload = Object.assign(
       {},
       {
-        code: this.model._id,
+        code: this.id,
       },
-      this.model.get('state') ? { state: this.model.get('state') } : null
+      this.doc.get('state') ? { state: this.doc.get('state') } : null
     ) as AuthorizationCodeResponsePayload;
 
     return {
-      redirect_uri: this.model.get('redirect_uri'),
+      redirect_uri: this.doc.get('redirect_uri'),
       response_mode:
-        this.model.get('response_mode') ??
+        this.doc.get('response_mode') ??
         AuthorizationCodeStrategy.DEFAULT_RESPONSE_MODE,
       payload,
-    } as AuthorizationResponse;
-  }
-
-  public validate(): boolean {
-    return validateAuthorizationCode(this.auth);
+    };
   }
 }
 

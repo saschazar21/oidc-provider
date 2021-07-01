@@ -16,7 +16,7 @@ export type Authorization = {
   _id?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  active?: boolean;
+  expiresAt?: Date;
   consent?: boolean;
   user?: string;
   scope: SCOPE[];
@@ -43,99 +43,94 @@ export type AuthorizationSchema = Authorization & {
 
 const generateId = id(ALPHABET_LENGTH.LONG);
 
-const authSchema = new Schema<Document<AuthorizationSchema>>({
-  _id: {
-    required: true,
-    trim: true,
-    type: String,
-  },
-  createdAt: {
-    default: Date.now,
-    index: {
-      expires: LIFETIME.REFRESH_TOKEN,
-      unique: true,
+const authSchema = new Schema<Document<AuthorizationSchema>>(
+  {
+    _id: {
+      required: true,
+      trim: true,
+      type: String,
     },
-    type: Date,
-  },
-  updatedAt: Date,
-  active: {
-    default: false,
-    type: Boolean,
-  },
-  consent: {
-    default: false,
-    type: Boolean,
-  },
-  user: {
-    ref: 'User',
-    required: [
-      function (): boolean {
-        return this.consent;
+    expiresAt: {
+      default: (): Date => new Date(Date.now() + LIFETIME.REFRESH_TOKEN * 1000),
+      type: Date,
+    },
+    consent: {
+      default: false,
+      type: Boolean,
+    },
+    user: {
+      ref: 'User',
+      required: [
+        function (): boolean {
+          return this.consent;
+        },
+        'ERROR! User is required, if consent is given!',
+      ],
+      trim: true,
+      type: String,
+    },
+    scope: {
+      enum: Object.values(SCOPE),
+      required: true,
+      type: [String],
+    },
+    response_type: {
+      enum: Object.values(RESPONSE_TYPE),
+      required: true,
+      type: [String],
+    },
+    client_id: {
+      ref: 'Client',
+      required: true,
+      trim: true,
+      type: String,
+    },
+    redirect_uri: {
+      required: true,
+      trim: true,
+      type: String,
+      validate: {
+        validator: async function (value: string): Promise<boolean> {
+          const client = await ClientModel.findById(this.get('client_id'));
+          const redirect_uris: string[] = client
+            ? client.get('redirect_uris')
+            : [];
+          return redirect_uris.includes(value);
+        },
+        message: ({ value }): string =>
+          `ERROR: ${value} not a redirect URL of client!`,
       },
-      'ERROR! User is required, if consent is given!',
-    ],
-    trim: true,
-    type: String,
-  },
-  scope: {
-    enum: Object.values(SCOPE),
-    required: true,
-    type: [String],
-  },
-  response_type: {
-    enum: Object.values(RESPONSE_TYPE),
-    required: true,
-    type: [String],
-  },
-  client_id: {
-    ref: 'Client',
-    required: true,
-    trim: true,
-    type: String,
-  },
-  redirect_uri: {
-    required: true,
-    trim: true,
-    type: String,
-    validate: {
-      validator: async function (value: string): Promise<boolean> {
-        const client = await ClientModel.findById(this.get('client_id'));
-        const redirect_uris: string[] = client
-          ? client.get('redirect_uris')
-          : [];
-        return redirect_uris.includes(value);
-      },
-      message: ({ value }): string =>
-        `ERROR: ${value} not a redirect URL of client!`,
+    },
+    state: String,
+    response_mode: {
+      enum: Object.values(RESPONSE_MODE),
+      type: String,
+    },
+    nonce: String,
+    display: {
+      enum: Object.values(DISPLAY),
+      type: [String],
+    },
+    prompt: {
+      enum: Object.values(PROMPT),
+      type: [String],
+    },
+    max_age: Number,
+    ui_locales: [String],
+    login_hint: String,
+    acr_values: {
+      enum: Object.values(ACR_VALUES),
+      type: [String],
+    },
+    code_challenge: String,
+    code_challenge_method: {
+      enum: Object.values(PKCE),
+      type: String,
     },
   },
-  state: String,
-  response_mode: {
-    enum: Object.values(RESPONSE_MODE),
-    type: String,
-  },
-  nonce: String,
-  display: {
-    enum: Object.values(DISPLAY),
-    type: [String],
-  },
-  prompt: {
-    enum: Object.values(PROMPT),
-    type: [String],
-  },
-  max_age: Number,
-  ui_locales: [String],
-  login_hint: String,
-  acr_values: {
-    enum: Object.values(ACR_VALUES),
-    type: [String],
-  },
-  code_challenge: String,
-  code_challenge_method: {
-    enum: Object.values(PKCE),
-    type: String,
-  },
-});
+  { timestamps: true }
+);
+authSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 authSchema.pre('validate', async function () {
   if (this.get('_id')) {
@@ -143,9 +138,6 @@ authSchema.pre('validate', async function () {
   }
   if (this.get('consent')) {
     throw new Error('ERROR: Custom consent is not allowed!');
-  }
-  if (this.get('active')) {
-    throw new Error('ERROR: Custom active state is not allowed!');
   }
   this.set({ _id: await generateId() });
 });

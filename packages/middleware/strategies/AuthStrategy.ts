@@ -1,14 +1,15 @@
 import type { Document } from 'mongoose';
 
+import connect, { disconnect } from 'database/lib';
 import AuthorizationModel, {
-  AuthorizationSchema,
+  Authorization,
 } from 'database/lib/schemata/authorization';
+import {
+  AccessTokenModel,
+  AccessTokenSchema,
+} from 'database/lib/schemata/token';
+import UserModel from 'database/lib/schemata/user';
 import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
-
-export type AuthorizationCodeResponsePayload = {
-  code: string;
-  state?: string;
-};
 
 export type ImplicitOrHybridResponsePayload = {
   access_token: string;
@@ -19,43 +20,119 @@ export type ImplicitOrHybridResponsePayload = {
   state?: string;
 };
 
-export type AuthorizationResponse = {
+export type AuthorizationResponse<T> = {
   redirect_uri: string;
   response_mode: RESPONSE_MODE;
-  payload: AuthorizationCodeResponsePayload | ImplicitOrHybridResponsePayload;
+  payload: T;
 };
 
-abstract class AuthStrategy {
-  public static DEFAULT_RESPONSE_MODE = RESPONSE_MODE.QUERY;
+abstract class AuthStrategy<T> {
+  public static readonly DEFAULT_RESPONSE_MODE: RESPONSE_MODE =
+    RESPONSE_MODE.QUERY;
 
-  private _auth: AuthorizationSchema;
+  private _auth: Authorization;
+  private _id: string;
 
-  protected _model: Document<AuthorizationSchema>;
+  protected _doc: Document<Authorization>;
 
-  public get auth(): AuthorizationSchema {
+  public get auth(): Authorization {
     return this._auth;
   }
 
-  public get model(): Document<AuthorizationSchema> {
-    return this._model;
+  public get doc(): Document<Authorization> {
+    return this._doc;
   }
 
-  constructor(auth: AuthorizationSchema) {
-    this._auth = auth;
+  public get id(): string {
+    return this._id;
+  }
 
-    if (!this.validate()) {
-      throw new Error('Authorization strategy validation failed!');
+  constructor(auth: Authorization) {
+    const { _id, ...rest } = auth;
+    this._id = _id;
+    this._auth = rest;
+  }
+
+  private sanitizeUpdate(): Authorization {
+    return Object.keys(this.auth).reduce(
+      (obj: Authorization, key: string): Authorization =>
+        Object.assign(
+          {},
+          {
+            ...obj,
+          },
+          !this.doc.get(key) || this.doc.get(key).length === 0
+            ? { [key]: this.auth[key] }
+            : null
+        ),
+      {} as Authorization
+    );
+  }
+
+  protected async createAccessToken(): Promise<Document<AccessTokenSchema>> {
+    try {
+      await connect();
+      return AccessTokenModel.create({ authorization: this.id });
+    } finally {
+      await disconnect();
     }
   }
 
-  public async create(): Promise<Document<AuthorizationSchema>> {
-    this._model = await AuthorizationModel.create(this.auth);
-    return this.model;
+  protected async validate(): Promise<boolean> {
+    if (!this.doc) {
+      throw new Error('No Authorization available!');
+    }
+
+    try {
+      await connect();
+      if (!(await UserModel.findById(this.doc.get('user'), '_id'))) {
+        throw new Error(`No user assigned to Authorization ID ${this.id}!`);
+      }
+      if (!this.doc.get('consent')) {
+        throw new Error(
+          `User has not given consent to Authorization ID: ${this.id}!`
+        );
+      }
+      return true;
+    } finally {
+      await disconnect();
+    }
   }
 
-  public abstract get responsePayload(): AuthorizationResponse;
+  public async init(): Promise<Document<Authorization>> {
+    try {
+      await connect();
+      this._doc = this.id
+        ? await AuthorizationModel.findById(this.id)
+        : await AuthorizationModel.create(this.auth);
+      if (!this.doc) {
+        throw new Error(
+          `Failed to fetch/create Authorization using data: ${JSON.stringify(
+            this.auth
+          )}`
+        );
+      }
+      const sanitized = !this.doc.isNew && this.sanitizeUpdate();
+      if (sanitized && Object.keys(sanitized).length > 0) {
+        this._doc = await AuthorizationModel.findByIdAndUpdate(
+          this.id,
+          sanitized,
+          {
+            new: true,
+            omitUndefined: true,
+            timestamps: true,
+          }
+        );
+      }
+      this._id = this.doc.get('_id');
+      this._auth = this.doc.toJSON() as unknown as Authorization;
+      return this.doc;
+    } finally {
+      await disconnect();
+    }
+  }
 
-  public abstract validate(): boolean;
+  public abstract responsePayload(): Promise<AuthorizationResponse<T>>;
 }
 
 export default AuthStrategy;

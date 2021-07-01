@@ -12,6 +12,7 @@ import { ClientSchema } from './client';
 import { UserSchema } from './user';
 import { LIFETIME } from 'utils/lib/types/lifetime';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
+import { TOKEN_TYPE } from 'utils/lib/types/token_type';
 import { SCOPE } from 'utils/lib/types/scope';
 
 describe('TokenModel', () => {
@@ -89,10 +90,10 @@ describe('TokenModel', () => {
     access_token = token.get('_id');
 
     expect(access_token).toHaveLength(ALPHABET_LENGTH.LONG);
-    expect(token.get('type')).toEqual('AccessToken');
+    expect(token.get('type')).toEqual(TOKEN_TYPE.ACCESS_TOKEN);
     expect(token.get('authorization')).toHaveProperty('_id', authorization_id);
     expect(token.get('authorization').get('client_id')).toEqual(client_id);
-    expect(Date.parse(token.get('expires'))).toEqual(
+    expect(Date.parse(token.get('expiresAt'))).toEqual(
       Date.parse(token.get('createdAt')) + LIFETIME.ACCESS_TOKEN * 1000
     );
   });
@@ -106,10 +107,10 @@ describe('TokenModel', () => {
     refresh_token = token.get('_id');
 
     expect(access_token).toHaveLength(ALPHABET_LENGTH.LONG);
-    expect(token.get('type')).toEqual('RefreshToken');
+    expect(token.get('type')).toEqual(TOKEN_TYPE.REFRESH_TOKEN);
     expect(token.get('authorization')).toHaveProperty('_id', authorization_id);
     expect(token.get('authorization').get('client_id')).toEqual(client_id);
-    expect(Date.parse(token.get('expires'))).toEqual(
+    expect(Date.parse(token.get('expiresAt'))).toEqual(
       Date.parse(token.get('createdAt')) + LIFETIME.REFRESH_TOKEN * 1000
     );
   });
