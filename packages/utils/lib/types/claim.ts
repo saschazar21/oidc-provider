@@ -5,6 +5,8 @@ export enum CLAIM {
   EXP = 'exp',
   ACR = 'acr',
   SUB = 'sub',
+  NBF = 'nbf',
+  JTI = 'jti',
   NAME = 'name',
   GIVEN_NAME = 'given_name',
   FAMILY_NAME = 'family_name',
@@ -25,6 +27,7 @@ export enum CLAIM {
   ADDRESS = 'address',
   UPDATED_AT = 'updated_at',
   NONCE = 'nonce',
+  AUTH_TIME = 'auth_time',
   AT_HASH = 'at_hash',
   C_HASH = 'c_hash',
 }

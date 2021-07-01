@@ -37,6 +37,10 @@ const baseTokenSchema = new Schema<Document<BaseTokenSchema>>(
       trim: true,
       type: String,
     },
+    active: {
+      default: true,
+      type: Boolean,
+    },
     authorization: {
       ref: 'Authorization',
       required: true,

@@ -1,3 +1,5 @@
+import { CLAIM } from 'utils/lib/types/claim';
+
 export enum SCOPE {
   OPENID = 'openid',
   PROFILE = 'profile',
@@ -5,3 +7,27 @@ export enum SCOPE {
   ADDRESS = 'address',
   PHONE = 'phone',
 }
+
+export const SCOPE_CLAIMS = {
+  [SCOPE.OPENID]: [
+    CLAIM.SUB,
+    CLAIM.ISS,
+    CLAIM.AUD,
+    CLAIM.EXP,
+    CLAIM.IAT,
+    CLAIM.AT_HASH,
+  ],
+  [SCOPE.PROFILE]: [
+    CLAIM.NAME,
+    CLAIM.FAMILY_NAME,
+    CLAIM.GIVEN_NAME,
+    CLAIM.MIDDLE_NAME,
+    CLAIM.NICKNAME,
+    CLAIM.PREFERRED_USERNAME,
+    CLAIM.PICTURE,
+    CLAIM.UPDATED_AT,
+  ],
+  [SCOPE.EMAIL]: [CLAIM.EMAIL, CLAIM.EMAIL_VERIFIED],
+  [SCOPE.ADDRESS]: [CLAIM.ADDRESS],
+  [SCOPE.PHONE]: [CLAIM.PHONE_NUMBER, CLAIM.PHONE_NUMBER_VERIFIED],
+};

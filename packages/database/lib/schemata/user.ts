@@ -199,7 +199,7 @@ const userSchema = new Schema<User>(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 userSchema
