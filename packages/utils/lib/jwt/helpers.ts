@@ -1,14 +1,14 @@
 import getUrl from 'config/lib/url';
 import connection, { disconnect, UserModel } from 'database/lib';
 import { AuthorizationSchema } from 'database/lib/schemata/authorization';
-import { UserSchema } from 'database/lib/schemata/user';
+import { AddressSchema, UserSchema } from 'database/lib/schemata/user';
 import { CLAIM } from 'utils/lib/types/claim';
 import { SCOPE, SCOPE_CLAIMS } from 'utils/lib/types/scope';
 import { LIFETIME } from '../types/lifetime';
 
 const fetchUserData = async (
   id: string,
-  scope = [SCOPE.OPENID]
+  scope: SCOPE[]
 ): Promise<UserSchema> => {
   const fields = scope.reduce(
     (claims: CLAIM[], current: SCOPE): CLAIM[] =>
@@ -24,7 +24,9 @@ const fetchUserData = async (
 
   try {
     await connection();
-    return UserModel.findById(id, fields.join(' '), { lean: true });
+    const user = await UserModel.findById(id, fields.join(' '));
+    const { _id, id: theId, ...obj } = user.toJSON();
+    return obj;
   } finally {
     await disconnect();
   }
@@ -44,13 +46,13 @@ const fillOpenIDClaims = (
 
 export const fillClaims = async (
   auth: AuthorizationSchema
-): Promise<{ [key in CLAIM]: string | number }> => {
+): Promise<{ [key in CLAIM]: string | number | AddressSchema }> => {
   const userData = await fetchUserData(auth.user, auth.scope);
 
   return Object.assign(
     {},
     { ...userData },
-    auth.scope?.includes(SCOPE.OPENID) ? { ...fillOpenIDClaims(auth) } : null,
+    { ...fillOpenIDClaims(auth) },
     auth.nonce ? { nonce: auth.nonce } : null
   );
 };

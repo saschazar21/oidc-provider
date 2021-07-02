@@ -15,7 +15,7 @@ export const SCOPE_CLAIMS = {
     CLAIM.AUD,
     CLAIM.EXP,
     CLAIM.IAT,
-    CLAIM.AT_HASH,
+    CLAIM.AUTH_TIME,
   ],
   [SCOPE.PROFILE]: [
     CLAIM.NAME,

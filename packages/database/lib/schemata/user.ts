@@ -54,32 +54,41 @@ const generateId = id(ALPHABET_LENGTH.SHORT);
 
 const rightPad = (val: string): string => (val ? `${val} ` : '');
 
-const addressSchema = new Schema<AddressSchema>({
-  _id: {
-    default: idSync(),
-    type: String,
+const addressSchema = new Schema<AddressSchema>(
+  {
+    _id: {
+      default: idSync(),
+      select: false,
+      type: String,
+    },
+    street_address: {
+      trim: true,
+      type: String,
+    },
+    locality: {
+      trim: true,
+      type: String,
+    },
+    region: {
+      trim: true,
+      type: String,
+    },
+    postal_code: {
+      trim: true,
+      type: String,
+    },
+    country: {
+      trim: true,
+      type: String,
+    },
   },
-  street_address: {
-    trim: true,
-    type: String,
-  },
-  locality: {
-    trim: true,
-    type: String,
-  },
-  region: {
-    trim: true,
-    type: String,
-  },
-  postal_code: {
-    trim: true,
-    type: String,
-  },
-  country: {
-    trim: true,
-    type: String,
-  },
-});
+  {
+    toJSON: {
+      transform: (_doc, { _id, id, ...rest }): AddressSchema => rest,
+      virtuals: true,
+    },
+  }
+);
 
 addressSchema.virtual('formatted').get(function () {
   return `${this.street_address}
