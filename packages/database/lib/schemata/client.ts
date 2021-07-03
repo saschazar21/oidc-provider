@@ -9,12 +9,12 @@ export type ClientSchema = {
   _id?: string;
   active?: boolean;
   client_secret?: string;
-  createdAt?: Date;
+  created_at?: Date;
   logo?: string;
   name: string;
   owner: string | UserSchema;
   redirect_uris: string[];
-  updatedAt?: Date;
+  updated_at?: Date;
 };
 
 const generateClientId = generateId();
@@ -71,7 +71,7 @@ const clientSchema = new Schema<ClientSchema>(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
 );
 
 clientSchema.method(
@@ -80,7 +80,6 @@ clientSchema.method(
     const client_secret = await generateClientSecret();
     this.set({
       client_secret,
-      updatedAt: new Date(),
       __v: this.get('__v') + 1,
     });
     return client_secret;
@@ -115,7 +114,7 @@ clientSchema.pre('findOneAndUpdate', async function () {
     throw new Error('ERROR: Updating client_id or client_secret is forbidden!');
   }
 
-  await this.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
+  await this.update({}, { $inc: { __v: 1 } });
 });
 
 export const ClientModel = mongoose.model<ClientSchema>('Client', clientSchema);

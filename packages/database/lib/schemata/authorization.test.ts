@@ -91,15 +91,6 @@ describe('AuthorizationModel', () => {
     await expect(AuthorizationModel.create(data)).rejects.toThrowError();
   });
 
-  it('should throw when custom active is given', async () => {
-    const data = {
-      ...baseAuthorization,
-      active: true,
-    };
-
-    await expect(AuthorizationModel.create(data)).rejects.toThrowError();
-  });
-
   it('should throw when invalid redirect_uri is given', async () => {
     const data = {
       ...baseAuthorization,
@@ -140,7 +131,7 @@ describe('AuthorizationModel', () => {
     );
 
     expect(updated).toBeDefined();
-    expect(updated.get('updatedAt')).toBeTruthy();
+    expect(updated.get('updated_at')).toBeTruthy();
     expect(updated.get('__v')).toBeGreaterThan(0);
     expect(updated.get('consent')).not.toEqual(baseAuthorization.consent);
   });

@@ -24,9 +24,17 @@ const fetchUserData = async (
 
   try {
     await connection();
-    const user = await UserModel.findById(id, fields.join(' '));
+    const user = await UserModel.findById(id, fields.join(' '), {
+      timestamps: true,
+    });
     const { _id, id: theId, ...obj } = user.toJSON();
-    return obj;
+    return Object.assign(
+      {},
+      obj,
+      obj.updated_at
+        ? { updated_at: Math.floor(obj.updated_at.valueOf() * 0.001) }
+        : null
+    );
   } finally {
     await disconnect();
   }
@@ -41,7 +49,7 @@ const fillOpenIDClaims = (
     [CLAIM.AUD]: auth.client_id,
     [CLAIM.EXP]: Math.floor(Date.now() * 0.001) + LIFETIME.ACCESS_TOKEN,
     [CLAIM.IAT]: Math.floor(Date.now() * 0.001),
-    [CLAIM.AUTH_TIME]: Math.floor(auth.updatedAt.valueOf() * 0.001),
+    [CLAIM.AUTH_TIME]: Math.floor(auth.updated_at.valueOf() * 0.001),
   } as { [key in CLAIM]: string | number });
 
 export const fillClaims = async (

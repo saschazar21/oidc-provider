@@ -21,8 +21,8 @@ export type UserSchema = {
   _id?: string;
   active?: boolean;
   password: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  created_at?: Date;
+  updated_at?: Date;
   name?: string;
   given_name?: string;
   family_name?: string;
@@ -84,7 +84,6 @@ const addressSchema = new Schema<AddressSchema>(
   },
   {
     toJSON: {
-      transform: (_doc, { _id, id, ...rest }): AddressSchema => rest,
       virtuals: true,
     },
   }
@@ -112,10 +111,6 @@ const userSchema = new Schema<User>(
       required: true,
       trim: true,
       type: String,
-    },
-    updatedAt: {
-      alias: 'updated_at',
-      type: Date,
     },
     given_name: {
       trim: true,
@@ -208,7 +203,10 @@ const userSchema = new Schema<User>(
       },
     ],
   },
-  { timestamps: true, toJSON: { virtuals: true } }
+  {
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+    toJSON: { virtuals: true },
+  }
 );
 
 userSchema
@@ -266,7 +264,7 @@ userSchema.pre('findOneAndUpdate', async function () {
     );
   }
 
-  await this.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
+  await this.update({}, { $inc: { __v: 1 } });
 });
 
 const User = mongoose.model<User>('User', userSchema);

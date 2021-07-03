@@ -26,7 +26,7 @@ describe('AuthorizationCodeStrategy', () => {
   };
 
   const client: ClientSchema = {
-    name: 'Test Client',
+    name: 'Authorization Code Test Client',
     owner: '',
     redirect_uris: ['https://someuri.go'],
   };
@@ -105,7 +105,7 @@ describe('AuthorizationCodeStrategy', () => {
     const authorizationCodeStrategy = new AuthorizationCodeStrategy(auth);
     const doc = await authorizationCodeStrategy.init();
 
-    expect(doc.get('updatedAt')).not.toEqual(authorization.get('updatedAt'));
+    expect(doc.get('updated_at')).not.toEqual(authorization.get('updated_at'));
     expect(doc.toJSON()).not.toMatchObject(authorization.toJSON());
 
     const payload = await authorizationCodeStrategy.responsePayload();

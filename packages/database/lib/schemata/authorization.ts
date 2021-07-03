@@ -14,9 +14,9 @@ import id from 'utils/lib/util/id';
 
 export type Authorization = {
   _id?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  expiresAt?: Date;
+  created_at?: Date;
+  updated_at?: Date;
+  expires_at?: Date;
   consent?: boolean;
   user?: string;
   scope: SCOPE[];
@@ -50,7 +50,7 @@ const authSchema = new Schema<Document<AuthorizationSchema>>(
       trim: true,
       type: String,
     },
-    expiresAt: {
+    expires_at: {
       default: (): Date => new Date(Date.now() + LIFETIME.REFRESH_TOKEN * 1000),
       type: Date,
     },
@@ -128,9 +128,9 @@ const authSchema = new Schema<Document<AuthorizationSchema>>(
       type: String,
     },
   },
-  { timestamps: true }
+  { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
 );
-authSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+authSchema.index({ expires_at: 1 }, { expireAfterSeconds: 0 });
 
 authSchema.pre('validate', async function () {
   if (this.get('_id')) {
@@ -150,7 +150,7 @@ authSchema.pre('findOneAndUpdate', async function () {
     throw new Error('ERROR: Custom ID is not allowed!');
   }
 
-  await this.update({}, { $set: { updatedAt: new Date() }, $inc: { __v: 1 } });
+  await this.update({}, { $inc: { __v: 1 } });
 });
 
 export const AuthorizationModel = mongoose.model<AuthorizationSchema>(

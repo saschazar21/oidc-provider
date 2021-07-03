@@ -24,7 +24,11 @@ describe('JWT helpers', () => {
     given_name: 'Testy',
     middle_name: 'T',
     family_name: 'McTestface',
+    nickname: 'Testified',
+    preferred_username: 'test@email.com',
     phone_number: '+44555123456',
+    picture:
+      'https://gravatar.com/avatar/93942e96f5acd83e2e047ad8fe03114d?d=robohash',
     address: {
       street_address: 'Teststreet',
       locality: 'Test Village',

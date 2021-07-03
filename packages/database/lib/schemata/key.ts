@@ -2,8 +2,8 @@ import mongoose, { Schema } from 'mongoose';
 
 export type KeySchema = {
   _id?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  created_at?: Date;
+  updated_at?: Date;
   bin: Buffer;
 };
 
@@ -15,11 +15,11 @@ export const keySchema = new Schema<KeySchema>(
       type: Buffer,
     },
   },
-  { timestamps: true }
+  { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
 );
 
 keySchema.post('findOneAndUpdate', async function () {
-  await this.update({ updatedAt: new Date(), $inc: { __v: 1 } });
+  await this.update({ $inc: { __v: 1 } });
 });
 
 export const KeyModel = mongoose.model<KeySchema>('Key', keySchema);

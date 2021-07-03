@@ -24,7 +24,7 @@ describe('KeyModel', () => {
 
     const model = await KeyModel.create(key);
     expect(model).toHaveProperty('_id', _id);
-    expect(model).toHaveProperty('createdAt');
+    expect(model).toHaveProperty('created_at');
   });
 
   it('updates a Key entry', async () => {
@@ -41,6 +41,6 @@ describe('KeyModel', () => {
 
     expect(original.get('_id')).toEqual(updated.get('_id'));
     expect(original.get('bin')).not.toMatchObject(updated.get('bin'));
-    expect(updated).toHaveProperty('updatedAt');
+    expect(updated).toHaveProperty('updated_at');
   });
 });

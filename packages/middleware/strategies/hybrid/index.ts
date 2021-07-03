@@ -41,8 +41,8 @@ class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
       (await this.createAccessToken());
     const expires_in =
       accessTokenModel &&
-      accessTokenModel.get('expiresAt') &&
-      Math.floor((accessTokenModel.get('expiresAt') - Date.now()) * 0.001);
+      accessTokenModel.get('expires_at') &&
+      Math.floor((accessTokenModel.get('expires_at') - Date.now()) * 0.001);
 
     const payload = Object.assign(
       {},

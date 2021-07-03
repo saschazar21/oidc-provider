@@ -71,7 +71,7 @@ describe('UserModel', () => {
     expect(user.get('password')).not.toEqual(baseData.password);
     expect(user.get('name')).toEqual(baseData.name);
     expect(user.get('given_name')).toEqual(baseData.name.split(' ')[0]);
-    expect(user.get('createdAt')).toBeTruthy();
+    expect(user.get('created_at')).toBeTruthy();
     expect(user.get('acr')).toEqual(ACR_VALUES.BASIC);
     expect(match).toBeTruthy();
   });

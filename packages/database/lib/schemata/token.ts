@@ -7,27 +7,27 @@ import id from 'utils/lib/util/id';
 
 export type BaseTokenSchema = {
   _id?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  created_at?: Date;
+  updated_at?: Date;
   active?: boolean;
   authorization: string;
 };
 
 export type AccessTokenSchema = BaseTokenSchema & {
   type: TOKEN_TYPE.ACCESS_TOKEN;
-  expiresAt?: Date;
+  expires_at?: Date;
 };
 
 export type RefreshTokenSchema = BaseTokenSchema & {
   type: TOKEN_TYPE.REFRESH_TOKEN;
-  expiresAt?: Date;
+  expires_at?: Date;
 };
 
 const generateId = id(ALPHABET_LENGTH.LONG);
 
 const discriminatorOptions = {
   discriminatorKey: 'type',
-  timestamps: true,
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
 };
 
 const baseTokenSchema = new Schema<Document<BaseTokenSchema>>(
@@ -52,25 +52,25 @@ const baseTokenSchema = new Schema<Document<BaseTokenSchema>>(
 
 const accessTokenSchema = new Schema<Document<AccessTokenSchema>>(
   {
-    expiresAt: {
+    expires_at: {
       default: (): Date => new Date(Date.now() + LIFETIME.ACCESS_TOKEN * 1000),
       type: Date,
     },
   },
   discriminatorOptions
 );
-accessTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+accessTokenSchema.index({ expires_at: 1 }, { expireAfterSeconds: 0 });
 
 const refreshTokenSchema = new Schema<Document<RefreshTokenSchema>>(
   {
-    expiresAt: {
+    expires_at: {
       default: (): Date => new Date(Date.now() + LIFETIME.REFRESH_TOKEN * 1000),
       type: Date,
     },
   },
   discriminatorOptions
 );
-refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+refreshTokenSchema.index({ expires_at: 1 }, { expireAfterSeconds: 0 });
 
 baseTokenSchema.pre('validate', async function () {
   if (this.get('_id')) {

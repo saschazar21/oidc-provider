@@ -93,8 +93,8 @@ describe('TokenModel', () => {
     expect(token.get('type')).toEqual(TOKEN_TYPE.ACCESS_TOKEN);
     expect(token.get('authorization')).toHaveProperty('_id', authorization_id);
     expect(token.get('authorization').get('client_id')).toEqual(client_id);
-    expect(Date.parse(token.get('expiresAt'))).toEqual(
-      Date.parse(token.get('createdAt')) + LIFETIME.ACCESS_TOKEN * 1000
+    expect(Date.parse(token.get('expires_at'))).toEqual(
+      Date.parse(token.get('created_at')) + LIFETIME.ACCESS_TOKEN * 1000
     );
   });
 
@@ -110,8 +110,8 @@ describe('TokenModel', () => {
     expect(token.get('type')).toEqual(TOKEN_TYPE.REFRESH_TOKEN);
     expect(token.get('authorization')).toHaveProperty('_id', authorization_id);
     expect(token.get('authorization').get('client_id')).toEqual(client_id);
-    expect(Date.parse(token.get('expiresAt'))).toEqual(
-      Date.parse(token.get('createdAt')) + LIFETIME.REFRESH_TOKEN * 1000
+    expect(Date.parse(token.get('expires_at'))).toEqual(
+      Date.parse(token.get('created_at')) + LIFETIME.REFRESH_TOKEN * 1000
     );
   });
 });
