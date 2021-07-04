@@ -1,6 +1,7 @@
 import { getUrl } from 'config/lib/url';
 import { JWKS, JWT } from 'jose';
 
+import { KeyModel } from 'database/lib';
 import connection, { disconnect } from 'database/lib/connect';
 import sign, { verify } from 'utils/lib/jwt/sign';
 import getKeys from 'utils/lib/keys';
@@ -12,6 +13,8 @@ describe('JWT Sign', () => {
   let keys: JWKS.KeyStore;
 
   afterAll(async () => {
+    await KeyModel.findByIdAndDelete('master');
+
     await disconnect();
   });
 
