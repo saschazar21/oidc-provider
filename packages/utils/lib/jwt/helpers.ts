@@ -1,10 +1,16 @@
 import getUrl from 'config/lib/url';
 import connection, { disconnect, UserModel } from 'database/lib';
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
+import { Authorization } from 'database/lib/schemata/authorization';
 import { AddressSchema, UserSchema } from 'database/lib/schemata/user';
 import { CLAIM } from 'utils/lib/types/claim';
 import { SCOPE, SCOPE_CLAIMS } from 'utils/lib/types/scope';
 import { LIFETIME } from '../types/lifetime';
+
+export type JWTPayload = {
+  [key in CLAIM]: string | number;
+} & {
+  [CLAIM.ADDRESS]?: AddressSchema;
+};
 
 const fetchUserData = async (
   id: string,
@@ -41,7 +47,7 @@ const fetchUserData = async (
 };
 
 const fillOpenIDClaims = (
-  auth: AuthorizationSchema
+  auth: Authorization & { updated_at: Date }
 ): { [key in CLAIM]: string | number } =>
   ({
     [CLAIM.SUB]: auth.user,
@@ -53,8 +59,8 @@ const fillOpenIDClaims = (
   } as { [key in CLAIM]: string | number });
 
 export const fillClaims = async (
-  auth: AuthorizationSchema
-): Promise<{ [key in CLAIM]: string | number | AddressSchema }> => {
+  auth: Authorization & { updated_at: Date }
+): Promise<JWTPayload> => {
   const userData = await fetchUserData(auth.user, auth.scope);
 
   return Object.assign(
