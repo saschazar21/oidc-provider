@@ -6,6 +6,12 @@ import { CLAIM } from 'utils/lib/types/claim';
 import { SCOPE, SCOPE_CLAIMS } from 'utils/lib/types/scope';
 import { LIFETIME } from '../types/lifetime';
 
+export type JWTAuth = Authorization & {
+  updated_at: Date;
+  user: string;
+  client_id: string;
+};
+
 export type JWTPayload = {
   [key in CLAIM]: string | number;
 } & {
@@ -46,9 +52,7 @@ const fetchUserData = async (
   }
 };
 
-const fillOpenIDClaims = (
-  auth: Authorization & { updated_at: Date }
-): { [key in CLAIM]: string | number } =>
+const fillOpenIDClaims = (auth: JWTAuth): { [key in CLAIM]: string | number } =>
   ({
     [CLAIM.SUB]: auth.user,
     [CLAIM.ISS]: getUrl(),
@@ -58,9 +62,7 @@ const fillOpenIDClaims = (
     [CLAIM.AUTH_TIME]: Math.floor(auth.updated_at.valueOf() * 0.001),
   } as { [key in CLAIM]: string | number });
 
-export const fillClaims = async (
-  auth: Authorization & { updated_at: Date }
-): Promise<JWTPayload> => {
+export const fillClaims = async (auth: JWTAuth): Promise<JWTPayload> => {
   const userData = await fetchUserData(auth.user, auth.scope);
 
   return Object.assign(
