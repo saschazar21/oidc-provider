@@ -11,6 +11,7 @@ describe('JWT Encode', () => {
   let keys: JWKS.KeyStore;
 
   afterAll(async () => {
+    await connection();
     await KeyModel.findByIdAndDelete('master');
 
     await disconnect();
@@ -21,6 +22,8 @@ describe('JWT Encode', () => {
 
     const { keystore } = await getKeys();
     keys = keystore;
+
+    await disconnect();
   });
 
   it('encrypts a JWT using default settings (RSA-OAEP)', async () => {

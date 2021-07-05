@@ -14,8 +14,6 @@ import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { SCOPE } from 'utils/lib/types/scope';
 
 describe('AuthorizationCodeStrategy', () => {
-  jest.setTimeout(30000);
-
   let authorization: Document<Authorization>;
   let clientId: string;
   let userId: string;
@@ -33,6 +31,7 @@ describe('AuthorizationCodeStrategy', () => {
 
   afterAll(async () => {
     try {
+      await connection();
       await Promise.all([
         AuthorizationModel.collection.drop(),
         UserModel.findByIdAndDelete(userId),

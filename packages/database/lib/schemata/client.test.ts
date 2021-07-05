@@ -1,8 +1,7 @@
-import mongoose from 'mongoose';
-
-import connect, { ClientModel, UserModel } from '../';
-import { ClientSchema } from './client';
-import { UserSchema } from './user';
+import { ClientModel, UserModel } from 'database/lib';
+import connect, { disconnect } from 'database/lib/connect';
+import { ClientSchema } from 'database/lib/schemata/client';
+import { UserSchema } from 'database/lib/schemata/user';
 
 describe('ClientModel', () => {
   let client_id: string;
@@ -15,11 +14,12 @@ describe('ClientModel', () => {
   };
 
   afterAll(async () => {
+    await connect();
     await Promise.all([
       UserModel.findByIdAndDelete(sub),
       ClientModel.findByIdAndDelete(client_id),
     ]);
-    mongoose.connection.close();
+    await disconnect();
   });
 
   beforeAll(async () => {
@@ -33,6 +33,7 @@ describe('ClientModel', () => {
       owner: sub,
       redirect_uris: ['https://test.com/cb'],
     };
+    await disconnect();
   });
 
   it('should fail when _id is present', async () => {

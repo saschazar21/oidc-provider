@@ -1,7 +1,6 @@
-import mongoose from 'mongoose';
-
-import connect, { ClientModel, UserModel } from '../';
-import { ClientSchema } from './client';
+import { ClientModel, UserModel } from 'database/lib';
+import connect, { disconnect } from 'database/lib/connect';
+import { ClientSchema } from 'database/lib/schemata/client';
 import { ACR_VALUES } from 'utils/lib/types/acr';
 
 describe('UserModel', () => {
@@ -16,8 +15,9 @@ describe('UserModel', () => {
   };
 
   afterAll(async () => {
+    await connect();
     await UserModel.findByIdAndDelete(sub);
-    mongoose.connection.close();
+    await disconnect();
   });
 
   beforeAll(async () => {

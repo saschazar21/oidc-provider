@@ -13,6 +13,7 @@ describe('JWT Sign', () => {
   let keys: JWKS.KeyStore;
 
   afterAll(async () => {
+    await connection();
     await KeyModel.findByIdAndDelete('master');
 
     await disconnect();
@@ -23,6 +24,8 @@ describe('JWT Sign', () => {
 
     const { keystore } = await getKeys();
     keys = keystore;
+
+    await disconnect();
   });
 
   it('signs a JWT using default settings (HS256)', async () => {

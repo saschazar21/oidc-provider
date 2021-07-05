@@ -1,15 +1,16 @@
 import mongoose from 'mongoose';
 import { randomBytes } from 'crypto';
 
-import connect from '../connect';
-import KeyModel from './key';
+import connect, { disconnect } from 'database/lib/connect';
+import KeyModel from 'database/lib/schemata/key';
 
 describe('KeyModel', () => {
   const _id = 'testmaster';
 
   afterAll(async () => {
+    await connect();
     await KeyModel.findByIdAndDelete('testmaster');
-    mongoose.connection.close();
+    await disconnect();
   });
 
   beforeAll(async () => {

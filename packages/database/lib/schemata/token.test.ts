@@ -1,15 +1,14 @@
-import mongoose from 'mongoose';
-
 import { ALPHABET_LENGTH } from 'config/lib/id';
-import connect, {
+import {
   AuthorizationModel,
   ClientModel,
   AccessTokenModel,
   RefreshTokenModel,
   UserModel,
-} from '../';
-import { ClientSchema } from './client';
-import { UserSchema } from './user';
+} from 'database/lib';
+import connect, { disconnect } from 'database/lib/connect';
+import { ClientSchema } from 'database/lib/schemata/client';
+import { UserSchema } from 'database/lib/schemata/user';
 import { LIFETIME } from 'utils/lib/types/lifetime';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { TOKEN_TYPE } from 'utils/lib/types/token_type';
@@ -41,6 +40,7 @@ describe('TokenModel', () => {
   };
 
   afterAll(async () => {
+    await connect();
     await Promise.all([
       UserModel.findByIdAndDelete(sub),
       ClientModel.findByIdAndDelete(client_id),
@@ -49,7 +49,7 @@ describe('TokenModel', () => {
       RefreshTokenModel.findByIdAndDelete(refresh_token),
     ]);
 
-    mongoose.connection.close();
+    await disconnect();
   });
 
   beforeAll(async () => {

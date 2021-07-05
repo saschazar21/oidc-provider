@@ -1,9 +1,8 @@
-import mongoose from 'mongoose';
-
-import connect, { AuthorizationModel, ClientModel, UserModel } from '../';
-import { AuthorizationSchema } from './authorization';
-import { ClientSchema } from './client';
-import { UserSchema } from './user';
+import { AuthorizationModel, ClientModel, UserModel } from 'database/lib';
+import connect, { disconnect } from 'database/lib/connect';
+import { AuthorizationSchema } from 'database/lib/schemata/authorization';
+import { ClientSchema } from 'database/lib/schemata/client';
+import { UserSchema } from 'database/lib/schemata/user';
 import { ACR_VALUES } from 'utils/lib/types/acr';
 import { DISPLAY } from 'utils/lib/types/display';
 import { PKCE } from 'utils/lib/types/pkce';
@@ -47,13 +46,14 @@ describe('AuthorizationModel', () => {
   };
 
   afterAll(async () => {
+    await connect();
     await Promise.all([
       AuthorizationModel.findByIdAndDelete(authorization_id),
       ClientModel.findByIdAndDelete(client_id),
       UserModel.findByIdAndDelete(sub),
     ]);
 
-    mongoose.connection.close();
+    await disconnect();
   });
 
   beforeAll(async () => {
@@ -71,6 +71,7 @@ describe('AuthorizationModel', () => {
           user: sub,
         };
       });
+    await disconnect();
   });
 
   it('should throw when custom ID is given', async () => {

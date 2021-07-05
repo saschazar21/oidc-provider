@@ -9,12 +9,10 @@ import { UserSchema } from 'database/lib/schemata/user';
 import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
 import { AuthorizationSchema } from 'database/lib/schemata/authorization';
 import { SCOPE, SCOPE_CLAIMS } from 'utils/lib/types/scope';
-import { RESPONSE_TYPE } from '../types/response_type';
-import { fillClaims } from './helpers';
+import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
+import { fillClaims } from 'utils/lib/jwt/helpers';
 
 describe('JWT helpers', () => {
-  jest.setTimeout(30000);
-
   let clientDoc: Document<ClientSchema>;
   let userDoc: Document<UserSchema>;
 
@@ -45,6 +43,7 @@ describe('JWT helpers', () => {
   };
 
   afterAll(async () => {
+    await connection();
     await Promise.all([
       AuthorizationModel.collection.drop(),
       ClientModel.findByIdAndDelete(clientDoc._id),
@@ -59,6 +58,8 @@ describe('JWT helpers', () => {
 
     userDoc = await UserModel.create(user);
     clientDoc = await ClientModel.create({ ...client, owner: userDoc._id });
+
+    await disconnect();
   });
 
   it('fill minimal required OpenID claims', async () => {
