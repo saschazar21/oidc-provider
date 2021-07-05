@@ -10,7 +10,7 @@ import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
 import { AuthorizationSchema } from 'database/lib/schemata/authorization';
 import { SCOPE, SCOPE_CLAIMS } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { fillClaims } from 'utils/lib/jwt/helpers';
+import { fillClaims, JWTAuth } from 'utils/lib/jwt/helpers';
 
 describe('JWT helpers', () => {
   let clientDoc: Document<ClientSchema>;
@@ -73,7 +73,7 @@ describe('JWT helpers', () => {
 
     const authDoc = await AuthorizationModel.create(auth);
 
-    const claims = await fillClaims(authDoc.toJSON());
+    const claims = await fillClaims(authDoc.toJSON() as JWTAuth);
 
     SCOPE_CLAIMS[SCOPE.OPENID].forEach((claim) =>
       expect(claims).toHaveProperty(claim)
@@ -95,7 +95,7 @@ describe('JWT helpers', () => {
 
     const authDoc = await AuthorizationModel.create(auth);
 
-    const claims = await fillClaims(authDoc.toJSON());
+    const claims = await fillClaims(authDoc.toJSON() as JWTAuth);
 
     Object.keys(SCOPE_CLAIMS)
       .flatMap((scope) => SCOPE_CLAIMS[scope])

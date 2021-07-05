@@ -3,6 +3,7 @@ import { JWKS, JWT } from 'jose';
 
 import { KeyModel } from 'database/lib';
 import connection, { disconnect } from 'database/lib/connect';
+import { JWTAuth } from 'utils/lib/jwt/helpers';
 import sign, { verify } from 'utils/lib/jwt/sign';
 import getKeys from 'utils/lib/keys';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
@@ -11,6 +12,14 @@ import { CLAIM } from 'utils/lib/types/claim';
 
 describe('JWT Sign', () => {
   let keys: JWKS.KeyStore;
+
+  const auth = {
+    scope: [SCOPE.OPENID],
+    response_type: [RESPONSE_TYPE.ID_TOKEN],
+    updated_at: new Date(),
+    user: 'testuser',
+    client_id: 'testclient',
+  };
 
   afterAll(async () => {
     await connection();
@@ -29,13 +38,6 @@ describe('JWT Sign', () => {
   });
 
   it('signs a JWT using default settings (HS256)', async () => {
-    const auth = {
-      scope: [SCOPE.OPENID],
-      response_type: [RESPONSE_TYPE.ID_TOKEN],
-      updated_at: new Date(),
-      user: 'testuser',
-      client_id: 'testclient',
-    };
     const signed = await sign(auth);
 
     const [header] = signed.split('.');
@@ -54,13 +56,6 @@ describe('JWT Sign', () => {
   });
 
   it('signs a JWT using RS256 algorithm', async () => {
-    const auth = {
-      scope: [SCOPE.OPENID],
-      response_type: [RESPONSE_TYPE.ID_TOKEN],
-      updated_at: new Date(),
-      user: 'testuser',
-      client_id: 'testclient',
-    };
     const signed = await sign(auth, 'RS256');
 
     const [header] = signed.split('.');
@@ -82,13 +77,6 @@ describe('JWT Sign', () => {
   });
 
   it('signs a JWT using ES256 algorithm', async () => {
-    const auth = {
-      scope: [SCOPE.OPENID],
-      response_type: [RESPONSE_TYPE.ID_TOKEN],
-      updated_at: new Date(),
-      user: 'testuser',
-      client_id: 'testclient',
-    };
     const signed = await sign(auth, 'ES256');
 
     const [header] = signed.split('.');
@@ -110,14 +98,6 @@ describe('JWT Sign', () => {
   });
 
   it('verifies signed JWT', async () => {
-    const auth = {
-      scope: [SCOPE.OPENID],
-      response_type: [RESPONSE_TYPE.ID_TOKEN],
-      updated_at: new Date(),
-      user: 'testuser',
-      client_id: 'testclient',
-    };
-
     const signed = await sign(auth);
     const verified = await verify(signed);
 
@@ -126,27 +106,19 @@ describe('JWT Sign', () => {
   });
 
   it('fails to verify invalid signature', async () => {
-    const auth = {
-      scope: [SCOPE.OPENID],
-      response_type: [RESPONSE_TYPE.ID_TOKEN],
-      updated_at: new Date(),
-      user: 'testuser',
-      client_id: 'testclient',
-    };
-
     const signed = await sign(auth);
     await expect(verify(`${signed}_invalid`)).rejects.toThrowError();
   });
 
-  it('throws error, when unsupported algorithm is given', async () => {
-    const auth = {
-      scope: [SCOPE.OPENID],
-      response_type: [RESPONSE_TYPE.ID_TOKEN],
-      updated_at: new Date(),
-      user: 'testuser',
-      client_id: 'testclient',
+  it('fails to sign JWT, when insufficient claims given', async () => {
+    const { user, ...newAuth } = {
+      ...auth,
+      scope: [SCOPE.OPENID, SCOPE.PROFILE],
     };
+    await expect(sign(newAuth as JWTAuth)).rejects.toThrowError();
+  });
 
+  it('throws error, when unsupported algorithm is given', async () => {
     await expect(sign(auth, 'asdf' as 'none')).rejects.toThrowError();
   });
 });
