@@ -1,37 +1,31 @@
+import { AccessTokenModel } from 'database/lib';
 import AuthStrategy, {
   AuthorizationResponse,
 } from 'middleware/strategies/AuthStrategy';
 import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 
-export type HybridResponsePayload = {
+export type ImplicitResponsePayload = {
   access_token?: string;
-  code: string;
-  token_type?: 'Bearer';
   expires_in?: number;
-  id_token?: string;
+  id_token: string;
   state?: string;
+  token_type?: 'Bearer';
 };
 
-class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
+class ImplicitStrategy extends AuthStrategy<ImplicitResponsePayload> {
   public static readonly DEFAULT_RESPONSE_MODE = RESPONSE_MODE.FRAGMENT;
 
   protected async validate(): Promise<boolean> {
-    if (
-      Array.isArray(this.auth.response_type) &&
-      this.auth.response_type.indexOf(RESPONSE_TYPE.ID_TOKEN) > -1 &&
-      !this.auth.nonce
-    ) {
-      throw new Error(
-        `Nonce is required, when response_type=${RESPONSE_TYPE.ID_TOKEN}!`
-      );
+    if (!this.auth.nonce) {
+      throw new Error(`Nonce is required!`);
     }
 
     return super.validate();
   }
 
   public async responsePayload(): Promise<
-    AuthorizationResponse<HybridResponsePayload>
+    AuthorizationResponse<ImplicitResponsePayload>
   > {
     await this.validate();
 
@@ -43,33 +37,30 @@ class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
       accessTokenModel &&
       accessTokenModel.get('expires_at') &&
       Math.floor((accessTokenModel.get('expires_at') - Date.now()) * 0.001);
-    const idToken =
-      response_type.includes(RESPONSE_TYPE.ID_TOKEN) &&
-      (await this.createIdToken());
+    const idToken = await this.createIdToken();
 
     const payload = Object.assign(
       {},
       {
-        code: this.id,
+        id_token: idToken,
       },
       expires_in > 0 && accessTokenModel
         ? {
-            access_token: accessTokenModel._id,
+            access_token: accessTokenModel.get('_id'),
             expires_in,
             token_type: 'Bearer',
           }
         : null,
-      idToken ? { id_token: idToken } : null,
-      this.doc.get('state') ? { state: this.doc.get('state') } : null
-    ) as HybridResponsePayload;
+      this.auth.state ? { state: this.auth.state } : null
+    ) as ImplicitResponsePayload;
 
     return {
-      redirect_uri: this.doc.get('redirect_uri'),
+      redirect_uri: this.auth.redirect_uri,
       response_mode:
-        this.doc.get('response_mode') ?? HybridStrategy.DEFAULT_RESPONSE_MODE,
+        this.auth.response_mode ?? ImplicitStrategy.DEFAULT_RESPONSE_MODE,
       payload,
     };
   }
 }
 
-export default HybridStrategy;
+export default ImplicitStrategy;
