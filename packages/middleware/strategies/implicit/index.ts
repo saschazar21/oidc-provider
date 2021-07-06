@@ -51,13 +51,13 @@ class ImplicitStrategy extends AuthStrategy<ImplicitResponsePayload> {
             token_type: 'Bearer',
           }
         : null,
-      this.auth.state ? { state: this.auth.state } : null
+      this.doc.get('state') ? { state: this.doc.get('state') } : null
     ) as ImplicitResponsePayload;
 
     return {
-      redirect_uri: this.auth.redirect_uri,
+      redirect_uri: this.doc.get('redirect_uri'),
       response_mode:
-        this.auth.response_mode ?? ImplicitStrategy.DEFAULT_RESPONSE_MODE,
+        this.doc.get('response_mode') ?? ImplicitStrategy.DEFAULT_RESPONSE_MODE,
       payload,
     };
   }
