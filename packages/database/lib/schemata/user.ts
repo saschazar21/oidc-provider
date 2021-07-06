@@ -4,11 +4,10 @@ import { ACR_VALUES } from 'utils/lib/types/acr';
 import { ALPHABET_LENGTH } from 'config/lib/id';
 import { EMAIL_REGEX } from 'utils/lib/types/email';
 import { URL_REGEX } from 'utils/lib/types/url';
-import id, { id as idSync } from 'utils/lib/util/id';
+import id from 'utils/lib/util/id';
 import hashPassword, { comparePassword } from 'utils/lib/util/password';
 
 export type AddressSchema = {
-  _id?: string;
   formatted?: string;
   street_address?: string;
   locality?: string;
@@ -56,11 +55,7 @@ const rightPad = (val: string): string => (val ? `${val} ` : '');
 
 const addressSchema = new Schema<AddressSchema>(
   {
-    _id: {
-      default: idSync(),
-      select: false,
-      type: String,
-    },
+    _id: false,
     street_address: {
       trim: true,
       type: String,

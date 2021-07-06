@@ -33,7 +33,6 @@ describe('ClientModel', () => {
       owner: sub,
       redirect_uris: ['https://test.com/cb'],
     };
-    await disconnect();
   });
 
   it('should fail when _id is present', async () => {

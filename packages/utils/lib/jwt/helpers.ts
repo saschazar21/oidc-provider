@@ -4,12 +4,14 @@ import { Authorization } from 'database/lib/schemata/authorization';
 import { AddressSchema, UserSchema } from 'database/lib/schemata/user';
 import { CLAIM } from 'utils/lib/types/claim';
 import { SCOPE, SCOPE_CLAIMS } from 'utils/lib/types/scope';
-import { LIFETIME } from '../types/lifetime';
+import { LIFETIME } from 'utils/lib/types/lifetime';
+import hashCodeOrToken from 'utils/lib/util/hash-code-token';
 
 export type JWTAuth = Authorization & {
   updated_at: Date;
   user: string;
   client_id: string;
+  access_token?: string;
 };
 
 export type JWTPayload = {
@@ -64,11 +66,15 @@ const fillOpenIDClaims = (auth: JWTAuth): { [key in CLAIM]: string | number } =>
 
 export const fillClaims = async (auth: JWTAuth): Promise<JWTPayload> => {
   const userData = await fetchUserData(auth.user, auth.scope);
+  const at_hash = auth.access_token && hashCodeOrToken(auth.access_token);
+  const c_hash = auth._id && hashCodeOrToken(auth._id);
 
   return Object.assign(
     {},
     { ...userData },
     { ...fillOpenIDClaims(auth) },
+    at_hash ? { at_hash } : null,
+    c_hash ? { c_hash } : null,
     auth.nonce ? { nonce: auth.nonce } : null
   );
 };

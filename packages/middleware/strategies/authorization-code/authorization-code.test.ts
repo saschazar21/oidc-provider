@@ -88,7 +88,8 @@ describe('AuthorizationCodeStrategy', () => {
 
     expect(doc.toJSON()).toMatchObject(authorization.toJSON());
     expect(authorizationCodeStrategy.id).toEqual(authorization._id);
-    expect(doc.get('active')).toBeFalsy();
+    expect(doc.get('consent')).toBeFalsy();
+    expect(doc.get('user')).toBeFalsy();
   });
 
   it('updates Authorization and returns response payload', async () => {

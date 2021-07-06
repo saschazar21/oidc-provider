@@ -19,7 +19,7 @@ class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
   protected async validate(): Promise<boolean> {
     if (
       Array.isArray(this.auth.response_type) &&
-      this.auth.response_type.includes[RESPONSE_TYPE.ID_TOKEN] &&
+      this.auth.response_type.indexOf(RESPONSE_TYPE.ID_TOKEN) > -1 &&
       !this.auth.nonce
     ) {
       throw new Error(
@@ -43,6 +43,9 @@ class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
       accessTokenModel &&
       accessTokenModel.get('expires_at') &&
       Math.floor((accessTokenModel.get('expires_at') - Date.now()) * 0.001);
+    const idToken =
+      response_type.includes(RESPONSE_TYPE.ID_TOKEN) &&
+      (await this.createIdToken());
 
     const payload = Object.assign(
       {},
@@ -56,6 +59,7 @@ class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
             token_type: 'Bearer',
           }
         : null,
+      idToken ? { id_token: idToken } : null,
       this.doc.get('state') ? { state: this.doc.get('state') } : null
     ) as HybridResponsePayload;
 

@@ -71,7 +71,6 @@ describe('AuthorizationModel', () => {
           user: sub,
         };
       });
-    await disconnect();
   });
 
   it('should throw when custom ID is given', async () => {

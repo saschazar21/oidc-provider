@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, UpdateQuery } from 'mongoose';
 
-import { ClientModel } from 'database/lib';
+import { ClientModel, UserModel } from 'database/lib';
 import { ALPHABET_LENGTH } from 'config/lib/id';
 import { ACR_VALUES } from 'utils/lib/types/acr';
 import { DISPLAY } from 'utils/lib/types/display';
@@ -137,7 +137,16 @@ authSchema.pre('validate', async function () {
     throw new Error('ERROR: Custom ID is not allowed!');
   }
   if (this.get('consent')) {
-    throw new Error('ERROR: Custom consent is not allowed!');
+    const user =
+      this.get('user') &&
+      (await UserModel.findById(this.get('user'), 'consents'));
+    if (
+      !user ||
+      user.get('consents')?.length < 1 ||
+      user.get('consents').indexOf(this.get('client_id')) < 0
+    ) {
+      throw new Error('ERROR: Custom consent without user is not allowed!');
+    }
   }
   this.set({ _id: await generateId() });
 });

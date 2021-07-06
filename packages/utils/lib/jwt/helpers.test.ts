@@ -8,9 +8,11 @@ import connection, {
 import { UserSchema } from 'database/lib/schemata/user';
 import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
 import { AuthorizationSchema } from 'database/lib/schemata/authorization';
+import { AccessTokenModel } from 'database/lib/schemata/token';
+import { fillClaims, JWTAuth } from 'utils/lib/jwt/helpers';
 import { SCOPE, SCOPE_CLAIMS } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { fillClaims, JWTAuth } from 'utils/lib/jwt/helpers';
+import hashCodeOrToken from 'utils/lib/util/hash-code-token';
 
 describe('JWT helpers', () => {
   let clientDoc: Document<ClientSchema>;
@@ -42,9 +44,18 @@ describe('JWT helpers', () => {
     owner: '',
   };
 
+  const baseAuth: AuthorizationSchema = {
+    client_id: '',
+    scope: [SCOPE.OPENID],
+    redirect_uri: client.redirect_uris[0],
+    response_type: [RESPONSE_TYPE.CODE, RESPONSE_TYPE.ID_TOKEN],
+    user: '',
+  };
+
   afterAll(async () => {
     await connection();
     await Promise.all([
+      AccessTokenModel.collection.drop(),
       AuthorizationModel.collection.drop(),
       ClientModel.findByIdAndDelete(clientDoc._id),
       UserModel.findByIdAndDelete(userDoc._id),
@@ -58,17 +69,13 @@ describe('JWT helpers', () => {
 
     userDoc = await UserModel.create(user);
     clientDoc = await ClientModel.create({ ...client, owner: userDoc._id });
-
-    await disconnect();
   });
 
   it('fill minimal required OpenID claims', async () => {
-    const auth: AuthorizationSchema = {
-      client_id: clientDoc.get('_id'),
-      scope: [SCOPE.OPENID],
-      redirect_uri: client.redirect_uris[0],
-      response_type: [RESPONSE_TYPE.CODE, RESPONSE_TYPE.ID_TOKEN],
+    const auth = {
+      ...baseAuth,
       user: userDoc.get('_id'),
+      client_id: clientDoc.get('_id'),
     };
 
     const authDoc = await AuthorizationModel.create(auth);
@@ -85,20 +92,36 @@ describe('JWT helpers', () => {
 
   it('fill all claims supported by OpenID provider', async () => {
     const auth: AuthorizationSchema = {
+      ...baseAuth,
       client_id: clientDoc.get('_id'),
       scope: [...Object.keys(SCOPE_CLAIMS)] as SCOPE[],
-      redirect_uri: client.redirect_uris[0],
-      response_type: [RESPONSE_TYPE.CODE, RESPONSE_TYPE.ID_TOKEN],
       user: userDoc.get('_id'),
       nonce: 'testnonce',
     };
 
     const authDoc = await AuthorizationModel.create(auth);
+    const tokenDoc = await AccessTokenModel.create({
+      authorization: authDoc.get('_id'),
+    });
 
-    const claims = await fillClaims(authDoc.toJSON() as JWTAuth);
+    const fields = {
+      ...authDoc.toJSON(),
+      access_token: tokenDoc.get('_id'),
+    } as JWTAuth;
+
+    const claims = await fillClaims(fields);
 
     Object.keys(SCOPE_CLAIMS)
       .flatMap((scope) => SCOPE_CLAIMS[scope])
       .forEach((claim) => expect(claims).toHaveProperty(claim));
+
+    expect(claims).toHaveProperty(
+      'at_hash',
+      hashCodeOrToken(tokenDoc.get('_id'))
+    );
+    expect(claims).toHaveProperty(
+      'c_hash',
+      hashCodeOrToken(authDoc.get('_id'))
+    );
   });
 });

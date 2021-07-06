@@ -9,6 +9,9 @@ import {
   AccessTokenSchema,
 } from 'database/lib/schemata/token';
 import UserModel from 'database/lib/schemata/user';
+import encrypt from 'utils/lib/jwt/encrypt';
+import sign from 'utils/lib/jwt/sign';
+import { JWTAuth } from 'utils/lib/jwt/helpers';
 import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
 
 export type ImplicitOrHybridResponsePayload = {
@@ -32,6 +35,7 @@ abstract class AuthStrategy<T> {
 
   private _auth: Authorization;
   private _id: string;
+  private _token: string;
 
   protected _doc: Document<Authorization>;
 
@@ -45,6 +49,10 @@ abstract class AuthStrategy<T> {
 
   public get id(): string {
     return this._id;
+  }
+
+  public get token(): string {
+    return this._token;
   }
 
   constructor(auth: Authorization) {
@@ -72,10 +80,22 @@ abstract class AuthStrategy<T> {
   protected async createAccessToken(): Promise<Document<AccessTokenSchema>> {
     try {
       await connect();
-      return AccessTokenModel.create({ authorization: this.id });
+      const token = await AccessTokenModel.create({ authorization: this.id });
+      this._token = token._id as string;
+      return token;
     } finally {
       await disconnect();
     }
+  }
+
+  protected async createIdToken(use: 'sig' | 'enc' = 'sig'): Promise<string> {
+    const auth = Object.assign(
+      {},
+      { ...this.auth },
+      this.token ? { access_token: this.token } : null
+    );
+
+    return use === 'sig' ? sign(auth as JWTAuth) : encrypt(auth as JWTAuth);
   }
 
   protected async validate(): Promise<boolean> {
