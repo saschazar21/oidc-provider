@@ -36,6 +36,7 @@ describe('Hybrid Strategy', () => {
       RESPONSE_TYPE.ID_TOKEN,
       RESPONSE_TYPE.TOKEN,
     ],
+    nonce: 'testnonce',
   };
 
   afterAll(async () => {
@@ -97,7 +98,6 @@ describe('Hybrid Strategy', () => {
       _id: authorization.get('_id'),
       user: user_id,
       consent: true,
-      nonce: 'testnonce',
     };
     const hybridStrategy = new HybridStrategy(auth);
     await hybridStrategy.init();
@@ -114,15 +114,12 @@ describe('Hybrid Strategy', () => {
   });
 
   it('fails to return response payload, when nonce is missing and response_type contains id_token', async () => {
-    const auth = {
+    const { nonce, ...auth } = {
       ...baseAuth,
       client_id,
       user: user_id,
       consent: true,
     };
-    const hybridStrategy = new HybridStrategy(auth);
-
-    await hybridStrategy.init();
-    await expect(hybridStrategy.responsePayload()).rejects.toThrowError();
+    expect(() => new HybridStrategy(auth)).toThrowError();
   });
 });

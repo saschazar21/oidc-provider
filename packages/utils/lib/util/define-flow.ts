@@ -4,7 +4,9 @@ import {
   RESPONSE_TYPE_FLOW,
 } from 'utils/lib/types/response_type';
 
-const defineFlow = (response_type: RESPONSE_TYPE[]): AUTHENTICATION_FLOW => {
+const defineFlow = (
+  response_type: RESPONSE_TYPE[] = []
+): AUTHENTICATION_FLOW => {
   return (Object.keys(RESPONSE_TYPE_FLOW) as AUTHENTICATION_FLOW[]).reduce(
     (detected: AUTHENTICATION_FLOW, current: AUTHENTICATION_FLOW) => {
       if (detected) {

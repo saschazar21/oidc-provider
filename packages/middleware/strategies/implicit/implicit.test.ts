@@ -34,6 +34,7 @@ describe('Implicit Strategy', () => {
     response_type: [RESPONSE_TYPE.ID_TOKEN],
     scope: [SCOPE.OPENID],
     user: '',
+    nonce: 'testnonce',
   };
 
   afterAll(async () => {
@@ -88,7 +89,6 @@ describe('Implicit Strategy', () => {
       ...baseAuthorization,
       _id: authorization.get('_id'),
       consent: true,
-      nonce: 'testnonce',
     };
 
     const implicitStrategy = new ImplicitStrategy(auth);
@@ -109,7 +109,6 @@ describe('Implicit Strategy', () => {
       ...baseAuthorization,
       response_type: [RESPONSE_TYPE.ID_TOKEN, RESPONSE_TYPE.TOKEN],
       consent: true,
-      nonce: 'gimmeeverything',
       state: 'I am a state',
     };
 
@@ -121,5 +120,11 @@ describe('Implicit Strategy', () => {
 
     expect(responsePayload.payload).toHaveProperty('access_token');
     expect(responsePayload.payload).toHaveProperty('expires_in');
+  });
+
+  it('throws, when nonce is missing', async () => {
+    const { nonce, ...auth } = baseAuthorization;
+
+    expect(() => new ImplicitStrategy(auth)).toThrowError();
   });
 });

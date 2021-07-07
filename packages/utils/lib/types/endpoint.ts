@@ -10,5 +10,6 @@ export enum ENDPOINT {
 }
 
 export enum CLIENT_ENDPOINT {
+  CONSENT = '/consent',
   LOGIN = '/login',
 }

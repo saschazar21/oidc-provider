@@ -15,12 +15,12 @@ export type ImplicitResponsePayload = {
 class ImplicitStrategy extends AuthStrategy<ImplicitResponsePayload> {
   public static readonly DEFAULT_RESPONSE_MODE = RESPONSE_MODE.FRAGMENT;
 
-  protected async validate(): Promise<boolean> {
+  protected prevalidate(): boolean {
     if (!this.auth.nonce) {
       throw new Error(`Nonce is required!`);
     }
 
-    return super.validate();
+    return super.prevalidate();
   }
 
   public async responsePayload(): Promise<

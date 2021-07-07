@@ -1,21 +1,19 @@
 import { createHash } from 'crypto';
 
-const MIN_LENGTH = 43;
-const MAX_LENGTH = 128;
-
+const CODE_CHALLENGE_LENGTH = 43;
 const CODE_VERIFIER_REGEX = /^[a-z0-9\-._~]{43,128}$/i;
+
+export const CODE_VERIFIER_ALPHABET =
+  'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~';
 
 export const verifyCodeChallenge = (
   code_challenge: string,
   code_verifier?: string,
   code_challenge_method: 'plain' | 'S256' = 'plain'
 ): boolean => {
-  if (
-    code_challenge.length < MIN_LENGTH ||
-    code_challenge.length > MAX_LENGTH
-  ) {
+  if (code_challenge.length !== CODE_CHALLENGE_LENGTH) {
     throw new Error(
-      `ERROR: code_challenge must consist between ${MIN_LENGTH} and ${MAX_LENGTH} characters!`
+      `ERROR: code_challenge must consist of exactly ${CODE_CHALLENGE_LENGTH} characters!`
     );
   }
   if (code_verifier && !CODE_VERIFIER_REGEX.test(code_verifier)) {

@@ -13,6 +13,7 @@ import encrypt from 'utils/lib/jwt/encrypt';
 import sign from 'utils/lib/jwt/sign';
 import { JWTAuth } from 'utils/lib/jwt/helpers';
 import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
+import { SCOPE } from 'utils/lib/types/scope';
 
 export type ImplicitOrHybridResponsePayload = {
   access_token: string;
@@ -59,6 +60,18 @@ abstract class AuthStrategy<T> {
     const { _id, ...rest } = auth;
     this._id = _id;
     this._auth = rest;
+
+    this.prevalidate();
+  }
+
+  protected prevalidate(): boolean {
+    if (
+      !Array.isArray(this.auth.scope) ||
+      !this.auth.scope.includes(SCOPE.OPENID)
+    ) {
+      throw new Error(`ERROR: scope parameter must contain "${SCOPE.OPENID}"`);
+    }
+    return true;
   }
 
   private sanitizeUpdate(): Authorization {
@@ -132,7 +145,7 @@ abstract class AuthStrategy<T> {
           )}`
         );
       }
-      const sanitized = !this.doc.isNew && this.sanitizeUpdate();
+      const sanitized = this.id && this.sanitizeUpdate();
       if (sanitized && Object.keys(sanitized).length > 0) {
         this._doc = await AuthorizationModel.findByIdAndUpdate(
           this.id,
