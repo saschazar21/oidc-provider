@@ -1,4 +1,3 @@
-import { AccessTokenModel } from 'database/lib';
 import AuthStrategy, {
   AuthorizationResponse,
 } from 'middleware/strategies/AuthStrategy';
