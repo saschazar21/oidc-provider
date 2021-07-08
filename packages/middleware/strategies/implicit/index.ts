@@ -17,7 +17,7 @@ class ImplicitStrategy extends AuthStrategy<ImplicitResponsePayload> {
 
   protected prevalidate(): boolean {
     if (!this.auth.nonce) {
-      throw new Error(`Nonce is required!`);
+      throw new Error(`ERROR: Nonce is required!`);
     }
 
     return super.prevalidate();

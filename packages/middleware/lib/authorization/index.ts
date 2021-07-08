@@ -46,28 +46,18 @@ const authorization = async (
     );
   }
 
-  const authorizationId = cookies.get('authorization', { signed: !IS_TEST });
-  const userId =
-    cookies.get('user', { signed: !IS_TEST }) ||
-    cookies.get('sub', { signed: !IS_TEST });
-  const authRequest = await mapAuthRequest(req, res);
-
   try {
+    const authorizationId = cookies.get('authorization', { signed: !IS_TEST });
+    const userId =
+      cookies.get('user', { signed: !IS_TEST }) ||
+      cookies.get('sub', { signed: !IS_TEST });
+    const authRequest = await mapAuthRequest(req, res);
+
     auth = await buildAuthorizationSchema({
       ...authRequest,
       _id: authorizationId,
       user: userId,
     });
-  } catch (e) {
-    throw new HTTPError(
-      e.message,
-      STATUS_CODE.BAD_REQUEST,
-      req.method,
-      req.url
-    );
-  }
-
-  try {
     authenticationFlow = getAuthenticationFlow(auth);
     authorization =
       (await authenticationFlow.init()) as Document<AuthorizationSchema>;
@@ -81,9 +71,20 @@ const authorization = async (
       });
     }
   } catch (e) {
-    console.error(e);
+    let redirectUri: URL;
     const { redirect_uri = '', state } = auth;
-    const redirectUri = new URL(redirect_uri);
+
+    try {
+      redirectUri = new URL(redirect_uri);
+    } catch (err) {
+      throw new HTTPError(
+        e.message ?? err.message,
+        STATUS_CODE.BAD_REQUEST,
+        req.method,
+        req.url
+      );
+    }
+
     const responseQuery = Object.assign(
       {},
       { ...redirectUri.searchParams },
@@ -91,7 +92,9 @@ const authorization = async (
         // TODO: add types for error codes
         error: 'invalid_request',
       },
-      e.name === HTTPError.NAME ? { error_description: e.message } : null,
+      e.name === HTTPError.NAME || e.message?.startsWith('ERROR:')
+        ? { error_description: e.message }
+        : null,
       state ? { state } : null
     );
     redirectUri.search = encode(responseQuery);
@@ -122,15 +125,6 @@ const authorization = async (
 
     if (!authorization.get('consent')) {
       redirectUri = redirectUri ?? new URL(getUrl(CLIENT_ENDPOINT.CONSENT));
-    }
-
-    if (!redirectUri) {
-      throw new HTTPError(
-        e.message,
-        STATUS_CODE.INTERNAL_SERVER_ERROR,
-        req.method,
-        req.url
-      );
     }
 
     redirectUri.search = encode({

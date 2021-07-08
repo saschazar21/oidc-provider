@@ -93,6 +93,21 @@ describe('Authorization Middleware', () => {
   });
 
   describe('Authorization Code Flow', () => {
+    it('should return HTTP Status 400 when redirect_uri omitted', async () => {
+      const { redirect_uri, ...customQuery } = baseAuthorization;
+
+      const updatedReq = new MockRequest({
+        ...baseRequest,
+        url: `${ENDPOINT.AUTHORIZATION}?${encode(
+          customQuery as unknown as ParsedUrlQueryInput
+        )}`,
+      });
+
+      await expect(
+        authorizationMiddleware(updatedReq, res)
+      ).rejects.toThrowError();
+    });
+
     it('should redirect to client on malformed request', async () => {
       const customQuery = {
         ...baseAuthorization,
@@ -108,8 +123,8 @@ describe('Authorization Middleware', () => {
       const result = await authorizationMiddleware(updatedReq, res);
 
       expect(result).toBeFalsy();
-      expect(res.getHeader('location')).toEqual(
-        `${client.redirect_uris[0]}/?error=invalid_request`
+      expect(new URL(res.getHeader('location') as string).hostname).toEqual(
+        new URL(client.redirect_uris[0]).hostname
       );
     });
 
@@ -309,8 +324,9 @@ describe('Authorization Middleware', () => {
       expect(result).toBeFalsy();
 
       const redirect_uri = new URL(authorization.get('redirect_uri'));
-      redirect_uri.search = encode({ error: 'invalid_request' });
-      expect(res.getHeader('location')).toEqual(redirect_uri.toString());
+      expect(new URL(res.getHeader('location') as string).hostname).toEqual(
+        redirect_uri.hostname
+      );
     });
   });
 });

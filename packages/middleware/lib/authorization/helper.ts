@@ -79,7 +79,9 @@ export const getAuthenticationFlow = (
     case AUTHENTICATION_FLOW.HYBRID:
       return new HybridStrategy(auth);
     default:
-      throw new Error('ERROR: Could not define authorization flow!');
+      throw new Error(
+        'ERROR: Could not determine authorization flow! response_type missing or invalid?'
+      );
   }
 };
 

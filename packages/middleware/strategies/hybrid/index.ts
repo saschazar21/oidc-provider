@@ -23,7 +23,7 @@ class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
       !this.auth.nonce
     ) {
       throw new Error(
-        `Nonce is required, when response_type=${RESPONSE_TYPE.ID_TOKEN}!`
+        `ERROR: Nonce is required, when response_type=${RESPONSE_TYPE.ID_TOKEN}!`
       );
     }
 
