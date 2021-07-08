@@ -83,7 +83,6 @@ describe('Authorization Middleware', () => {
       .then((client) => {
         clientDoc = client;
         baseAuthorization.client_id = client.get('_id');
-        baseAuthorization.client_id = client.get('_id');
       });
     await disconnect();
   });
