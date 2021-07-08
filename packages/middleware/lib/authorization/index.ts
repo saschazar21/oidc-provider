@@ -72,7 +72,7 @@ const authorization = async (
     }
   } catch (e) {
     let redirectUri: URL;
-    const { redirect_uri = '', state } = auth;
+    const { redirect_uri = '', state } = auth || {};
 
     try {
       redirectUri = new URL(redirect_uri);
