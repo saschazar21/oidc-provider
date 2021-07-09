@@ -19,6 +19,8 @@ import bodyParser from 'middleware/lib/body-parser';
 import { METHOD } from 'utils/lib/types/method';
 import { AUTHENTICATION_FLOW } from 'utils/lib/types/response_type';
 import defineFlow from 'utils/lib/util/define-flow';
+import AuthorizationError from 'utils/lib/errors/authorization_error';
+import { ERROR_CODE } from 'utils/lib/types/error_code';
 
 /**
  * map to string[]
@@ -56,7 +58,10 @@ export const buildAuthorizationSchema = async (
       'redirect_uri response_type scope nonce state client_id user'
     );
     if (!authorization) {
-      throw new Error(`ERROR: No Authorization found with ID: ${auth._id}!`);
+      throw new AuthorizationError(
+        `No Authorization found with ID: ${auth._id}!`,
+        ERROR_CODE.INVALID_REQUEST
+      );
     }
     return {
       ...authorization.toJSON(),
@@ -79,8 +84,9 @@ export const getAuthenticationFlow = (
     case AUTHENTICATION_FLOW.HYBRID:
       return new HybridStrategy(auth);
     default:
-      throw new Error(
-        'ERROR: Could not determine authorization flow! response_type missing or invalid?'
+      throw new AuthorizationError(
+        'No supported response_type found!',
+        ERROR_CODE.UNSUPPORTED_RESPONSE_TYPE
       );
   }
 };

@@ -9,11 +9,13 @@ import {
   AccessTokenSchema,
 } from 'database/lib/schemata/token';
 import UserModel from 'database/lib/schemata/user';
+import AuthorizationError from 'utils/lib/errors/authorization_error';
 import encrypt from 'utils/lib/jwt/encrypt';
 import sign from 'utils/lib/jwt/sign';
 import { JWTAuth } from 'utils/lib/jwt/helpers';
 import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
 import { SCOPE } from 'utils/lib/types/scope';
+import { ERROR_CODE } from 'utils/lib/types/error_code';
 
 export type ImplicitOrHybridResponsePayload = {
   access_token: string;
@@ -69,7 +71,10 @@ abstract class AuthStrategy<T> {
       !Array.isArray(this.auth.scope) ||
       !this.auth.scope.includes(SCOPE.OPENID)
     ) {
-      throw new Error(`ERROR: scope parameter must contain "${SCOPE.OPENID}"`);
+      throw new AuthorizationError(
+        `scope parameter must contain "${SCOPE.OPENID}"`,
+        ERROR_CODE.INVALID_SCOPE
+      );
     }
     return true;
   }
@@ -113,17 +118,24 @@ abstract class AuthStrategy<T> {
 
   protected async validate(): Promise<boolean> {
     if (!this.doc) {
-      throw new Error('No Authorization available!');
+      throw new AuthorizationError(
+        'No Authorization available!',
+        ERROR_CODE.SERVER_ERROR
+      );
     }
 
     try {
       await connect();
       if (!(await UserModel.findById(this.doc.get('user'), '_id'))) {
-        throw new Error(`No user assigned to Authorization ID ${this.id}!`);
+        throw new AuthorizationError(
+          `No user assigned to Authorization ID ${this.id}!`,
+          ERROR_CODE.LOGIN_REQUIRED
+        );
       }
       if (!this.doc.get('consent')) {
-        throw new Error(
-          `User has not given consent to Authorization ID: ${this.id}!`
+        throw new AuthorizationError(
+          `User has not given consent to Authorization ID: ${this.id}!`,
+          ERROR_CODE.CONSENT_REQUIRED
         );
       }
       return true;
@@ -139,10 +151,11 @@ abstract class AuthStrategy<T> {
         ? await AuthorizationModel.findById(this.id)
         : await AuthorizationModel.create(this.auth);
       if (!this.doc) {
-        throw new Error(
+        throw new AuthorizationError(
           `Failed to fetch/create Authorization using data: ${JSON.stringify(
             this.auth
-          )}`
+          )}`,
+          ERROR_CODE.INVALID_REQUEST
         );
       }
       const sanitized = this.id && this.sanitizeUpdate();

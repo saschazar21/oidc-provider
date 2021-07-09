@@ -1,6 +1,8 @@
 import AuthStrategy, {
   AuthorizationResponse,
 } from 'middleware/strategies/AuthStrategy';
+import AuthorizationError from 'utils/lib/errors/authorization_error';
+import { ERROR_CODE } from 'utils/lib/types/error_code';
 import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 
@@ -22,8 +24,9 @@ class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
       this.auth.response_type.indexOf(RESPONSE_TYPE.ID_TOKEN) > -1 &&
       !this.auth.nonce
     ) {
-      throw new Error(
-        `ERROR: Nonce is required, when response_type=${RESPONSE_TYPE.ID_TOKEN}!`
+      throw new AuthorizationError(
+        `Nonce is required, when response_type=${RESPONSE_TYPE.ID_TOKEN}!`,
+        ERROR_CODE.INVALID_REQUEST
       );
     }
 

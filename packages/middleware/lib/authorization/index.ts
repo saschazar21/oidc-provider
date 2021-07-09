@@ -18,9 +18,11 @@ import AuthStrategy, {
 } from 'middleware/strategies/AuthStrategy';
 import { AuthorizationSchema } from 'database/lib/schemata/authorization';
 import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
+import { ERROR_CODE } from 'utils/lib/types/error_code';
 import { METHOD } from 'utils/lib/types/method';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 import HTTPError from 'utils/lib/errors/http_error';
+import AuthorizationError from 'utils/lib/errors/authorization_error';
 
 // TODO: move to a general config space;
 const MAX_AGE = 1000 * 60 * 5; // 5 minutes between login & authorization
@@ -89,10 +91,14 @@ const authorization = async (
       {},
       { ...redirectUri.searchParams },
       {
-        // TODO: add types for error codes
-        error: 'invalid_request',
+        error:
+          e.name === AuthorizationError.NAME
+            ? e.errorCode
+            : ERROR_CODE.INVALID_REQUEST,
       },
-      e.name === HTTPError.NAME || e.message?.startsWith('ERROR:')
+      e.name === HTTPError.NAME ||
+        e.name === AuthorizationError.NAME ||
+        e.message?.startsWith('ERROR:')
         ? { error_description: e.message }
         : null,
       state ? { state } : null
@@ -119,12 +125,21 @@ const authorization = async (
         ? STATUS_CODE.SEE_OTHER
         : STATUS_CODE.TEMPORARY_REDIRECT;
 
-    if (!authorization.get('user')) {
-      redirectUri = redirectUri ?? new URL(getUrl(CLIENT_ENDPOINT.LOGIN));
+    if (e.errorCode === ERROR_CODE.LOGIN_REQUIRED) {
+      redirectUri = new URL(getUrl(CLIENT_ENDPOINT.LOGIN));
     }
 
-    if (!authorization.get('consent')) {
-      redirectUri = redirectUri ?? new URL(getUrl(CLIENT_ENDPOINT.CONSENT));
+    if (e.errorCode === ERROR_CODE.CONSENT_REQUIRED) {
+      redirectUri = new URL(getUrl(CLIENT_ENDPOINT.CONSENT));
+    }
+
+    if (!redirectUri) {
+      throw new HTTPError(
+        e.message,
+        STATUS_CODE.INTERNAL_SERVER_ERROR,
+        req.method,
+        req.url
+      );
     }
 
     redirectUri.search = encode({
