@@ -4,7 +4,7 @@ import getConfiguration from 'config/lib/openid-configuration';
 import methods from 'middleware/lib/methods';
 import { METHOD } from 'utils/lib/types/method';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
-import HTTPError from 'utils/lib/util/http_error';
+import HTTPError from 'utils/lib/errors/http_error';
 
 const openidconfiguration = async (
   req: IncomingMessage,
@@ -22,12 +22,14 @@ const openidconfiguration = async (
     res.writeHead(STATUS_CODE.OK, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify(configuration));
   } catch (e) {
-    throw e.name === HTTPError.NAME ? e : new HTTPError(
-      e.message,
-      STATUS_CODE.INTERNAL_SERVER_ERROR,
-      req.method,
-      req.url
-    );
+    throw e.name === HTTPError.NAME
+      ? e
+      : new HTTPError(
+          e.message,
+          STATUS_CODE.INTERNAL_SERVER_ERROR,
+          req.method,
+          req.url
+        );
   }
 };
 

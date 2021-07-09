@@ -9,7 +9,7 @@ import connect, {
 import bodyParser from 'middleware/lib/body-parser';
 import cookieParser from 'middleware/lib/cookies';
 import redirect from 'middleware/lib/redirect';
-import HTTPError from 'utils/lib/util/http_error';
+import HTTPError from 'utils/lib/errors/http_error';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 
 const IS_TEST = process.env.NODE_ENV === 'test';

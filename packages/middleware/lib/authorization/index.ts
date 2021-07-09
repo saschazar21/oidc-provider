@@ -20,7 +20,7 @@ import { AuthorizationSchema } from 'database/lib/schemata/authorization';
 import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
 import { METHOD } from 'utils/lib/types/method';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
-import HTTPError from 'utils/lib/util/http_error';
+import HTTPError from 'utils/lib/errors/http_error';
 
 // TODO: move to a general config space;
 const MAX_AGE = 1000 * 60 * 5; // 5 minutes between login & authorization

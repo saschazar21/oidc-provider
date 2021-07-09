@@ -8,7 +8,7 @@ import { ResponsePayload } from 'middleware/lib/authorization/helper';
 import methods from 'middleware/lib/methods';
 import { METHOD } from 'utils/lib/types/method';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
-import HTTPError from 'utils/lib/util/http_error';
+import HTTPError from 'utils/lib/errors/http_error';
 import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
 import redirect from 'middleware/lib/redirect';
 

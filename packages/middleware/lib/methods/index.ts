@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'http';
 
 import { METHOD } from 'utils/lib/types/method';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
-import HTTPError from 'utils/lib/util/http_error';
+import HTTPError from 'utils/lib/errors/http_error';
 
 const methods = async (
   req: IncomingMessage,
