@@ -47,15 +47,11 @@ const authorization = async (
       case RESPONSE_MODE.FORM_POST:
         body = generateHTML(auth);
         break;
-      default:
-        throw new Error(
-          `ERROR: response_mode=${response_mode} is not supported`
-        );
     }
 
     if (body) {
       res.writeHead(STATUS_CODE.OK, {
-        'Content-Type': 'text/html; charset=UTF-8',
+        'content-type': 'text/html; charset=UTF-8',
       });
       res.write(body);
       return;

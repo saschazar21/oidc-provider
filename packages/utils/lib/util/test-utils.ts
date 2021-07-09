@@ -15,7 +15,13 @@ export const mockResponse = (): any => {
     this._header = this._headers = {
       ...this._header,
       ...this._headers,
-      ...headers,
+      ...Object.keys(headers).reduce(
+        (obj: object, key: string) => ({
+          ...obj,
+          [key.toLowerCase()]: headers[key],
+        }),
+        {} as object
+      ),
     };
     this.headersSent = true;
   });

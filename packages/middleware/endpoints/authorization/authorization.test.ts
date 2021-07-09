@@ -1,11 +1,12 @@
 import { ServerResponse } from 'http';
-import { encode, ParsedUrlQuery } from 'querystring';
+import { decode, encode, ParsedUrlQuery } from 'querystring';
 import cookie from 'cookie-parse';
 import { Document } from 'mongoose';
 import MockRequest from 'mock-req';
 
 import getUrl from 'config/lib/url';
 import connection, {
+  AccessTokenModel,
   AuthorizationModel,
   ClientModel,
   KeyModel,
@@ -21,6 +22,7 @@ import { SCOPE } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { METHOD } from 'utils/lib/types/method';
 import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
+import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
 
 describe('Authorization Endpoint', () => {
   let res: ServerResponse;
@@ -37,19 +39,6 @@ describe('Authorization Endpoint', () => {
   const baseUser: UserSchema = {
     email: 'authorization-endpoint-test-user@example.com',
     password: 'testpassword',
-  };
-
-  const baseAuthorization: AuthorizationSchema = {
-    client_id: '',
-    scope: [SCOPE.OPENID],
-    redirect_uri: baseClient.redirect_uris[0],
-    response_type: [RESPONSE_TYPE.CODE],
-  };
-
-  const baseRequest = {
-    method: METHOD.GET,
-    protocol: 'https',
-    url: ENDPOINT.AUTHORIZATION,
   };
 
   afterAll(async () => {
@@ -73,7 +62,6 @@ describe('Authorization Endpoint', () => {
       })
       .then((c) => {
         client = c;
-        baseAuthorization.client_id = c.get('_id');
         return user.update({ $push: { consents: [client.get('_id')] } });
       })
       .then(() => disconnect());
@@ -85,7 +73,25 @@ describe('Authorization Endpoint', () => {
 
   describe('Authorization Code', () => {
     let authorizationId: string;
-    it('follows happy path and resolves with code query parameter', async () => {
+
+    const baseAuthorization: AuthorizationSchema = {
+      client_id: '',
+      scope: [SCOPE.OPENID],
+      redirect_uri: baseClient.redirect_uris[0],
+      response_type: [RESPONSE_TYPE.CODE],
+    };
+
+    const baseRequest = {
+      method: METHOD.GET,
+      protocol: 'https',
+      url: ENDPOINT.AUTHORIZATION,
+    };
+
+    beforeAll(() => {
+      baseAuthorization.client_id = client.get('_id');
+    });
+
+    it('follows happy path and redirects to login endpoint', async () => {
       const req = new MockRequest({
         ...baseRequest,
         url: `${baseRequest.url}?${encode(
@@ -121,10 +127,194 @@ describe('Authorization Endpoint', () => {
       await authorizationEndpoint(req, res);
 
       const url = new URL(res.getHeader('location') as string);
+      const payload = decode(url.search.substr(1));
 
       expect(`${url.protocol}//${url.hostname}`).toEqual(
         baseAuthorization.redirect_uri
       );
+
+      expect(payload).toHaveProperty('code', authorizationId);
+    });
+  });
+
+  describe('Implicit', () => {
+    let authorizationId: string;
+
+    const baseAuthorization = {
+      client_id: '',
+      scope: [SCOPE.OPENID],
+      redirect_uri: baseClient.redirect_uris[0],
+      response_type: [RESPONSE_TYPE.ID_TOKEN, RESPONSE_TYPE.TOKEN].join(' '),
+      nonce: 'testnonce',
+      state: 'teststate',
+    };
+
+    const baseRequest = {
+      method: METHOD.GET,
+      protocol: 'https',
+      url: ENDPOINT.AUTHORIZATION,
+    };
+
+    beforeAll(() => {
+      baseAuthorization.client_id = client.get('_id');
+    });
+
+    it('follows happy path and redirects to login endpoint', async () => {
+      const req = new MockRequest({
+        ...baseRequest,
+        url: `${baseRequest.url}?${encode(
+          baseAuthorization as unknown as ParsedUrlQuery
+        )}`,
+      });
+      await authorizationEndpoint(req, res);
+
+      const url = new URL(getUrl(CLIENT_ENDPOINT.LOGIN));
+      url.search = encode({ redirect_to: getUrl(ENDPOINT.AUTHORIZATION) });
+      expect(res.getHeader('location')).toEqual(url.toString());
+
+      const parsed = cookie.parse(res.getHeader('set-cookie')[0]);
+      expect(parsed).toHaveProperty('authorization');
+
+      authorizationId = parsed.authorization;
+    });
+
+    it('returns JWT and access token after user has been authenticated and asked for consent', async () => {
+      await connection();
+      await AuthorizationModel.findByIdAndUpdate(authorizationId, {
+        user: user.get('_id'),
+        consent: true,
+      });
+      await disconnect();
+
+      const req = new MockRequest({
+        ...baseRequest,
+        headers: {
+          cookie: `authorization=${authorizationId}; sub=${user.get('_id')}`,
+        },
+      });
+      await authorizationEndpoint(req, res);
+
+      const url = new URL(res.getHeader('location') as string);
+
+      const payload = decode(url.hash.substr(1));
+
+      expect(`${url.protocol}//${url.hostname}`).toEqual(
+        baseAuthorization.redirect_uri
+      );
+      expect(payload).toHaveProperty('id_token');
+      expect(payload).toHaveProperty('access_token');
+      expect(payload).toHaveProperty('state', baseAuthorization.state);
+
+      await connection();
+      const token = await AccessTokenModel.findById(payload.access_token);
+      await disconnect();
+      expect(token.get('authorization')).toEqual(authorizationId);
+    });
+
+    it('returns JWT and access token using response_mode=form_post', async () => {
+      await connection();
+      const authorization = await AuthorizationModel.create({
+        ...baseAuthorization,
+        response_type: [RESPONSE_TYPE.ID_TOKEN, RESPONSE_TYPE.TOKEN],
+        response_mode: RESPONSE_MODE.FORM_POST,
+        user: user.get('_id'),
+        consent: true,
+      });
+      await disconnect();
+
+      const req = new MockRequest({
+        ...baseRequest,
+        headers: {
+          cookie: `authorization=${authorization.get('_id')}; sub=${user.get(
+            '_id'
+          )}`,
+        },
+      });
+      await authorizationEndpoint(req, res);
+      res.end();
+
+      expect(res.getHeader('content-type')).toEqual('text/html; charset=UTF-8');
+    });
+  });
+
+  describe('Hybrid', () => {
+    let authorizationId: string;
+
+    const baseAuthorization = {
+      client_id: '',
+      scope: [SCOPE.OPENID],
+      redirect_uri: baseClient.redirect_uris[0],
+      response_type: [
+        RESPONSE_TYPE.CODE,
+        RESPONSE_TYPE.ID_TOKEN,
+        RESPONSE_TYPE.TOKEN,
+      ].join(' '),
+      response_mode: RESPONSE_MODE.QUERY,
+      nonce: 'testnonce',
+      state: 'teststate',
+    };
+
+    const baseRequest = {
+      method: METHOD.GET,
+      protocol: 'https',
+      url: ENDPOINT.AUTHORIZATION,
+    };
+
+    beforeAll(() => {
+      baseAuthorization.client_id = client.get('_id');
+    });
+
+    it('follows happy path and redirects to login endpoint', async () => {
+      const req = new MockRequest({
+        ...baseRequest,
+        url: `${baseRequest.url}?${encode(
+          baseAuthorization as unknown as ParsedUrlQuery
+        )}`,
+      });
+      await authorizationEndpoint(req, res);
+
+      const url = new URL(getUrl(CLIENT_ENDPOINT.LOGIN));
+      url.search = encode({ redirect_to: getUrl(ENDPOINT.AUTHORIZATION) });
+      expect(res.getHeader('location')).toEqual(url.toString());
+
+      const parsed = cookie.parse(res.getHeader('set-cookie')[0]);
+      expect(parsed).toHaveProperty('authorization');
+
+      authorizationId = parsed.authorization;
+    });
+
+    it('returns Authorization code, JWT and access token after user has been authenticated and asked for consent', async () => {
+      await connection();
+      await AuthorizationModel.findByIdAndUpdate(authorizationId, {
+        user: user.get('_id'),
+        consent: true,
+      });
+      await disconnect();
+
+      const req = new MockRequest({
+        ...baseRequest,
+        headers: {
+          cookie: `authorization=${authorizationId}; sub=${user.get('_id')}`,
+        },
+      });
+      await authorizationEndpoint(req, res);
+
+      const url = new URL(res.getHeader('location') as string);
+
+      const payload = decode(url.search.substr(1));
+
+      expect(`${url.protocol}//${url.hostname}`).toEqual(
+        baseAuthorization.redirect_uri
+      );
+      expect(payload).toHaveProperty('code', authorizationId);
+      expect(payload).toHaveProperty('id_token');
+      expect(payload).toHaveProperty('access_token');
+      expect(payload).toHaveProperty('state', baseAuthorization.state);
+
+      await connection();
+      const token = await AccessTokenModel.findById(payload.access_token);
+      await disconnect();
+      expect(token.get('authorization')).toEqual(authorizationId);
     });
   });
 });
