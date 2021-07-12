@@ -23,6 +23,7 @@ class HTTPError extends Error implements Error {
     path: string
   ) {
     super(message);
+    this.name = HTTPError.NAME;
     this._id = HTTPError.generateID();
     this._method = method;
     this._path = path;
@@ -33,10 +34,6 @@ class HTTPError extends Error implements Error {
 
   get id(): string {
     return this._id;
-  }
-
-  get name(): string {
-    return HTTPError.NAME;
   }
 
   get statusCode(): number {

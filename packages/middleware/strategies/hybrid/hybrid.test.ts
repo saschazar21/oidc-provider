@@ -120,6 +120,7 @@ describe('Hybrid Strategy', () => {
       user: user_id,
       consent: true,
     };
-    expect(() => new HybridStrategy(auth)).toThrowError();
+    const strategy = new HybridStrategy(auth);
+    await expect(strategy.init()).rejects.toThrowError();
   });
 });

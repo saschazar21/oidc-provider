@@ -18,7 +18,7 @@ export type HybridResponsePayload = {
 class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
   public static readonly DEFAULT_RESPONSE_MODE = RESPONSE_MODE.FRAGMENT;
 
-  protected prevalidate(): boolean {
+  protected async prevalidate(): Promise<boolean> {
     if (
       Array.isArray(this.auth.response_type) &&
       this.auth.response_type.indexOf(RESPONSE_TYPE.ID_TOKEN) > -1 &&

@@ -7,6 +7,7 @@ class AuthorizationError extends Error implements Error {
 
   constructor(message: string, errorCode: ERROR_CODE) {
     super(message);
+    this.name = AuthorizationError.NAME;
     this._errorCode = errorCode;
   }
 

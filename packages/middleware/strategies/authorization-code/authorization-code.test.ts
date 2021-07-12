@@ -15,6 +15,7 @@ import { SCOPE } from 'utils/lib/types/scope';
 
 describe('AuthorizationCodeStrategy', () => {
   let authorization: Document<Authorization>;
+  let userDoc: Document<UserSchema>;
   let clientId: string;
   let userId: string;
 
@@ -47,14 +48,14 @@ describe('AuthorizationCodeStrategy', () => {
   beforeAll(async () => {
     await connection();
 
-    const userModel = await UserModel.create(user);
+    userDoc = await UserModel.create(user);
     const clientModel = await ClientModel.create({
       ...client,
-      owner: userModel._id,
+      owner: userDoc._id,
     });
 
-    clientId = clientModel._id;
-    userId = userModel._id;
+    clientId = clientModel.get('_id');
+    userId = userDoc.get('_id');
   });
 
   it('creates a new Authorization using response_type=code', async () => {
@@ -86,39 +87,15 @@ describe('AuthorizationCodeStrategy', () => {
     });
     const doc = await authorizationCodeStrategy.init();
 
-    expect(doc.toJSON()).toMatchObject(authorization.toJSON());
+    const { prompt, ...rest } =
+      authorization.toJSON() as unknown as Authorization;
+    expect(doc.toJSON()).toMatchObject(rest);
     expect(authorizationCodeStrategy.id).toEqual(authorization._id);
     expect(doc.get('consent')).toBeFalsy();
     expect(doc.get('user')).toBeFalsy();
   });
 
-  it('updates Authorization and returns response payload', async () => {
-    const auth = {
-      _id: authorization.get('_id'),
-      user: userId,
-      active: true,
-      consent: true,
-      scope: [SCOPE.OPENID, SCOPE.EMAIL],
-      response_type: authorization.get('response_type'),
-    };
-
-    const authorizationCodeStrategy = new AuthorizationCodeStrategy(auth);
-    const doc = await authorizationCodeStrategy.init();
-
-    expect(doc.get('updated_at')).not.toEqual(authorization.get('updated_at'));
-    expect(doc.toJSON()).not.toMatchObject(authorization.toJSON());
-
-    const payload = await authorizationCodeStrategy.responsePayload();
-
-    expect(payload.redirect_uri).toEqual(authorization.get('redirect_uri'));
-    expect(payload.response_mode).toEqual(
-      AuthorizationCodeStrategy.DEFAULT_RESPONSE_MODE
-    );
-    expect(doc.get('scope')).not.toEqual(auth.scope);
-    expect(doc.get('scope')).toHaveLength(1);
-  });
-
-  it('fails to return response payload when consent=false', async () => {
+  it('fails to return response payload when user has not given consent yet', async () => {
     const auth = {
       client_id: clientId,
       redirect_uri: client.redirect_uris[0],
@@ -137,6 +114,36 @@ describe('AuthorizationCodeStrategy', () => {
     await expect(
       authorizationCodeStrategy.responsePayload()
     ).rejects.toThrowError();
+  });
+
+  it('updates Authorization and returns response payload', async () => {
+    await connection();
+    await userDoc.update({ $push: { consents: clientId } });
+    await disconnect();
+
+    const auth = {
+      _id: authorization.get('_id'),
+      user: userId,
+      scope: [SCOPE.OPENID, SCOPE.EMAIL],
+      response_type: authorization.get('response_type'),
+      state: 'teststate',
+    };
+
+    const authorizationCodeStrategy = new AuthorizationCodeStrategy(auth);
+    const doc = await authorizationCodeStrategy.init();
+
+    expect(doc.get('updated_at')).not.toEqual(authorization.get('updated_at'));
+    expect(doc.toJSON()).not.toMatchObject(authorization.toJSON());
+
+    const payload = await authorizationCodeStrategy.responsePayload();
+
+    expect(payload.redirect_uri).toEqual(authorization.get('redirect_uri'));
+    expect(payload.response_mode).toEqual(
+      AuthorizationCodeStrategy.DEFAULT_RESPONSE_MODE
+    );
+    expect(payload.payload.state).toEqual(auth.state);
+    expect(doc.get('scope')).not.toEqual(auth.scope);
+    expect(doc.get('scope')).toHaveLength(1);
   });
 
   it('fails to create Authorization when client_id is missing', async () => {

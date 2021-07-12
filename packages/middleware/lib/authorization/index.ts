@@ -16,7 +16,10 @@ import redirect from 'middleware/lib/redirect';
 import AuthStrategy, {
   AuthorizationResponse,
 } from 'middleware/strategies/AuthStrategy';
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
+import {
+  Authorization,
+  AuthorizationSchema,
+} from 'database/lib/schemata/authorization';
 import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
 import { ERROR_CODE } from 'utils/lib/types/error_code';
 import { METHOD } from 'utils/lib/types/method';
@@ -25,7 +28,7 @@ import HTTPError from 'utils/lib/errors/http_error';
 import AuthorizationError from 'utils/lib/errors/authorization_error';
 
 // TODO: move to a general config space;
-const MAX_AGE = 1000 * 60 * 5; // 5 minutes between login & authorization
+const MAX_AGE = 1000 * 60 * 15; // 15 minutes between login & authorization
 const IS_TEST = process.env.NODE_ENV === 'test';
 
 const authorization = async (
@@ -34,7 +37,6 @@ const authorization = async (
 ): Promise<AuthorizationResponse<ResponsePayload> | void> => {
   let auth: AuthorizationSchema;
   let authenticationFlow: AuthStrategy<ResponsePayload>;
-  let authorization: Document<AuthorizationSchema>;
   let cookies: Cookies;
 
   try {
@@ -61,10 +63,10 @@ const authorization = async (
       user: userId,
     });
     authenticationFlow = getAuthenticationFlow(auth);
-    authorization =
-      (await authenticationFlow.init()) as Document<AuthorizationSchema>;
+    const authorizationDoc = await authenticationFlow.init();
+
     if (!authorizationId) {
-      cookies.set('authorization', authorization.get('_id'), {
+      cookies.set('authorization', authorizationDoc.get('_id'), {
         expires: new Date(Date.now() + MAX_AGE),
         httpOnly: true,
         maxAge: MAX_AGE,
@@ -72,6 +74,7 @@ const authorization = async (
         secure: true,
       });
     }
+    auth = authenticationFlow.auth as AuthorizationSchema;
   } catch (e) {
     let redirectUri: URL;
     const { redirect_uri = '', state } = auth || {};
@@ -96,9 +99,7 @@ const authorization = async (
             ? e.errorCode
             : ERROR_CODE.INVALID_REQUEST,
       },
-      e.name === HTTPError.NAME ||
-        e.name === AuthorizationError.NAME ||
-        e.message?.startsWith('ERROR:')
+      e.name === HTTPError.NAME || e.name === AuthorizationError.NAME
         ? { error_description: e.message }
         : null,
       state ? { state } : null

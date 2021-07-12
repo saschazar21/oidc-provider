@@ -3,6 +3,7 @@ import type { Document } from 'mongoose';
 import connect, { disconnect } from 'database/lib';
 import AuthorizationModel, {
   Authorization,
+  AuthorizationSchema,
 } from 'database/lib/schemata/authorization';
 import {
   AccessTokenModel,
@@ -16,6 +17,7 @@ import { JWTAuth } from 'utils/lib/jwt/helpers';
 import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
 import { SCOPE } from 'utils/lib/types/scope';
 import { ERROR_CODE } from 'utils/lib/types/error_code';
+import { PROMPT } from 'utils/lib/types/prompt';
 
 export type ImplicitOrHybridResponsePayload = {
   access_token: string;
@@ -41,6 +43,7 @@ abstract class AuthStrategy<T> {
   private _token: string;
 
   protected _doc: Document<Authorization>;
+  protected _filter: { [key: string]: 0 | 1 };
 
   public get auth(): Authorization {
     return this._auth;
@@ -48,6 +51,10 @@ abstract class AuthStrategy<T> {
 
   public get doc(): Document<Authorization> {
     return this._doc;
+  }
+
+  public get filter(): { [key: string]: 0 | 1 } {
+    return this._filter;
   }
 
   public get id(): string {
@@ -62,11 +69,50 @@ abstract class AuthStrategy<T> {
     const { _id, ...rest } = auth;
     this._id = _id;
     this._auth = rest;
-
-    this.prevalidate();
+    this._filter = {
+      prompt: 0,
+    };
   }
 
-  protected prevalidate(): boolean {
+  private async validatePrompt(): Promise<boolean> {
+    const { client_id, prompt, user } = this.auth;
+    if (!prompt?.length) {
+      return true;
+    }
+
+    if (prompt.includes(PROMPT.NONE)) {
+      if (prompt.length > 1) {
+        throw new AuthorizationError(
+          `Invalid prompt, either '${PROMPT.NONE}' or combination of other values is allowed!`,
+          ERROR_CODE.INVALID_REQUEST
+        );
+      }
+
+      if (!user) {
+        throw new AuthorizationError(
+          'No active user session found, but client requires existing authentication!',
+          ERROR_CODE.LOGIN_REQUIRED
+        );
+      }
+
+      try {
+        await connect();
+        const userDoc = await UserModel.findById(user, 'consents');
+        const consents = userDoc.get('consents');
+        if (!Array.isArray(consents) || !consents.includes(client_id)) {
+          throw new AuthorizationError(
+            `No consent found for client, but client requires existing consent!`,
+            ERROR_CODE.INTERACTION_REQUIRED
+          );
+        }
+      } finally {
+        await disconnect();
+      }
+    }
+    return true;
+  }
+
+  protected async prevalidate(): Promise<boolean> {
     if (
       !Array.isArray(this.auth.scope) ||
       !this.auth.scope.includes(SCOPE.OPENID)
@@ -76,7 +122,8 @@ abstract class AuthStrategy<T> {
         ERROR_CODE.INVALID_SCOPE
       );
     }
-    return true;
+
+    return this.validatePrompt();
   }
 
   private sanitizeUpdate(): Authorization {
@@ -124,20 +171,44 @@ abstract class AuthStrategy<T> {
       );
     }
 
+    const prompts = this.doc.get('prompt');
+    if (Array.isArray(prompts) && prompts.includes(PROMPT.LOGIN)) {
+      throw new AuthorizationError(
+        'Login required!',
+        ERROR_CODE.LOGIN_REQUIRED
+      );
+    }
+
+    if (Array.isArray(prompts) && prompts.includes(PROMPT.CONSENT)) {
+      throw new AuthorizationError(
+        'Consent required!',
+        ERROR_CODE.CONSENT_REQUIRED
+      );
+    }
+
     try {
       await connect();
-      if (!(await UserModel.findById(this.doc.get('user'), '_id'))) {
+      const user = await UserModel.findById(
+        this.doc.get('user'),
+        '_id consents'
+      );
+      if (!user) {
         throw new AuthorizationError(
           `No user assigned to Authorization ID ${this.id}!`,
           ERROR_CODE.LOGIN_REQUIRED
         );
       }
-      if (!this.doc.get('consent')) {
+      const consents = user.get('consents');
+      if (
+        !Array.isArray(consents) ||
+        !consents.includes(this.doc.get('client_id'))
+      ) {
         throw new AuthorizationError(
-          `User has not given consent to Authorization ID: ${this.id}!`,
+          `User has not given consent to Client ID: ${this.auth.client_id}!`,
           ERROR_CODE.CONSENT_REQUIRED
         );
       }
+      await this.doc.update({ consent: true });
       return true;
     } finally {
       await disconnect();
@@ -145,10 +216,12 @@ abstract class AuthStrategy<T> {
   }
 
   public async init(): Promise<Document<Authorization>> {
+    await this.prevalidate();
+
     try {
       await connect();
       this._doc = this.id
-        ? await AuthorizationModel.findById(this.id)
+        ? await AuthorizationModel.findById(this.id, this.filter)
         : await AuthorizationModel.create(this.auth);
       if (!this.doc) {
         throw new AuthorizationError(

@@ -17,7 +17,7 @@ export type ImplicitResponsePayload = {
 class ImplicitStrategy extends AuthStrategy<ImplicitResponsePayload> {
   public static readonly DEFAULT_RESPONSE_MODE = RESPONSE_MODE.FRAGMENT;
 
-  protected prevalidate(): boolean {
+  protected async prevalidate(): Promise<boolean> {
     if (!this.auth.nonce) {
       throw new AuthorizationError(
         'Nonce is required!',

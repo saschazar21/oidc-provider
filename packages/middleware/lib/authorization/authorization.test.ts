@@ -23,6 +23,7 @@ import ImplicitStrategy, {
 import { verify } from 'utils/lib/jwt/sign';
 import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
 import { METHOD } from 'utils/lib/types/method';
+import { PROMPT } from 'utils/lib/types/prompt';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { SCOPE } from 'utils/lib/types/scope';
 import { mockResponse } from 'utils/lib/util/test-utils';
@@ -248,6 +249,127 @@ describe('Authorization Middleware', () => {
         AuthorizationCodeStrategy.DEFAULT_RESPONSE_MODE
       );
       expect(result.payload).toHaveProperty('code', authorization.get('_id'));
+    });
+
+    it('should redirect to login, when prompt=login, although user is authenticated', async () => {
+      const updatedAuthorization = {
+        ...baseAuthorization,
+        prompt: [PROMPT.LOGIN],
+      };
+
+      const updatedReq = new MockRequest({
+        ...baseRequest,
+        method: METHOD.POST,
+        headers: {
+          cookie: `user=${userDoc.get('_id')}`,
+        },
+      });
+      updatedReq.write(
+        encode(updatedAuthorization as unknown as ParsedUrlQueryInput)
+      );
+      updatedReq.end();
+
+      const result = await authorizationMiddleware(updatedReq, res);
+
+      expect(result).toBeFalsy();
+      expect(res.getHeader('location')).toMatch(getUrl(CLIENT_ENDPOINT.LOGIN));
+    });
+
+    it('should redirect to consent, when prompt=consent, although user has given consent', async () => {
+      const updatedAuthorization = {
+        ...baseAuthorization,
+        prompt: [PROMPT.CONSENT],
+      };
+
+      const updatedReq = new MockRequest({
+        ...baseRequest,
+        method: METHOD.POST,
+        headers: {
+          cookie: `user=${userDoc.get('_id')}`,
+        },
+      });
+      updatedReq.write(
+        encode(updatedAuthorization as unknown as ParsedUrlQueryInput)
+      );
+      updatedReq.end();
+
+      const result = await authorizationMiddleware(updatedReq, res);
+
+      expect(result).toBeFalsy();
+      expect(res.getHeader('location')).toMatch(
+        getUrl(CLIENT_ENDPOINT.CONSENT)
+      );
+    });
+
+    it('should redirect to redirect_uri when invalid prompt is given', async () => {
+      const updatedAuthorization = {
+        ...baseAuthorization,
+        prompt: [PROMPT.NONE, PROMPT.LOGIN].join(' '),
+      };
+
+      const updatedReq = new MockRequest({
+        ...baseRequest,
+        method: METHOD.POST,
+      });
+      updatedReq.write(
+        encode(updatedAuthorization as unknown as ParsedUrlQueryInput)
+      );
+      updatedReq.end();
+
+      const result = await authorizationMiddleware(updatedReq, res);
+
+      expect(result).toBeFalsy();
+      expect(res.getHeader('location')).toMatch(client.redirect_uris[0]);
+    });
+
+    it('should redirect to redirect_uri when no user is authenticated and prompt=none', async () => {
+      const updatedAuthorization = {
+        ...baseAuthorization,
+        prompt: PROMPT.NONE,
+      };
+
+      const updatedReq = new MockRequest({
+        ...baseRequest,
+        method: METHOD.POST,
+      });
+      updatedReq.write(
+        encode(updatedAuthorization as unknown as ParsedUrlQueryInput)
+      );
+      updatedReq.end();
+
+      const result = await authorizationMiddleware(updatedReq, res);
+
+      expect(result).toBeFalsy();
+      expect(res.getHeader('location')).toMatch(client.redirect_uris[0]);
+    });
+
+    it('should redirect to redirect_uri when user is authenticated, has not consented and prompt=none', async () => {
+      await connection();
+      await userDoc.update({ consents: [] });
+      await disconnect();
+
+      const updatedAuthorization = {
+        ...baseAuthorization,
+        prompt: PROMPT.NONE,
+      };
+
+      const updatedReq = new MockRequest({
+        ...baseRequest,
+        headers: {
+          cookie: `user=${userDoc.get('_id')}`,
+        },
+        method: METHOD.POST,
+        protocol: 'https',
+      });
+      updatedReq.write(
+        encode(updatedAuthorization as unknown as ParsedUrlQueryInput)
+      );
+      updatedReq.end();
+
+      const result = await authorizationMiddleware(updatedReq, res);
+
+      expect(result).toBeFalsy();
+      expect(res.getHeader('location')).toMatch(client.redirect_uris[0]);
     });
   });
 

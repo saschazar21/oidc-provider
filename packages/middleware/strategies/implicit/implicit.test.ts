@@ -60,7 +60,6 @@ describe('Implicit Strategy', () => {
       .then(async (c) => {
         client = c;
         baseAuthorization.client_id = c.get('_id');
-        await user.update({ consents: [c.get('_id')] });
         return disconnect();
       });
   });
@@ -85,10 +84,13 @@ describe('Implicit Strategy', () => {
   });
 
   it('updates Authorization and returns response payload', async () => {
+    await connection();
+    await user.update({ $push: { consents: client.get('_id') } });
+    await disconnect();
+
     const auth = {
       ...baseAuthorization,
       _id: authorization.get('_id'),
-      consent: true,
     };
 
     const implicitStrategy = new ImplicitStrategy(auth);
@@ -125,6 +127,7 @@ describe('Implicit Strategy', () => {
   it('throws, when nonce is missing', async () => {
     const { nonce, ...auth } = baseAuthorization;
 
-    expect(() => new ImplicitStrategy(auth)).toThrowError();
+    const strategy = new ImplicitStrategy(auth);
+    await expect(strategy.init()).rejects.toThrowError();
   });
 });
