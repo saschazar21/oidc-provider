@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import { randomBytes } from 'crypto';
 
 import connect, { disconnect } from 'database/lib/connect';

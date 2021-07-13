@@ -1,10 +1,11 @@
+import { ServerResponse } from 'http';
 import MockRes from 'mock-res';
 
 export const flushHeaders = jest.fn(function flushHeaders(): void {
   this._header = this._headers = {};
 });
 
-export const mockResponse = (): any => {
+export const mockResponse = (): ServerResponse => {
   const res = new MockRes();
   res.flushHeaders = flushHeaders;
   res.writeHead = jest.fn(function writeHead(

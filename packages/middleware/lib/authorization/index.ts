@@ -2,7 +2,6 @@ import { IncomingMessage, ServerResponse } from 'http';
 import type Cookies from 'cookies';
 import { URL } from 'url';
 import { encode } from 'querystring';
-import { Document } from 'mongoose';
 
 import getUrl from 'config/lib/url';
 import {
@@ -16,10 +15,7 @@ import redirect from 'middleware/lib/redirect';
 import AuthStrategy, {
   AuthorizationResponse,
 } from 'middleware/strategies/AuthStrategy';
-import {
-  Authorization,
-  AuthorizationSchema,
-} from 'database/lib/schemata/authorization';
+import { AuthorizationSchema } from 'database/lib/schemata/authorization';
 import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
 import { ERROR_CODE } from 'utils/lib/types/error_code';
 import { METHOD } from 'utils/lib/types/method';

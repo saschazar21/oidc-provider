@@ -1,3 +1,4 @@
+import { ClientRequest, IncomingMessage } from 'http';
 import { Mongoose, connection } from 'mongoose';
 import MockReq from 'mock-req';
 import { encode } from 'querystring';
@@ -9,7 +10,9 @@ import { STATUS_CODE } from 'utils/lib/types/status_code';
 import { LoginForm } from 'utils/lib/types/login';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
-const createReq = (configuration?: { [key: string]: string | number }): any =>
+const createReq = (configuration?: {
+  [key: string]: string | number;
+}): ClientRequest =>
   new MockReq({
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -82,9 +85,9 @@ describe('Login Middleware', () => {
     updatedReq.write(encode({ ...body }));
     updatedReq.end();
 
-    await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError(
-      'E-Mail and/or Password missing!'
-    );
+    await expect(
+      loginMiddleware(updatedReq as unknown as IncomingMessage, res)
+    ).rejects.toThrowError('E-Mail and/or Password missing!');
   });
 
   it('should fail when no password given', async () => {
@@ -94,9 +97,9 @@ describe('Login Middleware', () => {
     updatedReq.write(encode({ ...body }));
     updatedReq.end();
 
-    await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError(
-      'E-Mail and/or Password missing!'
-    );
+    await expect(
+      loginMiddleware(updatedReq as unknown as IncomingMessage, res)
+    ).rejects.toThrowError('E-Mail and/or Password missing!');
   });
 
   it('should fail when wrong password given', async () => {
@@ -109,6 +112,8 @@ describe('Login Middleware', () => {
     updatedReq.write(encode(updatedPayload));
     updatedReq.end();
 
-    await expect(loginMiddleware(updatedReq, res)).rejects.toThrowError();
+    await expect(
+      loginMiddleware(updatedReq as unknown as IncomingMessage, res)
+    ).rejects.toThrowError();
   });
 });

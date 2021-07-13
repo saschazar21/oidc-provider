@@ -3,7 +3,6 @@ import type { Document } from 'mongoose';
 import connect, { disconnect } from 'database/lib';
 import AuthorizationModel, {
   Authorization,
-  AuthorizationSchema,
 } from 'database/lib/schemata/authorization';
 import {
   AccessTokenModel,
