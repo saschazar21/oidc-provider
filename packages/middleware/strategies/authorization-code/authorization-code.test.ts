@@ -118,7 +118,7 @@ describe('AuthorizationCodeStrategy', () => {
 
   it('updates Authorization and returns response payload', async () => {
     await connection();
-    await userDoc.update({ $push: { consents: clientId } });
+    await userDoc.update({ $addToSet: { consents: clientId } });
     await disconnect();
 
     const auth = {

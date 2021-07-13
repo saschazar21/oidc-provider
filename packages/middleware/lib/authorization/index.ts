@@ -123,6 +123,8 @@ const authorization = async (
         : STATUS_CODE.TEMPORARY_REDIRECT;
 
     if (e.errorCode === ERROR_CODE.LOGIN_REQUIRED) {
+      cookies.set('sub');
+      cookies.set('user');
       redirectUri = new URL(getUrl(CLIENT_ENDPOINT.LOGIN));
     }
 

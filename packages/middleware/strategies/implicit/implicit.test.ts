@@ -85,7 +85,7 @@ describe('Implicit Strategy', () => {
 
   it('updates Authorization and returns response payload', async () => {
     await connection();
-    await user.update({ $push: { consents: client.get('_id') } });
+    await user.update({ $addToSet: { consents: client.get('_id') } });
     await disconnect();
 
     const auth = {

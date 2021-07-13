@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http';
+import { encode } from 'querystring';
 import type Cookies from 'cookies';
 
 import connect, {
@@ -9,7 +10,9 @@ import connect, {
 import bodyParser from 'middleware/lib/body-parser';
 import cookieParser from 'middleware/lib/cookies';
 import redirect from 'middleware/lib/redirect';
+import AuthorizationError from 'utils/lib/errors/authorization_error';
 import HTTPError from 'utils/lib/errors/http_error';
+import { ERROR_CODE } from 'utils/lib/types/error_code';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 
 const IS_TEST = process.env.NODE_ENV === 'test';
@@ -47,36 +50,71 @@ const consent = async (
     cookies.get('user', { signed: !IS_TEST }) ||
     cookies.get('sub', { signed: !IS_TEST });
 
-  let err = '';
-  err = !err.length && !sub?.length ? 'User not logged in!' : err;
-  err = !err.length && !authorizationId ? 'No authorization found!' : err;
-  err = !err.length && !consent ? 'No consent was given!' : err;
-  if (err.length > 0) {
-    throw new HTTPError(err, STATUS_CODE.BAD_REQUEST, req.method, req.url);
-  }
-
-  await connect()
-    .then(() =>
-      AuthorizationModel.findByIdAndUpdate(
-        authorizationId,
-        { $set: { consent: true } },
-        { new: true, fields: 'client_id' }
-      )
-    )
-    .then((authorization) => {
-      if (!authorization || !authorization.get('client_id')) {
-        throw new HTTPError(
-          'Updating consent on authorization failed!',
-          STATUS_CODE.INTERNAL_SERVER_ERROR,
+  let err: HTTPError | AuthorizationError;
+  err =
+    !err && !authorizationId
+      ? new HTTPError(
+          `No authorization found using ID: ${authorizationId}!`,
+          STATUS_CODE.BAD_REQUEST,
           req.method,
           req.url
-        );
-      }
-      return UserModel.findByIdAndUpdate(sub, {
-        $addToSet: { consents: authorization.get('client_id') },
+        )
+      : err;
+  err =
+    !err && !sub?.length
+      ? new AuthorizationError(
+          'User not authenticated!',
+          ERROR_CODE.LOGIN_REQUIRED
+        )
+      : err;
+  err =
+    !err && !consent
+      ? new AuthorizationError(
+          'Consent was denied by user!',
+          ERROR_CODE.ACCESS_DENIED
+        )
+      : err;
+  if (err?.name === HTTPError.NAME) {
+    throw err;
+  }
+
+  try {
+    await connect();
+    const authorization = await AuthorizationModel.findById(authorizationId);
+    if (!authorization || !authorization.get('client_id')) {
+      throw new HTTPError(
+        'Updating consent on authorization failed!',
+        STATUS_CODE.INTERNAL_SERVER_ERROR,
+        req.method,
+        req.url
+      );
+    }
+
+    if (err) {
+      const state = authorization.get('state');
+      const responseQuery = Object.assign(
+        {},
+        {
+          error: (err as AuthorizationError).errorCode,
+          error_description: err.message,
+        },
+        state ? { state } : null
+      );
+      const location = new URL(authorization.get('redirect_uri'));
+      location.search = encode(responseQuery);
+
+      return redirect(req, res, {
+        location: location.toString(),
+        statusCode: STATUS_CODE.SEE_OTHER,
       });
-    })
-    .then(() => disconnect());
+    }
+
+    await UserModel.findByIdAndUpdate(sub, {
+      $addToSet: { consents: authorization.get('client_id') },
+    });
+  } finally {
+    await disconnect();
+  }
 
   // TODO: implement cookie-based redirect_to logic
   const location = redirect_to || '/';

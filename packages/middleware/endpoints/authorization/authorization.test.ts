@@ -62,7 +62,7 @@ describe('Authorization Endpoint', () => {
       })
       .then((c) => {
         client = c;
-        return user.update({ $push: { consents: [client.get('_id')] } });
+        return user.update({ $addToSet: { consents: [client.get('_id')] } });
       })
       .then(() => disconnect());
   });

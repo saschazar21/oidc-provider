@@ -62,7 +62,7 @@ describe('Hybrid Strategy', () => {
       .then((c) => {
         client_id = c.get('_id');
         return UserModel.findByIdAndUpdate(user_id, {
-          $push: { consents: client_id },
+          $addToSet: { consents: client_id },
         });
       })
       .finally(() => disconnect());

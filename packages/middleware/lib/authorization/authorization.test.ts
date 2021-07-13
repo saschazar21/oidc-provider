@@ -222,7 +222,7 @@ describe('Authorization Middleware', () => {
     it('should return a response payload object, when user & consent property set in Authorization', async () => {
       await connection();
       await userDoc.update({
-        $push: { consents: [clientDoc.get('_id')] },
+        $addToSet: { consents: [clientDoc.get('_id')] },
       });
       const authorization = await AuthorizationModel.create({
         ...baseAuthorization,
@@ -383,7 +383,7 @@ describe('Authorization Middleware', () => {
 
     it('should return a response payload object, when user & consent property set in Authorization', async () => {
       await connection();
-      await userDoc.update({ $push: { consents: [clientDoc.get('_id')] } });
+      await userDoc.update({ $addToSet: { consents: [clientDoc.get('_id')] } });
       const authorization = await AuthorizationModel.create({
         ...baseAuthorization,
         client_id: clientDoc.get('_id'),
@@ -424,7 +424,7 @@ describe('Authorization Middleware', () => {
 
     it('should redirect with error message when nonce is omitted', async () => {
       await connection();
-      await userDoc.update({ $push: { consents: [clientDoc.get('_id')] } });
+      await userDoc.update({ $addToSet: { consents: [clientDoc.get('_id')] } });
       const authorization = await AuthorizationModel.create({
         ...baseAuthorization,
         client_id: clientDoc.get('_id'),
