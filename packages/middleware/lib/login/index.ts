@@ -42,7 +42,7 @@ const login = async (
   if (!email?.length || !password?.length) {
     throw new HTTPError(
       'E-Mail and/or Password missing!',
-      STATUS_CODE.BAD_REQUEST,
+      STATUS_CODE.UNAUTHORIZED,
       req.method,
       req.url
     );
@@ -53,7 +53,7 @@ const login = async (
   if (!user || !(await user.comparePassword(password))) {
     throw new HTTPError(
       `User not found or passwords don't match!`,
-      STATUS_CODE.BAD_REQUEST,
+      STATUS_CODE.UNAUTHORIZED,
       req.method,
       req.url
     );
