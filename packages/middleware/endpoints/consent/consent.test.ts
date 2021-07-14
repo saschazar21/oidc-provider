@@ -16,6 +16,7 @@ import { encode } from 'querystring';
 import { SCOPE } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import getUrl from 'config/lib/url';
+import { ERROR_CODE } from 'utils/lib/types/error_code';
 
 describe('Consent endpoint', () => {
   let authorizationDoc: Document<AuthorizationSchema>;
@@ -83,12 +84,12 @@ describe('Consent endpoint', () => {
   });
 
   it('follows happy path and redirects to authorization endpoint', async () => {
+    const userId = userDoc.get('_id');
+    const authorizationId = authorizationDoc.get('_id');
     const req = new MockRequest({
       ...baseRequest,
       headers: {
-        cookie: `user=${userDoc.get(
-          '_id'
-        )}; authorization=${authorizationDoc.get('_id')}`,
+        cookie: `user=${userId}; authorization=${authorizationId}`,
       },
     });
 
@@ -110,5 +111,102 @@ describe('Consent endpoint', () => {
     await disconnect();
 
     expect(u.get('consents').includes(clientDoc.get('_id'))).toEqual(true);
+  });
+
+  it('redirects to redirect_uri if consent was denied', async () => {
+    const userId = userDoc.get('_id');
+    const authorizationId = authorizationDoc.get('_id');
+    const req = new MockRequest({
+      ...baseRequest,
+      headers: {
+        cookie: `user=${userId}; authorization=${authorizationId}`,
+      },
+    });
+
+    req.write(
+      encode({
+        consent: false,
+        redirect_to: getUrl(ENDPOINT.AUTHORIZATION),
+      })
+    );
+
+    req.end();
+
+    await consent(req, res);
+
+    const url = new URL(authorizationDoc.get('redirect_uri'));
+    url.search = encode({
+      error: ERROR_CODE.ACCESS_DENIED,
+    });
+
+    expect(res.getHeader('location')).toMatch(url.toString());
+  });
+
+  it('returns HTTP error code, when no User ID found', async () => {
+    const authorizationId = authorizationDoc.get('_id');
+    const req = new MockRequest({
+      ...baseRequest,
+      headers: {
+        cookie: `authorization=${authorizationId}`,
+      },
+    });
+
+    req.write(
+      encode({
+        consent: true,
+        redirect_to: getUrl(ENDPOINT.AUTHORIZATION),
+      })
+    );
+
+    req.end();
+
+    await consent(req, res);
+
+    const url = new URL(authorizationDoc.get('redirect_uri'));
+    url.search = encode({ error: ERROR_CODE.LOGIN_REQUIRED });
+
+    expect(res.getHeader('location')).toMatch(url.toString());
+  });
+
+  it('throws, when no Authorization ID found', async () => {
+    const userId = userDoc.get('_id');
+    const req = new MockRequest({
+      ...baseRequest,
+      headers: {
+        cookie: `user=${userId}`,
+      },
+    });
+
+    req.write(
+      encode({
+        consent: true,
+        redirect_to: getUrl(ENDPOINT.AUTHORIZATION),
+      })
+    );
+
+    req.end();
+
+    await expect(consent(req, res)).rejects.toThrowError();
+  });
+
+  it('throws, when invalid User ID found', async () => {
+    const authorizationId = authorizationDoc.get('_id');
+    const req = new MockRequest({
+      ...baseRequest,
+      headers: {
+        cookie: `user=invalid; authorization=${authorizationId}`,
+      },
+    });
+
+    req.write(
+      encode({
+        consent: true,
+        redirect_to: getUrl(ENDPOINT.AUTHORIZATION),
+      })
+    );
+
+    req.end();
+
+    await expect(consent(req, res)).rejects.toThrowError();
   });
 });

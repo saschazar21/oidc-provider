@@ -18,7 +18,7 @@ import { STATUS_CODE } from 'utils/lib/types/status_code';
 const IS_TEST = process.env.NODE_ENV === 'test';
 
 export type ConsentForm = {
-  consent: boolean;
+  consent: string;
   redirect_to?: string;
 };
 
@@ -68,7 +68,7 @@ const consent = async (
         )
       : err;
   err =
-    !err && !consent
+    !err && consent !== 'true'
       ? new AuthorizationError(
           'Consent was denied by user!',
           ERROR_CODE.ACCESS_DENIED
@@ -83,7 +83,7 @@ const consent = async (
     const authorization = await AuthorizationModel.findById(authorizationId);
     if (!authorization || !authorization.get('client_id')) {
       throw new HTTPError(
-        'Updating consent on authorization failed!',
+        `No authorization found using ID: ${authorizationId}!`,
         STATUS_CODE.INTERNAL_SERVER_ERROR,
         req.method,
         req.url
@@ -109,9 +109,18 @@ const consent = async (
       });
     }
 
-    await UserModel.findByIdAndUpdate(sub, {
+    const user = await UserModel.findByIdAndUpdate(sub, {
       $addToSet: { consents: authorization.get('client_id') },
     });
+
+    if (!user) {
+      throw new HTTPError(
+        'Updating consent on user failed!',
+        STATUS_CODE.INTERNAL_SERVER_ERROR,
+        req.method,
+        req.url
+      );
+    }
   } finally {
     await disconnect();
   }
