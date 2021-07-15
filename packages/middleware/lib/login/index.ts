@@ -40,6 +40,10 @@ const login = async (
   cookies.set('sub');
 
   if (!email?.length || !password?.length) {
+    res.setHeader(
+      'WWW-Authenticate',
+      'Digest realm="Authentication to OpenID Provider", charset="UTF-8"'
+    );
     throw new HTTPError(
       'E-Mail and/or Password missing!',
       STATUS_CODE.UNAUTHORIZED,
@@ -51,6 +55,10 @@ const login = async (
   const user = await connect().then(() => UserModel.findOne({ email }));
   await disconnect();
   if (!user || !(await user.comparePassword(password))) {
+    res.setHeader(
+      'WWW-Authenticate',
+      'Digest realm="Authentication to OpenID Provider", charset="UTF-8"'
+    );
     throw new HTTPError(
       `User not found or passwords don't match!`,
       STATUS_CODE.UNAUTHORIZED,

@@ -18,6 +18,11 @@ export type AccessTokenSchema = BaseTokenSchema & {
   expires_at?: Date;
 };
 
+export type AuthorizationCodeSchema = BaseTokenSchema & {
+  type: TOKEN_TYPE.AUTHORIZATION_CODE;
+  expires_at?: Date;
+};
+
 export type RefreshTokenSchema = BaseTokenSchema & {
   type: TOKEN_TYPE.REFRESH_TOKEN;
   expires_at?: Date;
@@ -61,6 +66,18 @@ const accessTokenSchema = new Schema<Document<AccessTokenSchema>>(
 );
 accessTokenSchema.index({ expires_at: 1 }, { expireAfterSeconds: 0 });
 
+const authorizationCodeSchema = new Schema<Document<AuthorizationCodeSchema>>(
+  {
+    expires_at: {
+      default: (): Date =>
+        new Date(Date.now() + LIFETIME.AUTHORIZATION_CODE * 1000),
+      type: Date,
+    },
+  },
+  discriminatorOptions
+);
+authorizationCodeSchema.index({ expires_at: 1 }, { expireAfterSeconds: 0 });
+
 const refreshTokenSchema = new Schema<Document<RefreshTokenSchema>>(
   {
     expires_at: {
@@ -87,6 +104,11 @@ const BaseTokenModel = mongoose.model<BaseTokenSchema>(
 export const AccessTokenModel = BaseTokenModel.discriminator(
   TOKEN_TYPE.ACCESS_TOKEN,
   accessTokenSchema
+);
+
+export const AuthorizationCodeModel = BaseTokenModel.discriminator(
+  TOKEN_TYPE.AUTHORIZATION_CODE,
+  authorizationCodeSchema
 );
 
 export const RefreshTokenModel = BaseTokenModel.discriminator(

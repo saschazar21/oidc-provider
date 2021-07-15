@@ -24,10 +24,12 @@
     "url": "https://github.com/saschazar21/now-oidc-provider/issues"
   },
   "dependencies": {
+    "basic-auth": "^2.0.1",
     "body": "^5.1.0",
     "cookies": "^0.8.0"
   },
   "devDependencies": {
+    "@types/basic-auth": "^1.1.3",
     "@types/body": "^5.1.0",
     "@types/cookies": "^0.7.4",
     "cookie-parse": "^0.4.0",

@@ -11,6 +11,7 @@ import AuthorizationModel, {
 } from 'database/lib/schemata/authorization';
 import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
 import KeyModel from 'database/lib/schemata/key';
+import { AuthorizationCodeModel } from 'database/lib/schemata/token';
 import UserModel, { UserSchema } from 'database/lib/schemata/user';
 import authorizationMiddleware from 'middleware/lib/authorization';
 import { AuthorizationResponse } from 'middleware/strategies/AuthStrategy';
@@ -248,7 +249,12 @@ describe('Authorization Middleware', () => {
         'response_mode',
         AuthorizationCodeStrategy.DEFAULT_RESPONSE_MODE
       );
-      expect(result.payload).toHaveProperty('code', authorization.get('_id'));
+      await connection();
+      const code = await AuthorizationCodeModel.findOne({
+        authorization: authorization.get('_id'),
+      });
+      await disconnect();
+      expect(result.payload).toHaveProperty('code', code.get('_id'));
     });
 
     it('should redirect to login, when prompt=login, although user is authenticated', async () => {

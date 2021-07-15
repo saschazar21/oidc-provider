@@ -3,6 +3,7 @@ import {
   AuthorizationModel,
   ClientModel,
   AccessTokenModel,
+  AuthorizationCodeModel,
   RefreshTokenModel,
   UserModel,
 } from 'database/lib';
@@ -19,6 +20,7 @@ describe('TokenModel', () => {
   let sub: string;
   let authorization_id: string;
   let access_token: string;
+  let authorization_code: string;
   let refresh_token: string;
 
   const baseUser: UserSchema = {
@@ -95,6 +97,24 @@ describe('TokenModel', () => {
     expect(token.get('authorization').get('client_id')).toEqual(client_id);
     expect(Date.parse(token.get('expires_at'))).toEqual(
       Date.parse(token.get('created_at')) + LIFETIME.ACCESS_TOKEN * 1000
+    );
+  });
+
+  it('creates an AuthorizationCode', async () => {
+    const code = await AuthorizationCodeModel.create({
+      authorization: authorization_id,
+      type: TOKEN_TYPE.AUTHORIZATION_CODE,
+    });
+    await AuthorizationCodeModel.populate(code, { path: 'authorization' });
+
+    authorization_code = code.get('_id');
+
+    expect(authorization_code).toHaveLength(ALPHABET_LENGTH.LONG);
+    expect(code.get('type')).toEqual(TOKEN_TYPE.AUTHORIZATION_CODE);
+    expect(code.get('authorization')).toHaveProperty('_id', authorization_id);
+    expect(code.get('authorization').get('client_id')).toEqual(client_id);
+    expect(Date.parse(code.get('expires_at'))).toEqual(
+      Date.parse(code.get('created_at')) + LIFETIME.AUTHORIZATION_CODE * 1000
     );
   });
 

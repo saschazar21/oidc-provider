@@ -7,6 +7,8 @@ import AuthorizationModel, {
 import {
   AccessTokenModel,
   AccessTokenSchema,
+  AuthorizationCodeModel,
+  AuthorizationCodeSchema,
 } from 'database/lib/schemata/token';
 import UserModel from 'database/lib/schemata/user';
 import AuthorizationError from 'utils/lib/errors/authorization_error';
@@ -39,6 +41,7 @@ abstract class AuthStrategy<T> {
 
   private _auth: Authorization;
   private _id: string;
+  private _code: string;
   private _token: string;
 
   protected _doc: Document<Authorization>;
@@ -46,6 +49,10 @@ abstract class AuthStrategy<T> {
 
   public get auth(): Authorization {
     return this._auth;
+  }
+
+  public get code(): string {
+    return this._code;
   }
 
   public get doc(): Document<Authorization> {
@@ -139,6 +146,21 @@ abstract class AuthStrategy<T> {
         ),
       {} as Authorization
     );
+  }
+
+  protected async createAuthorizationCode(): Promise<
+    Document<AuthorizationCodeSchema>
+  > {
+    try {
+      await connect();
+      const code = await AuthorizationCodeModel.create({
+        authorization: this.id,
+      });
+      this._code = code._id as string;
+      return code;
+    } finally {
+      await disconnect();
+    }
   }
 
   protected async createAccessToken(): Promise<Document<AccessTokenSchema>> {

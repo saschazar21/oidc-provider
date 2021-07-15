@@ -39,6 +39,7 @@ class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
     await this.validate();
 
     const response_type: RESPONSE_TYPE[] = this.doc.get('response_type');
+    const code = await this.createAuthorizationCode();
     const accessTokenModel =
       response_type.includes(RESPONSE_TYPE.TOKEN) &&
       (await this.createAccessToken());
@@ -53,7 +54,7 @@ class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
     const payload = Object.assign(
       {},
       {
-        code: this.id,
+        code: code.get('_id'),
       },
       expires_in > 0 && accessTokenModel
         ? {

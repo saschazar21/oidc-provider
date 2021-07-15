@@ -1,6 +1,7 @@
 import { Document } from 'mongoose';
 
 import connection, {
+  AuthorizationCodeModel,
   AuthorizationModel,
   ClientModel,
   disconnect,
@@ -34,6 +35,7 @@ describe('AuthorizationCodeStrategy', () => {
     try {
       await connection();
       await Promise.all([
+        AuthorizationCodeModel.collection.drop(),
         AuthorizationModel.collection.drop(),
         UserModel.findByIdAndDelete(userId),
         ClientModel.findByIdAndDelete(clientId),
@@ -141,6 +143,7 @@ describe('AuthorizationCodeStrategy', () => {
     expect(payload.response_mode).toEqual(
       AuthorizationCodeStrategy.DEFAULT_RESPONSE_MODE
     );
+    expect(payload.payload.code).toEqual(authorizationCodeStrategy.code);
     expect(payload.payload.state).toEqual(auth.state);
     expect(doc.get('scope')).not.toEqual(auth.scope);
     expect(doc.get('scope')).toHaveLength(1);

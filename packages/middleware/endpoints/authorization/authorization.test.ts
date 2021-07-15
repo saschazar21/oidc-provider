@@ -7,6 +7,7 @@ import MockRequest from 'mock-req';
 import getUrl from 'config/lib/url';
 import connection, {
   AccessTokenModel,
+  AuthorizationCodeModel,
   AuthorizationModel,
   ClientModel,
   KeyModel,
@@ -44,6 +45,7 @@ describe('Authorization Endpoint', () => {
   afterAll(async () => {
     await connection();
     await Promise.all([
+      AuthorizationCodeModel.collection.drop(),
       KeyModel.collection.drop(),
       AuthorizationModel.collection.drop(),
       ClientModel.findByIdAndDelete(client.get('_id')),
@@ -133,7 +135,13 @@ describe('Authorization Endpoint', () => {
         baseAuthorization.redirect_uri
       );
 
-      expect(payload).toHaveProperty('code', authorizationId);
+      await connection();
+      const code = await AuthorizationCodeModel.findOne({
+        authorization: authorizationId,
+      });
+      await disconnect();
+
+      expect(payload).toHaveProperty('code', code.get('_id'));
     });
   });
 
@@ -299,6 +307,12 @@ describe('Authorization Endpoint', () => {
       });
       await authorizationEndpoint(req, res);
 
+      await connection();
+      const code = await AuthorizationCodeModel.findOne({
+        authorization: authorizationId,
+      });
+      await disconnect();
+
       const url = new URL(res.getHeader('location') as string);
 
       const payload = decode(url.search.substr(1));
@@ -306,7 +320,8 @@ describe('Authorization Endpoint', () => {
       expect(`${url.protocol}//${url.hostname}`).toEqual(
         baseAuthorization.redirect_uri
       );
-      expect(payload).toHaveProperty('code', authorizationId);
+
+      expect(payload).toHaveProperty('code', code.get('_id'));
       expect(payload).toHaveProperty('id_token');
       expect(payload).toHaveProperty('access_token');
       expect(payload).toHaveProperty('state', baseAuthorization.state);

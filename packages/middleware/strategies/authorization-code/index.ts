@@ -13,10 +13,12 @@ class AuthorizationCodeStrategy extends AuthStrategy<AuthorizationCodeResponsePa
   > {
     await this.validate();
 
+    const code = await this.createAuthorizationCode();
+
     const payload = Object.assign(
       {},
       {
-        code: this.id,
+        code: code.get('_id'),
       },
       this.doc.get('state') ? { state: this.doc.get('state') } : null
     ) as AuthorizationCodeResponsePayload;

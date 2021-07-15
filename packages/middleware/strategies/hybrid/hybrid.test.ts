@@ -6,6 +6,7 @@ import AuthorizationModel, {
   AuthorizationSchema,
 } from 'database/lib/schemata/authorization';
 import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
+import { AuthorizationCodeModel } from 'database/lib/schemata/token';
 import UserModel, { UserSchema } from 'database/lib/schemata/user';
 import HybridStrategy from 'middleware/strategies/hybrid';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
@@ -42,6 +43,7 @@ describe('Hybrid Strategy', () => {
   afterAll(async () => {
     await connection();
     await Promise.all([
+      AuthorizationCodeModel.collection.drop(),
       KeyModel.collection.drop(),
       AuthorizationModel.collection.drop(),
       UserModel.findByIdAndDelete(user_id),
@@ -111,6 +113,7 @@ describe('Hybrid Strategy', () => {
       'response_mode',
       HybridStrategy.DEFAULT_RESPONSE_MODE
     );
+    expect(responsePayload.payload).toHaveProperty('code', hybridStrategy.code);
   });
 
   it('fails to return response payload, when nonce is missing and response_type contains id_token', async () => {
