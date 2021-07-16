@@ -8,7 +8,10 @@ import connection, {
 import { UserSchema } from 'database/lib/schemata/user';
 import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
 import { AuthorizationSchema } from 'database/lib/schemata/authorization';
-import { AccessTokenModel } from 'database/lib/schemata/token';
+import {
+  AccessTokenModel,
+  AuthorizationCodeModel,
+} from 'database/lib/schemata/token';
 import { fillClaims, JWTAuth } from 'utils/lib/jwt/helpers';
 import { SCOPE, SCOPE_CLAIMS } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
@@ -100,6 +103,9 @@ describe('JWT helpers', () => {
     };
 
     const authDoc = await AuthorizationModel.create(auth);
+    const authorizationCodeDoc = await AuthorizationCodeModel.create({
+      authorization: authDoc.get('_id'),
+    });
     const tokenDoc = await AccessTokenModel.create({
       authorization: authDoc.get('_id'),
     });
@@ -107,6 +113,7 @@ describe('JWT helpers', () => {
     const fields = {
       ...authDoc.toJSON(),
       access_token: tokenDoc.get('_id'),
+      code: authorizationCodeDoc.get('_id'),
     } as JWTAuth;
 
     const claims = await fillClaims(fields);
@@ -121,7 +128,7 @@ describe('JWT helpers', () => {
     );
     expect(claims).toHaveProperty(
       'c_hash',
-      hashCodeOrToken(authDoc.get('_id'))
+      hashCodeOrToken(authorizationCodeDoc.get('_id'))
     );
   });
 });

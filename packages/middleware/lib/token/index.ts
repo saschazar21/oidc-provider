@@ -9,12 +9,14 @@ import connection, {
 import validateRequestPayload from 'middleware/lib/token/validator';
 import HTTPError from 'utils/lib/errors/http_error';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
+import sign from 'utils/lib/jwt/sign';
 
 export type TokenResponsePayload = {
   access_token: string;
   token_type: 'Bearer';
   expires_in: number;
   refresh_token: string;
+  id_token: string;
 };
 
 const tokenMiddleware = async (
@@ -25,15 +27,26 @@ const tokenMiddleware = async (
 
   try {
     await connection();
-    const authorization = await AuthorizationCodeModel.findByIdAndDelete(code);
+    const authorizationCode = await AuthorizationCodeModel.findByIdAndDelete(
+      code
+    ).populate({
+      path: 'authorization',
+    });
+    const authorization = authorizationCode.get('authorization');
+
     const [accessToken, refreshToken] = await Promise.all([
       AccessTokenModel.create({
-        authorization: authorization.get('authorization'),
+        authorization: authorization.get('_id'),
       }),
       RefreshTokenModel.create({
-        authorization: authorization.get('authorization'),
+        authorization: authorization.get('_id'),
       }),
     ]);
+
+    const id_token = await sign({
+      ...authorization.toJSON(),
+      access_token: accessToken.get('_id'),
+    });
 
     const expires_in = Math.floor(
       (accessToken.get('expires_at').valueOf() - Date.now()) / 1000
@@ -44,6 +57,7 @@ const tokenMiddleware = async (
       token_type: 'Bearer',
       expires_in,
       refresh_token: refreshToken.get('_id'),
+      id_token,
     };
   } catch (e) {
     throw new HTTPError(

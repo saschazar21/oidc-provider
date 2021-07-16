@@ -2,7 +2,7 @@ import { ServerResponse } from 'http';
 import { Document } from 'mongoose';
 import MockRequest from 'mock-req';
 
-import connection, { disconnect } from 'database/lib';
+import connection, { disconnect, KeyModel } from 'database/lib';
 import {
   AccessTokenModel,
   AuthorizationCodeModel,
@@ -70,6 +70,7 @@ describe('Token middleware', () => {
   afterAll(async () => {
     await connection();
     await Promise.all([
+      KeyModel.collection.drop(),
       AccessTokenModel.collection.drop(),
       AuthorizationModel.collection.drop(),
       ClientModel.findByIdAndDelete(clientDoc.get('_id')),

@@ -12,6 +12,7 @@ export type JWTAuth = Authorization & {
   user: string;
   client_id: string;
   access_token?: string;
+  code?: string;
 };
 
 export type JWTPayload = {
@@ -67,7 +68,7 @@ const fillOpenIDClaims = (auth: JWTAuth): { [key in CLAIM]: string | number } =>
 export const fillClaims = async (auth: JWTAuth): Promise<JWTPayload> => {
   const userData = await fetchUserData(auth.user, auth.scope);
   const at_hash = auth.access_token && hashCodeOrToken(auth.access_token);
-  const c_hash = auth._id && hashCodeOrToken(auth._id);
+  const c_hash = auth.code && hashCodeOrToken(auth.code);
 
   return Object.assign(
     {},

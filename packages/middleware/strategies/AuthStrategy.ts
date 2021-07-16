@@ -178,6 +178,7 @@ abstract class AuthStrategy<T> {
     const auth = Object.assign(
       {},
       { ...this.auth },
+      this.code ? { code: this.code } : null,
       this.token ? { access_token: this.token } : null
     );
 
