@@ -1,20 +1,19 @@
 import { ServerResponse } from 'http';
 import { Document } from 'mongoose';
 import MockRequest from 'mock-req';
+import pkce from 'pkce-challenge';
 
 import connection, { disconnect } from 'database/lib';
 import {
-  AccessTokenModel,
   AuthorizationCodeModel,
   AuthorizationCodeSchema,
-  RefreshTokenModel,
 } from 'database/lib/schemata/token';
 import AuthorizationModel, {
   AuthorizationSchema,
 } from 'database/lib/schemata/authorization';
 import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
 import UserModel, { UserSchema } from 'database/lib/schemata/user';
-import tokenMiddleware from 'middleware/lib/token';
+import tokenMiddlewareValidator from 'middleware/lib/token/validator';
 import { SCOPE } from 'utils/lib/types/scope';
 import { METHOD } from 'utils/lib/types/method';
 import { ENDPOINT } from 'utils/lib/types/endpoint';
@@ -30,12 +29,12 @@ describe('Token middleware validator', () => {
 
   let res: ServerResponse;
 
-  const getAuthorizationCode = async (): Promise<
-    Document<AuthorizationCodeSchema>
-  > => {
+  const getAuthorizationCode = async (
+    id?: string
+  ): Promise<Document<AuthorizationCodeSchema>> => {
     await connection();
     const code = await AuthorizationCodeModel.create({
-      authorization: authorizationDoc.get('_id'),
+      authorization: id ?? authorizationDoc.get('_id'),
     });
     await disconnect();
 
@@ -70,11 +69,9 @@ describe('Token middleware validator', () => {
   afterAll(async () => {
     await connection();
     await Promise.all([
-      AccessTokenModel.collection.drop(),
       AuthorizationCodeModel.collection.drop(),
       AuthorizationModel.collection.drop(),
       ClientModel.findByIdAndDelete(clientDoc.get('_id')),
-      RefreshTokenModel.collection.drop(),
       UserModel.findByIdAndDelete(userDoc.get('_id')),
     ]);
     await disconnect();
@@ -101,24 +98,288 @@ describe('Token middleware validator', () => {
     res = mockResponse();
   });
 
-  it('returns an AccessToken & RefreshToken', async () => {
+  it('validates an Access Token request', async () => {
     const code = await getAuthorizationCode();
 
     const req = new MockRequest(baseRequest);
     req.write(
       encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
         client_id: clientDoc.get('_id'),
         client_secret: clientDoc.get('client_secret'),
         code: code.get('_id'),
-        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
         redirect_uri: baseClient.redirect_uris[0],
       })
     );
     req.end();
 
-    const response = await tokenMiddleware(req, res);
+    const result = await tokenMiddlewareValidator(req, res);
 
-    expect(response).toHaveProperty('access_token');
-    expect(response).toHaveProperty('refresh_token');
+    await connection();
+    const c = await AuthorizationCodeModel.findById(code.get('_id')).populate({
+      path: 'authorization',
+      populate: 'client_id',
+    });
+    await disconnect();
+
+    expect(result.code).toEqual(c.get('_id'));
+    expect(c.get('authorization').get('client_id').get('_id')).toEqual(
+      result.client_id
+    );
+  });
+
+  it('validates an Access Token request using PKCE', async () => {
+    const { code_challenge, code_verifier } = pkce();
+
+    await connection();
+    const auth = await AuthorizationModel.create({
+      ...baseAuthorization,
+      consent: true,
+      code_challenge,
+      code_challenge_method: 'S256',
+    });
+    await disconnect();
+
+    const code = await getAuthorizationCode(auth.get('_id'));
+
+    const req = new MockRequest(baseRequest);
+    req.write(
+      encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+        client_id: clientDoc.get('_id'),
+        client_secret: clientDoc.get('client_secret'),
+        code: code.get('_id'),
+        redirect_uri: baseClient.redirect_uris[0],
+        code_verifier,
+      })
+    );
+    req.end();
+
+    const result = await tokenMiddlewareValidator(req, res);
+
+    await connection();
+    const c = await AuthorizationCodeModel.findById(code.get('_id')).populate({
+      path: 'authorization',
+      populate: 'client_id',
+    });
+    await disconnect();
+
+    expect(result.code).toEqual(c.get('_id'));
+    expect(c.get('authorization').get('client_id').get('_id')).toEqual(
+      result.client_id
+    );
+  });
+
+  it('throws, when grant_type is invalid', async () => {
+    const req = new MockRequest(baseRequest);
+    req.write(encode({ grant_type: 'invalid' }));
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+  });
+
+  it('throws, when code is missing', async () => {
+    const req = new MockRequest(baseRequest);
+    req.write(encode({ grant_type: GRANT_TYPE.AUTHORIZATION_CODE }));
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+  });
+
+  it('throws, when code is invalid', async () => {
+    const req = new MockRequest(baseRequest);
+    req.write(
+      encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+        client_id: clientDoc.get('_id'),
+        client_secret: clientDoc.get('client_secret'),
+        code: 'invalid',
+        redirect_uri: baseClient.redirect_uris[0],
+      })
+    );
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+  });
+
+  it('throws when redirect_uri is missing', async () => {
+    const req = new MockRequest(baseRequest);
+    req.write(
+      encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+        client_id: clientDoc.get('_id'),
+        client_secret: clientDoc.get('client_secret'),
+        code: 'invalid',
+      })
+    );
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+  });
+
+  it('throws when client_id is missing', async () => {
+    const req = new MockRequest(baseRequest);
+    req.write(
+      encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+        client_secret: clientDoc.get('client_secret'),
+        code: 'invalid',
+        redirect_uri: baseClient.redirect_uris[0],
+      })
+    );
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+  });
+
+  it('throws when redirect_uri differs', async () => {
+    const code = await getAuthorizationCode();
+
+    const req = new MockRequest(baseRequest);
+    req.write(
+      encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+        client_id: clientDoc.get('_id'),
+        client_secret: clientDoc.get('client_secret'),
+        code: code.get('_id'),
+        redirect_uri: 'https://other.uri',
+      })
+    );
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+  });
+
+  it('throws, when client_id differs', async () => {
+    const code = await getAuthorizationCode();
+
+    const req = new MockRequest(baseRequest);
+    req.write(
+      encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+        client_id: 'other-client',
+        client_secret: clientDoc.get('client_secret'),
+        code: code.get('_id'),
+        redirect_uri: baseClient.redirect_uris[0],
+      })
+    );
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+  });
+
+  it('throws, when client_secret & code_verifier are missing', async () => {
+    const code = await getAuthorizationCode();
+
+    const req = new MockRequest(baseRequest);
+    req.write(
+      encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+        client_id: clientDoc.get('_id'),
+        code: code.get('_id'),
+        redirect_uri: baseClient.redirect_uris[0],
+      })
+    );
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+  });
+
+  it('throws when client_secret differs', async () => {
+    const code = await getAuthorizationCode();
+
+    const req = new MockRequest(baseRequest);
+    req.write(
+      encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+        client_id: clientDoc.get('_id'),
+        client_secret: 'other-secret',
+        code: code.get('_id'),
+        redirect_uri: baseClient.redirect_uris[0],
+      })
+    );
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+  });
+
+  it('throws, when code_verifier is invalid', async () => {
+    const { code_challenge, code_verifier } = pkce();
+
+    await connection();
+    const auth = await AuthorizationModel.create({
+      ...baseAuthorization,
+      code_challenge,
+      code_challenge_method: 'S256',
+      consent: true,
+    });
+    await disconnect();
+
+    const code = await getAuthorizationCode(auth.get('_id'));
+
+    const req = new MockRequest(baseRequest);
+    req.write(
+      encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+        client_id: clientDoc.get('_id'),
+        code: code.get('_id'),
+        code_verifier: `123${code_verifier.substr(3)}`,
+        redirect_uri: baseClient.redirect_uris[0],
+      })
+    );
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+  });
+
+  it('throws, when code_verifier has an invalid format', async () => {
+    const { code_challenge } = pkce();
+
+    await connection();
+    const auth = await AuthorizationModel.create({
+      ...baseAuthorization,
+      code_challenge,
+      code_challenge_method: 'S256',
+      consent: true,
+    });
+    await disconnect();
+
+    const code = await getAuthorizationCode(auth.get('_id'));
+
+    const req = new MockRequest(baseRequest);
+    req.write(
+      encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+        client_id: clientDoc.get('_id'),
+        code: code.get('_id'),
+        code_verifier: 'invalid',
+        redirect_uri: baseClient.redirect_uris[0],
+      })
+    );
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+  });
+
+  it('throws, when no consent was given', async () => {
+    await connection();
+    const auth = await AuthorizationModel.create(baseAuthorization);
+    await disconnect();
+
+    const code = await getAuthorizationCode(auth.get('_id'));
+
+    const req = new MockRequest(baseRequest);
+    req.write(
+      encode({
+        grant_type: GRANT_TYPE.AUTHORIZATION_CODE,
+        client_id: clientDoc.get('_id'),
+        client_secret: clientDoc.get('client_secret'),
+        code: code.get('_id'),
+        redirect_uri: baseClient.redirect_uris[0],
+      })
+    );
+    req.end();
+
+    await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
   });
 });

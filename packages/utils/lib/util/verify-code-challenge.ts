@@ -7,7 +7,7 @@ export const CODE_VERIFIER_ALPHABET =
   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~';
 
 export const verifyCodeChallenge = (
-  code_challenge: string,
+  code_challenge = '',
   code_verifier?: string,
   code_challenge_method: 'plain' | 'S256' = 'plain'
 ): boolean => {

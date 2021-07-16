@@ -2,6 +2,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 
 import connection, {
   AccessTokenModel,
+  AuthorizationCodeModel,
   disconnect,
   RefreshTokenModel,
 } from 'database/lib';
@@ -20,13 +21,18 @@ const tokenMiddleware = async (
   req: IncomingMessage,
   res: ServerResponse
 ): Promise<TokenResponsePayload> => {
-  const { code: authorization } = await validateRequestPayload(req, res);
+  const { code } = await validateRequestPayload(req, res);
 
   try {
     await connection();
+    const authorization = await AuthorizationCodeModel.findByIdAndDelete(code);
     const [accessToken, refreshToken] = await Promise.all([
-      AccessTokenModel.create({ authorization }),
-      RefreshTokenModel.create({ authorization }),
+      AccessTokenModel.create({
+        authorization: authorization.get('authorization'),
+      }),
+      RefreshTokenModel.create({
+        authorization: authorization.get('authorization'),
+      }),
     ]);
 
     const expires_in = Math.floor(
@@ -46,6 +52,19 @@ const tokenMiddleware = async (
       req.method,
       req.url
     );
+
+    // const headers = Object.assign(
+    //   {},
+    //   { 'Content-Type': 'application/json' },
+    //   e.statusCode === STATUS_CODE.UNAUTHORIZED
+    //     ? { 'WWW-Authenticate': 'Basic realm="Access to token endpoint"' }
+    //     : {}
+    // );
+    // res.writeHead(e.statusCode, headers);
+    // return res.write(JSON.stringify({
+    //   error: e.errorCode,
+    //   error_description: e.message,
+    // }));
   } finally {
     await disconnect();
   }

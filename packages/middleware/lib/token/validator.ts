@@ -30,11 +30,11 @@ const validateAuthorization = async (
     ).populate({
       path: 'authorization',
       populate: {
-        path: 'client',
+        path: 'client_id',
         select: '_id client_secret',
       },
     });
-    const authorization = authorizationCode.get('authorization');
+    const authorization = authorizationCode?.get('authorization');
     if (!authorizationCode || !authorization) {
       throw new TokenError('Invalid or expired code', ERROR_CODE.INVALID_GRANT);
     }
@@ -44,7 +44,7 @@ const validateAuthorization = async (
     if (authorization.get('redirect_uri') !== redirect_uri) {
       throw new TokenError('Invalid redirect_uri', ERROR_CODE.INVALID_GRANT);
     }
-    if (client_id !== authorization.get('client').get('_id')) {
+    if (client_id !== authorization.get('client_id').get('_id')) {
       throw new TokenError('Invalid client_id', ERROR_CODE.INVALID_CLIENT);
     }
     if (!client_secret?.length && !code_verifier?.length) {
@@ -55,20 +55,30 @@ const validateAuthorization = async (
     }
     if (
       client_secret?.length &&
-      client_secret !== authorization.get('client').get('client_secret')
+      client_secret !== authorization.get('client_id').get('client_secret')
     ) {
       throw new TokenError('Invalid client_secret', ERROR_CODE.INVALID_CLIENT);
     }
-    if (
-      code_verifier?.length &&
-      !verifyCodeChallenge(
-        authorization.get('code_challenge'),
-        code_verifier,
-        authorization.get('code_challenge_method')
-      )
-    ) {
-      throw new TokenError('Invalid code_verifier', ERROR_CODE.INVALID_CLIENT);
+    try {
+      if (
+        code_verifier?.length &&
+        !verifyCodeChallenge(
+          authorization.get('code_challenge'),
+          code_verifier,
+          authorization.get('code_challenge_method')
+        )
+      ) {
+        throw new TokenError(
+          'Invalid code_verifier',
+          ERROR_CODE.INVALID_CLIENT
+        );
+      }
+    } catch (e) {
+      throw e.name === TokenError.NAME
+        ? e
+        : new TokenError('Invalid code_verifier', ERROR_CODE.INVALID_CLIENT);
     }
+
     return true;
   } finally {
     await disconnect();

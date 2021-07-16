@@ -5,7 +5,7 @@ import { STATUS_CODE } from 'utils/lib/types/status_code';
 class TokenError extends AuthorizationError {
   private _statusCode: STATUS_CODE;
 
-  protected static _NAME = 'TokenError';
+  public static NAME = 'TokenError';
 
   constructor(
     message: string,
@@ -14,6 +14,7 @@ class TokenError extends AuthorizationError {
   ) {
     super(message, errorCode);
     this._statusCode = statusCode || STATUS_CODE.BAD_REQUEST;
+    this.name = TokenError.NAME;
   }
 
   public get statusCode(): STATUS_CODE {
