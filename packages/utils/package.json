@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "bcrypt": "^4.0.1",
-    "jose": "^1.27.1",
+    "jose": "^3.14.0",
     "keygrip": "^1.1.0",
     "nanoid": "^3.1.9"
   },

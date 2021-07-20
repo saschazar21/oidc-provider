@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
-import { JWKS, keyType } from 'jose';
 import retry from 'jest-retries';
+
+import KeyStore from 'utils/lib/util/keystore';
+import { JWE } from 'utils/lib/types/jwe';
+import { JWS } from 'utils/lib/types/jws';
 
 const MASTER_KEY = 'testkey';
 
@@ -66,25 +69,22 @@ describe('Existing Keys', () => {
     const { default: JWKSConfig } = await import('config/lib/jwks');
     const { default: createCookieSecrets } = await import('config/lib/keygrip');
     const cookies = await createCookieSecrets();
-    const keystore = new JWKS.KeyStore();
-    JWKSConfig.map(({ kty, size, options }) =>
-      keystore.generateSync(
-        kty as keyType,
-        size as
-          | number
-          | 'Ed25519'
-          | 'Ed448'
-          | 'X25519'
-          | 'X448'
-          | 'P-256'
-          | 'secp256k1'
-          | 'P-384'
-          | 'P-521',
-        options
+    const keystore = new KeyStore();
+
+    await Promise.all(
+      JWKSConfig.map(({ size, options: { alg } }) =>
+        keystore.generate(
+          alg as JWE | JWS,
+          Object.assign(
+            {},
+            typeof size === 'number' ? { modulusLength: size } : { crv: size }
+          ),
+          true
+        )
       )
     );
     keys = {
-      ...keystore.toJWKS(),
+      ...(await keystore.toJWKS(true)),
       cookies,
     };
     bin = await encrypt(MASTER_KEY, JSON.stringify(keys));
@@ -126,6 +126,6 @@ describe('Existing Keys', () => {
     const original = keys.keys;
     const { keystore } = await getKeys(MASTER_KEY);
 
-    expect(keystore.toJWKS()).toMatchObject({ keys: original });
+    expect(await keystore.toJWKS(true)).toMatchObject({ keys: original });
   });
 });

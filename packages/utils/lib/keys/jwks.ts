@@ -1,31 +1,32 @@
-import { JWKS, JSONWebKeySet, keyType } from 'jose';
+import { JWK } from 'jose/webcrypto/types';
+
 import config, { JWKSConfig } from 'config/lib/jwks';
+import { JWE } from 'utils/lib/types/jwe';
+import { JWS } from 'utils/lib/types/jws';
+import KeyStore from 'utils/lib/util/keystore';
 
-let keystore: JWKS.KeyStore;
+const keystore = new KeyStore();
 
-const initialize = async (jwks?: JSONWebKeySet): Promise<void> => {
+const initialize = async (jwks?: { keys: JWK[] }): Promise<void> => {
   try {
-    keystore = jwks ? JWKS.asKeyStore(jwks) : new JWKS.KeyStore();
+    jwks && (await keystore.import(jwks));
   } catch (e) {
     throw new Error(`ERROR: Restoring Keystore failed: ${e.message || e}`);
   }
   if (!keystore.size) {
     await Promise.all(
       config.map(async (key: JWKSConfig) => {
-        const { kty, size, options } = key;
+        const {
+          size,
+          options: { alg },
+        } = key;
+
         return keystore.generate(
-          kty as keyType,
-          size as
-            | number
-            | 'Ed25519'
-            | 'Ed448'
-            | 'X25519'
-            | 'X448'
-            | 'P-256'
-            | 'secp256k1'
-            | 'P-384'
-            | 'P-521',
-          options,
+          alg as JWE | JWS,
+          Object.assign(
+            {},
+            typeof size === 'number' ? { modulusLength: size } : { crv: size }
+          ),
           true
         );
       })
@@ -33,10 +34,10 @@ const initialize = async (jwks?: JSONWebKeySet): Promise<void> => {
   }
 };
 
-export const getKeystore = async (
-  jwks?: JSONWebKeySet
-): Promise<JWKS.KeyStore> => {
-  if (!keystore || jwks) {
+export const getKeystore = async (jwks?: {
+  keys: JWK[];
+}): Promise<KeyStore> => {
+  if (!keystore.size || jwks) {
     await initialize(jwks);
   }
 

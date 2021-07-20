@@ -5,4 +5,7 @@ module.exports = {
   setupFiles: ['<rootDir>/lib/test/setup.js'],
   testMatch: ['**/*.test.ts'],
   watchPathIgnorePatterns: ['globalConfig'],
+  moduleNameMapper: {
+    '^jose/(.*)$': '<rootDir>/node_modules/jose/dist/node/cjs/$1',
+  },
 };

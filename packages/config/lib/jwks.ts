@@ -2,7 +2,7 @@ export interface JWKSConfig {
   kty: 'EC' | 'RSA' | 'OKT' | 'oct';
   size: string | number;
   options: {
-    alg?: string;
+    alg: string;
     use: 'enc' | 'sig';
   };
 }

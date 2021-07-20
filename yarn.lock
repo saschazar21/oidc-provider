@@ -1977,11 +1977,6 @@
   dependencies:
     "@octokit/openapi-types" "^8.2.1"
 
-"@panva/asn1.js@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@panva/asn1.js/-/asn1.js-1.0.0.tgz#dd55ae7b8129e02049f009408b97c61ccf9032f6"
-  integrity sha512-UdkG3mLEqXgnlKsWanWcgb6dOjUzJ+XC5f+aWw30qrtjxeNUSfKX1cd5FBzOaXQumoe9nIqeZUvrRJS03HCCtw==
-
 "@shelf/jest-mongodb@^1.2.5":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@shelf/jest-mongodb/-/jest-mongodb-1.3.2.tgz#2af75feaa8fccd8571d9e28860b5c460e02ce36b"
@@ -5154,12 +5149,10 @@ jest@^27.0.3:
     import-local "^3.0.2"
     jest-cli "^27.0.6"
 
-jose@^1.27.1:
-  version "1.28.1"
-  resolved "https://registry.yarnpkg.com/jose/-/jose-1.28.1.tgz#34a0f851a534be59ffab82a6e8845f6874e8c128"
-  integrity sha512-6JK28rFu5ENp/yxMwM+iN7YeaInnY9B9Bggjkz5fuwLiJhbVrl2O4SJr65bdNBPl9y27fdC3Mymh+FVCvozLIg==
-  dependencies:
-    "@panva/asn1.js" "^1.0.0"
+jose@^3.14.0:
+  version "3.14.0"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-3.14.0.tgz#935dce329af54586441ef74b0362fac7d1225c57"
+  integrity sha512-Hk4yFVGiSTuryL0XVyRTCvCPoD9eDCvEX/t+SpHTXXeNXsoxyopPLhoCLTt90vnu7yeIYXDdJWHNgI3Ix4H1FQ==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"

@@ -18,7 +18,7 @@ export type ClientSchema = {
 };
 
 const generateClientId = generateId();
-const generateClientSecret = generateId(ALPHABET_LENGTH.LONG);
+const generateClientSecret = generateId(ALPHABET_LENGTH.CLIENT_SECRET);
 
 const clientSchema = new Schema<ClientSchema>(
   {

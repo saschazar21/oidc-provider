@@ -18,7 +18,7 @@ const jwks = async (
 
   try {
     const { keystore } = await getKeys();
-    const keys = keystore.toJWKS();
+    const keys = await keystore.toJWKS();
 
     res.writeHead(STATUS_CODE.OK, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify(keys));

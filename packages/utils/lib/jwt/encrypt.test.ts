@@ -1,4 +1,4 @@
-import { JWE, JWKS } from 'jose';
+import { compactDecrypt } from 'jose/jwe/compact/decrypt';
 
 import { KeyModel } from 'database/lib';
 import connection, { disconnect } from 'database/lib/connect';
@@ -7,9 +7,11 @@ import { JWTAuth } from 'utils/lib/jwt/helpers';
 import getKeys from 'utils/lib/keys';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
 import { SCOPE } from 'utils/lib/types/scope';
+import KeyStore from 'utils/lib/util/keystore';
+import { JWE, JWE_ENC } from 'utils/lib/types/jwe';
 
 describe('JWT Encode', () => {
-  let keys: JWKS.KeyStore;
+  let keys: KeyStore;
 
   const auth = {
     scope: [SCOPE.OPENID],
@@ -38,24 +40,24 @@ describe('JWT Encode', () => {
   it('encrypts a JWT using default settings (RSA-OAEP)', async () => {
     const encrypted = await encrypt(auth);
 
-    const decrypted = JWE.decrypt(
+    const { plaintext } = await compactDecrypt(
       encrypted,
-      keys.get({ alg: 'RSA-OAEP', use: 'enc' })
+      keys.get('RSA-OAEP' as JWE)
     );
-    const parsed = JSON.parse(Buffer.from(decrypted).toString());
+    const parsed = JSON.parse(Buffer.from(plaintext).toString());
 
     expect(parsed.sub).toEqual(auth.user);
     expect(parsed.aud).toEqual(auth.client_id);
   });
 
   it('encrypts a JWT using ECDH-ES algorithm', async () => {
-    const encrypted = await encrypt(auth, 'ECDH-ES');
+    const encrypted = await encrypt(auth, 'ECDH-ES' as JWE);
 
-    const decrypted = JWE.decrypt(
+    const { plaintext } = await compactDecrypt(
       encrypted,
-      keys.get({ alg: 'ECDH-ES', use: 'enc' })
+      keys.get('ECDH-ES' as JWE)
     );
-    const parsed = JSON.parse(Buffer.from(decrypted).toString());
+    const parsed = JSON.parse(Buffer.from(plaintext).toString());
 
     expect(parsed.sub).toEqual(auth.user);
     expect(parsed.aud).toEqual(auth.client_id);
@@ -71,7 +73,7 @@ describe('JWT Encode', () => {
   });
 
   it('fails to encrypt a JWT when invalid algorithm is given', async () => {
-    await expect(encrypt(auth, 'ASDF-TEST')).rejects.toThrowError();
+    await expect(encrypt(auth, 'ASDF-TEST' as JWE)).rejects.toThrowError();
   });
 
   it('fails to encrypt a JWT when insufficient claims given', async () => {
@@ -82,12 +84,18 @@ describe('JWT Encode', () => {
     await expect(encrypt(restAuth as JWTAuth)).rejects.toThrowError();
   });
 
+  it('fails to encrypt a JWT when invalid enc parameter was given', async () => {
+    await expect(
+      encrypt(auth, JWE.RSA_OAEP, 'A1282GCM' as JWE_ENC)
+    ).rejects.toThrowError();
+  });
+
   it('fails to decrypt a JWE using a wrong algorithm', async () => {
     const encrypted = await encrypt(auth);
 
-    expect(() =>
-      JWE.decrypt(encrypted, keys.get({ alg: 'ECDH-ES', use: 'enc' }))
-    ).toThrowError();
+    await expect(
+      compactDecrypt(encrypted, keys.get('ECDH-ES' as JWE))
+    ).rejects.toThrowError();
   });
 
   it('fails to decrypt a JWE when invalid string is given', async () => {

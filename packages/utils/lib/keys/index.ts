@@ -1,5 +1,4 @@
 import { Document } from 'mongoose';
-import { JWKS, JSONWebKeySet } from 'jose';
 import Keygrip from 'keygrip';
 
 import connect, { disconnect, KeyModel } from 'database/lib';
@@ -8,25 +7,27 @@ import getKeystore from 'utils/lib/keys/jwks';
 import createCookieSecrets from 'config/lib/keygrip';
 import getKeygrip from 'utils/lib/keys/keygrip';
 import { decrypt, encrypt } from 'utils/lib/util/aes';
+import { JWK } from 'jose/webcrypto/types';
+import KeyStore from 'utils/lib/util/keystore';
 
 export interface KeyObject {
   cookies: string[];
-  keys: JSONWebKeySet;
+  keys: KeyStore;
 }
 
 export interface KeyStructure {
   keygrip: Keygrip;
-  keystore: JWKS.KeyStore;
+  keystore: KeyStore;
 }
 
 let keys: KeyStructure;
 
 const createKeys = async (
   cookieSecrets: string[],
-  jwks?: JSONWebKeySet
+  keys?: JWK[]
 ): Promise<KeyStructure> => ({
   keygrip: await getKeygrip(cookieSecrets),
-  keystore: await getKeystore(jwks),
+  keystore: await getKeystore(Array.isArray(keys) && { keys }),
 });
 
 const fetchKeys = async (): Promise<Document<KeySchema>> => {
@@ -63,7 +64,7 @@ const getKeys = async (
     const { cookies, keys: jwks } = JSON.parse(
       await decrypt(masterkey, retrieved.get('bin'))
     );
-    keys = await createKeys(cookies, { keys: jwks });
+    keys = await createKeys(cookies, jwks);
     return keys;
   } catch (e) {
     if (e.message !== 'NOT_FOUND') {
@@ -76,7 +77,7 @@ const getKeys = async (
     const encrypted = (await encrypt(
       masterkey,
       JSON.stringify({
-        ...keys.keystore.toJWKS(true),
+        ...keys.keystore.export(true),
         cookies: cookieSecrets,
       })
     )) as Buffer;
