@@ -6,6 +6,8 @@ export enum ENDPOINT {
   LOGIN = '/api/login',
   OPENID_CONFIGURATION = '/.well-known/openid-configuration',
   TOKEN = '/api/token',
+  TOKEN_INTROSPECTION = '/api/token/introspect',
+  TOKEN_REVOCATION = '/api/token/revoke',
   USERINFO = '/api/userinfo',
 }
 

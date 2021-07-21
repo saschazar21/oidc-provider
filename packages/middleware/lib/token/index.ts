@@ -1,3 +1,4 @@
+import { Document } from 'mongoose';
 import { IncomingMessage, ServerResponse } from 'http';
 
 import connection, {
@@ -6,33 +7,52 @@ import connection, {
   disconnect,
   RefreshTokenModel,
 } from 'database/lib';
-import validateRequestPayload from 'middleware/lib/token/validator';
+import { AuthorizationSchema } from 'database/lib/schemata/authorization';
+import validateRequestPayload, {
+  AuthorizationCodeTokenEndpointPayload,
+  RefreshTokenEndpointPayload,
+} from 'middleware/lib/token/validator';
 import HTTPError from 'utils/lib/errors/http_error';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
 import sign from 'utils/lib/jwt/sign';
+import { LIFETIME } from 'utils/lib/types/lifetime';
+import { STATUS_CODE } from 'utils/lib/types/status_code';
 
 export type TokenResponsePayload = {
   access_token: string;
-  token_type: 'Bearer';
+  token_type: string;
   expires_in: number;
   refresh_token: string;
-  id_token: string;
+  id_token?: string;
 };
 
 const tokenMiddleware = async (
   req: IncomingMessage,
   res: ServerResponse
 ): Promise<TokenResponsePayload> => {
-  const { code } = await validateRequestPayload(req, res);
+  let authorization: Document<AuthorizationSchema>;
+
+  const { code, refresh_token } = (await validateRequestPayload(
+    req,
+    res
+  )) as AuthorizationCodeTokenEndpointPayload & RefreshTokenEndpointPayload;
 
   try {
     await connection();
-    const authorizationCode = await AuthorizationCodeModel.findByIdAndDelete(
-      code
-    ).populate({
-      path: 'authorization',
-    });
-    const authorization = authorizationCode.get('authorization');
+    if (code) {
+      const authorizationCode = await AuthorizationCodeModel.findByIdAndDelete(
+        code
+      ).populate({ path: 'authorization' });
+      authorization = authorizationCode.get('authorization');
+    }
+    if (refresh_token) {
+      const refreshToken = await RefreshTokenModel.findByIdAndDelete(
+        refresh_token
+      ).populate({ path: 'authorization' });
+      authorization = refreshToken.get('authorization');
+      await AccessTokenModel.findOneAndDelete({
+        authorization: authorization.get('_id'),
+      });
+    }
 
     const [accessToken, refreshToken] = await Promise.all([
       AccessTokenModel.create({
@@ -41,10 +61,16 @@ const tokenMiddleware = async (
       RefreshTokenModel.create({
         authorization: authorization.get('_id'),
       }),
+      authorization.update({
+        expires_at: new Date(Date.now() + LIFETIME.REFRESH_TOKEN * 1000),
+      }),
     ]);
 
     const id_token = await sign({
-      ...authorization.toJSON(),
+      ...(authorization.toJSON() as unknown as AuthorizationSchema & {
+        updated_at: Date;
+        user: string;
+      }),
       access_token: accessToken.get('_id'),
     });
 
