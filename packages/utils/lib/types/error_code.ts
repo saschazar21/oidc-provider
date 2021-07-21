@@ -18,4 +18,5 @@ export enum ERROR_CODE {
   UNAUTHORIZED_CLIENT = 'unauthorized_client',
   UNSUPPORTED_GRANT_TYPE = 'unsupported_grant_type',
   UNSUPPORTED_RESPONSE_TYPE = 'unsupported_response_type',
+  UNSUPPORTED_TOKEN_TYPE = 'unsupported_token_type',
 }
