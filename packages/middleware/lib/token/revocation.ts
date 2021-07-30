@@ -42,10 +42,12 @@ const revocationMiddleware = async (
     );
   }
 
-  if (!token) {
+  // TODO: abstract in helpers
+  if (!token?.length) {
     throw new TokenError('Missing token', ERROR_CODE.INVALID_REQUEST);
   }
 
+  // TODO: abstract in helpers
   if (
     token_type_hint &&
     token_type_hint !== 'access_token' &&
