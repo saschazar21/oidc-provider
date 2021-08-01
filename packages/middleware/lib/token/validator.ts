@@ -1,16 +1,22 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import basic from 'basic-auth';
+import { Document } from 'mongoose';
 
 import connection, {
   AuthorizationCodeModel,
+  ClientModel,
   disconnect,
   RefreshTokenModel,
 } from 'database/lib';
+import { BaseTokenSchema } from 'database/lib/schemata/token';
 import bodyParser from 'middleware/lib/body-parser';
+import { fetchToken } from 'middleware/lib/token/helpers';
+import HTTPError from 'utils/lib/errors/http_error';
 import TokenError from 'utils/lib/errors/token_error';
 import { ERROR_CODE } from 'utils/lib/types/error_code';
 import { GRANT_TYPE } from 'utils/lib/types/grant_type';
 import { SCOPE } from 'utils/lib/types/scope';
+import { STATUS_CODE } from 'utils/lib/types/status_code';
 import verifyCodeChallenge from 'utils/lib/util/verify-code-challenge';
 
 type BaseTokenEndpointPayload = {
@@ -28,6 +34,13 @@ export type AuthorizationCodeTokenEndpointPayload = BaseTokenEndpointPayload & {
 export type RefreshTokenEndpointPayload = BaseTokenEndpointPayload & {
   refresh_token: string;
   scope?: string;
+};
+
+export type IntrospectionRevocationRequestPayload = {
+  token: string;
+  token_type_hint?: 'access_token' | 'refresh_token';
+  client_id?: string;
+  client_secret?: string;
 };
 
 const compareScope = (scope: string, compare: SCOPE[]): SCOPE[] => {
@@ -226,6 +239,101 @@ const validateRequestPayload = async (
       );
 
   return payload;
+};
+
+export const validateClientSecret = async (
+  client_id: string,
+  client_secret: string
+): Promise<boolean> => {
+  try {
+    await connection();
+    const client = await ClientModel.findById(client_id, 'client_secret');
+    return client.get('client_secret') === client_secret;
+  } finally {
+    await disconnect();
+  }
+};
+
+export const validateIntrospectionRevocationRequestPayload = async (
+  req: IncomingMessage,
+  res: ServerResponse
+): Promise<Document<BaseTokenSchema>> => {
+  const { name, pass } = basic(req) || {};
+  const {
+    token,
+    token_type_hint,
+    client_id: clientId,
+    client_secret: clientSecret,
+  } = (await bodyParser(
+    req,
+    res,
+    'form'
+  )) as IntrospectionRevocationRequestPayload;
+
+  const client_id = name || clientId;
+  const client_secret = pass || clientSecret;
+
+  if (!client_id || !client_secret) {
+    throw new TokenError(
+      'Missing client_id and or client_secret',
+      ERROR_CODE.INVALID_CLIENT
+    );
+  }
+
+  if (!(await validateClientSecret(client_id, client_secret))) {
+    throw new TokenError(
+      'Client authentication failed',
+      ERROR_CODE.INVALID_CLIENT
+    );
+  }
+
+  if (!token?.length) {
+    throw new TokenError('Missing token', ERROR_CODE.INVALID_REQUEST);
+  }
+
+  if (
+    token_type_hint &&
+    token_type_hint !== 'access_token' &&
+    token_type_hint !== 'refresh_token'
+  ) {
+    throw new TokenError(
+      'Invalid token_type_hint',
+      ERROR_CODE.UNSUPPORTED_TOKEN_TYPE
+    );
+  }
+
+  const tokenDoc = await fetchToken(token);
+  if (!tokenDoc) {
+    return null;
+  }
+  const authorization = tokenDoc.get('authorization');
+  if (!authorization) {
+    throw new HTTPError(
+      `${tokenDoc.get('type')} ${tokenDoc.get(
+        '_id'
+      )} contains missing authorization`,
+      STATUS_CODE.SERVICE_UNAVAILABLE,
+      req.method,
+      req.url
+    );
+  }
+  const client = await authorization.get('client');
+  if (!client) {
+    throw new HTTPError(
+      `Authorization ID: ${authorization.get('_id')} contains missing client`,
+      STATUS_CODE.SERVICE_UNAVAILABLE,
+      req.method,
+      req.url
+    );
+  }
+  if (client.get('client_id') !== client_id) {
+    throw new TokenError(
+      'Client authentication failed',
+      ERROR_CODE.INVALID_CLIENT
+    );
+  }
+
+  return tokenDoc;
 };
 
 export default validateRequestPayload;

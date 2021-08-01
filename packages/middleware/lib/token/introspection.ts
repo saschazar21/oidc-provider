@@ -1,20 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import basic from 'basic-auth';
 
-import bodyParser from 'middleware/lib/body-parser';
-import HTTPError from 'utils/lib/errors/http_error';
-import TokenError from 'utils/lib/errors/token_error';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { getUrl } from 'config/lib/url';
+import { validateIntrospectionRevocationRequestPayload } from 'middleware/lib/token/validator';
+import { TOKEN_TYPE } from 'utils/lib/types/token_type';
 
-const BEARER_REGEX = /^bearer\s/i;
-
-export type IntrospectionRequestPayload = {
-  token: string;
-  token_type_hint?: 'access_token' | 'refresh_token';
-  client_id?: string;
-  client_secret?: string;
-};
+// const BEARER_REGEX = /^bearer\s/i;
 
 export type IntrospectionResponsePayload = {
   active: boolean;
@@ -35,52 +25,40 @@ const introspectionMiddleware = async (
   req: IncomingMessage,
   res: ServerResponse
 ): Promise<IntrospectionResponsePayload> => {
-  const { authorization } = req.headers;
-  const { name, pass } = basic(req) || {};
-  const {
-    token,
-    token_type_hint,
-    client_id: clientId,
-    client_secret: clientSecret,
-  } = (await bodyParser(req, res, 'form')) as IntrospectionRequestPayload;
+  // TODO: add Bearer authorization mechanism as described in https://datatracker.ietf.org/doc/html/rfc7662#section-2.1
+  const tokenDoc = await validateIntrospectionRevocationRequestPayload(
+    req,
+    res
+  );
 
-  const client_id = name || clientId;
-  const client_secret = pass || clientSecret;
-  const bearer =
-    BEARER_REGEX.test(authorization) &&
-    authorization.replace(BEARER_REGEX, '').trim();
-
-  if (!(client_id && client_secret) || !bearer) {
-    throw new HTTPError(
-      'No client or bearer credentials given',
-      STATUS_CODE.UNAUTHORIZED,
-      req.method,
-      req.url
-    );
-  }
-
-  // TODO: abstract in helpers
-  if (!token?.length) {
-    throw new TokenError('Missing token', ERROR_CODE.INVALID_REQUEST);
-  }
-
-  // TODO: abstract in helpers
   if (
-    token_type_hint &&
-    token_type_hint !== 'access_token' &&
-    token_type_hint !== 'refresh_token'
+    !tokenDoc ||
+    !tokenDoc.get('active') ||
+    tokenDoc.get('type') !== TOKEN_TYPE.ACCESS_TOKEN
   ) {
-    throw new TokenError(
-      'Invalid token_type_hint',
-      ERROR_CODE.UNSUPPORTED_TOKEN_TYPE
-    );
+    return { active: false };
   }
 
-  // TODO: add token validation and lookup functionality
+  const authorization = tokenDoc.get('authorization');
+  const client = authorization.get('client_id');
+  const user = authorization.get('user');
 
-  return {
-    active: false,
-  };
+  const scope = authorization.get('scope')?.join(' ');
+  const exp = Math.floor(tokenDoc.get('expires_at').valueOf() * 0.001);
+  const iat = Math.floor(tokenDoc.get('created_at').valueOf() * 0.001);
+
+  return Object.assign(
+    {},
+    {
+      active: true,
+      exp,
+      iat,
+      iss: getUrl(),
+    },
+    client ? { client_id: client.get('_id'), aud: client.get('_id') } : {},
+    scope ? { scope } : {},
+    user ? { sub: user.get('_id'), username: user.get('email') } : {}
+  );
 };
 
 export default introspectionMiddleware;
