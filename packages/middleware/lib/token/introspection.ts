@@ -47,18 +47,17 @@ const introspectionMiddleware = async (
   const exp = Math.floor(tokenDoc.get('expires_at').valueOf() * 0.001);
   const iat = Math.floor(tokenDoc.get('created_at').valueOf() * 0.001);
 
-  return Object.assign(
-    {},
-    {
-      active: true,
-      exp,
-      iat,
-      iss: getUrl(),
-    },
-    client ? { client_id: client.get('_id'), aud: client.get('_id') } : {},
-    scope ? { scope } : {},
-    user ? { sub: user.get('_id'), username: user.get('email') } : {}
-  );
+  return {
+    active: true,
+    aud: client.get('_id'),
+    client_id: client.get('_id'),
+    exp,
+    iat,
+    iss: getUrl(),
+    scope,
+    sub: user.get('_id'),
+    username: user.get('email'),
+  };
 };
 
 export default introspectionMiddleware;
