@@ -56,6 +56,7 @@ const introspectionMiddleware = async (
     iss: getUrl(),
     scope,
     sub: user.get('_id'),
+    token_type: 'Bearer',
     username: user.get('email'),
   };
 };
