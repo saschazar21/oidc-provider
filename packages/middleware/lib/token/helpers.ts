@@ -24,10 +24,7 @@ export const fetchToken = async (
       tokenDoc = await tokenDoc
         .populate({
           path: 'authorization',
-          populate: [
-            { path: 'client_id' },
-            { path: 'user', select: '-password' },
-          ],
+          populate: { path: 'client_id user', select: '-password' },
         })
         .execPopulate();
     }

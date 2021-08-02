@@ -5,6 +5,8 @@ import pkce from 'pkce-challenge';
 
 import connection, { disconnect } from 'database/lib';
 import {
+  AccessTokenModel,
+  AccessTokenSchema,
   AuthorizationCodeModel,
   AuthorizationCodeSchema,
   RefreshTokenModel,
@@ -17,6 +19,7 @@ import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
 import UserModel, { UserSchema } from 'database/lib/schemata/user';
 import tokenMiddlewareValidator, {
   AuthorizationCodeTokenEndpointPayload,
+  validateIntrospectionRevocationRequestPayload,
 } from 'middleware/lib/token/validator';
 import { SCOPE } from 'utils/lib/types/scope';
 import { METHOD } from 'utils/lib/types/method';
@@ -33,7 +36,19 @@ describe('Token middleware validator', () => {
 
   let res: ServerResponse;
 
-  const getAuthorizationCode = async (
+  const createAccessToken = async (
+    id?: string
+  ): Promise<Document<AccessTokenSchema>> => {
+    await connection();
+    const accessToken = await AccessTokenModel.create({
+      authorization: id ?? authorizationDoc.get('_id'),
+    });
+    await disconnect();
+
+    return accessToken;
+  };
+
+  const createAuthorizationCode = async (
     id?: string
   ): Promise<Document<AuthorizationCodeSchema>> => {
     await connection();
@@ -104,7 +119,7 @@ describe('Token middleware validator', () => {
     });
 
     it('validates an Access Token request', async () => {
-      const code = await getAuthorizationCode();
+      const code = await createAuthorizationCode();
 
       const req = new MockRequest(baseRequest);
       req.write(
@@ -150,7 +165,7 @@ describe('Token middleware validator', () => {
       });
       await disconnect();
 
-      const code = await getAuthorizationCode(auth.get('_id'));
+      const code = await createAuthorizationCode(auth.get('_id'));
 
       const req = new MockRequest(baseRequest);
       req.write(
@@ -270,7 +285,7 @@ describe('Token middleware validator', () => {
     });
 
     it('throws when redirect_uri differs', async () => {
-      const code = await getAuthorizationCode();
+      const code = await createAuthorizationCode();
 
       const req = new MockRequest(baseRequest);
       req.write(
@@ -288,7 +303,7 @@ describe('Token middleware validator', () => {
     });
 
     it('throws, when client_id differs', async () => {
-      const code = await getAuthorizationCode();
+      const code = await createAuthorizationCode();
 
       const req = new MockRequest(baseRequest);
       req.write(
@@ -306,7 +321,7 @@ describe('Token middleware validator', () => {
     });
 
     it('throws, when client_secret & code_verifier are missing', async () => {
-      const code = await getAuthorizationCode();
+      const code = await createAuthorizationCode();
 
       const req = new MockRequest(baseRequest);
       req.write(
@@ -323,7 +338,7 @@ describe('Token middleware validator', () => {
     });
 
     it('throws, when both client_secret & code_verifier are present', async () => {
-      const code = await getAuthorizationCode();
+      const code = await createAuthorizationCode();
 
       const req = new MockRequest(baseRequest);
       req.write(
@@ -342,7 +357,7 @@ describe('Token middleware validator', () => {
     });
 
     it('throws when client_secret differs', async () => {
-      const code = await getAuthorizationCode();
+      const code = await createAuthorizationCode();
 
       const req = new MockRequest(baseRequest);
       req.write(
@@ -371,7 +386,7 @@ describe('Token middleware validator', () => {
       });
       await disconnect();
 
-      const code = await getAuthorizationCode(auth.get('_id'));
+      const code = await createAuthorizationCode(auth.get('_id'));
 
       const req = new MockRequest(baseRequest);
       req.write(
@@ -400,7 +415,7 @@ describe('Token middleware validator', () => {
       });
       await disconnect();
 
-      const code = await getAuthorizationCode(auth.get('_id'));
+      const code = await createAuthorizationCode(auth.get('_id'));
 
       const req = new MockRequest(baseRequest);
       req.write(
@@ -422,7 +437,7 @@ describe('Token middleware validator', () => {
       const auth = await AuthorizationModel.create(baseAuthorization);
       await disconnect();
 
-      const code = await getAuthorizationCode(auth.get('_id'));
+      const code = await createAuthorizationCode(auth.get('_id'));
 
       const req = new MockRequest(baseRequest);
       req.write(
@@ -605,6 +620,266 @@ describe('Token middleware validator', () => {
       req.end();
 
       await expect(tokenMiddlewareValidator(req, res)).rejects.toThrowError();
+    });
+  });
+
+  describe('Token Introspection/Revocation', () => {
+    let additionalAuthorizationDoc: Document<AuthorizationSchema>;
+    let additionalClientDoc: Document<ClientSchema>;
+
+    const baseClient = {
+      name: 'test-introspection-token-validator-client',
+      redirect_uris: ['https://client.example.com/cb'],
+    };
+
+    const baseRequest = {
+      method: 'POST',
+      https: true,
+      url: ENDPOINT.TOKEN_INTROSPECTION,
+      headers: {},
+    };
+
+    const basePayload = {
+      token: '',
+      token_type_hint: 'access_token',
+    };
+
+    afterAll(async () => {
+      await connection();
+      await AuthorizationModel.findByIdAndDelete(
+        additionalAuthorizationDoc.get('_id')
+      );
+      await ClientModel.findByIdAndDelete(additionalClientDoc.get('_id'));
+      await disconnect();
+    });
+
+    beforeAll(async () => {
+      baseRequest.headers = {
+        authorization:
+          'Basic ' +
+          Buffer.from(
+            `${clientDoc.get('_id')}:${clientDoc.get('client_secret')}`
+          ).toString('base64'),
+      };
+
+      await connection();
+      additionalClientDoc = await ClientModel.create({
+        ...baseClient,
+        owner: userDoc.get('_id'),
+      });
+      additionalAuthorizationDoc = await AuthorizationModel.create({
+        ...baseAuthorization,
+        client_id: additionalClientDoc.get('_id'),
+        redirect_uri: baseClient.redirect_uris[0],
+      });
+      await disconnect();
+    });
+
+    beforeEach(() => {
+      res = mockResponse();
+    });
+
+    it('returns token document', async () => {
+      const accessToken = await createAccessToken();
+
+      const req = new MockRequest(baseRequest);
+      req.write(
+        encode({
+          ...basePayload,
+          token: accessToken.get('_id'),
+        })
+      );
+      req.end();
+
+      const token = await validateIntrospectionRevocationRequestPayload(
+        req,
+        res
+      );
+
+      expect(token.get('_id')).toEqual(accessToken.get('_id'));
+      expect(token.get('authorization').get('_id')).toEqual(
+        accessToken.get('authorization')
+      );
+      expect(token.get('authorization').get('client_id').get('_id')).toEqual(
+        clientDoc.get('_id')
+      );
+      expect(token.get('authorization').get('user').get('_id')).toEqual(
+        userDoc.get('_id')
+      );
+    });
+
+    it('returns null, when invalid token ID was given', async () => {
+      const req = new MockRequest(baseRequest);
+      req.write(
+        encode({
+          ...basePayload,
+          token: 'invalid',
+        })
+      );
+      req.end();
+
+      const token = await validateIntrospectionRevocationRequestPayload(
+        req,
+        res
+      );
+
+      expect(token).toBeNull();
+    });
+
+    it('throws when client_id is missing', async () => {
+      const accessToken = await createAccessToken();
+
+      const req = new MockRequest({ ...baseRequest, headers: {} });
+      req.write(
+        encode({
+          ...basePayload,
+          token: accessToken.get('_id'),
+          client_secret: clientDoc.get('client_secret'),
+        })
+      );
+      req.end();
+
+      await expect(
+        validateIntrospectionRevocationRequestPayload(req, res)
+      ).rejects.toThrowError();
+    });
+
+    it('throws when client_id is missing', async () => {
+      const accessToken = await createAccessToken();
+
+      const req = new MockRequest({ ...baseRequest, headers: {} });
+      req.write(
+        encode({
+          ...basePayload,
+          token: accessToken.get('_id'),
+          client_id: clientDoc.get('_id'),
+        })
+      );
+      req.end();
+
+      await expect(
+        validateIntrospectionRevocationRequestPayload(req, res)
+      ).rejects.toThrowError();
+    });
+
+    it("throws when client_id and client_secret don't match", async () => {
+      const accessToken = await createAccessToken();
+
+      const req = new MockRequest({ ...baseRequest, headers: {} });
+      req.write(
+        encode({
+          ...basePayload,
+          token: accessToken.get('_id'),
+          client_id: clientDoc.get('_id'),
+          client_secret: 'invalid',
+        })
+      );
+      req.end();
+
+      await expect(
+        validateIntrospectionRevocationRequestPayload(req, res)
+      ).rejects.toThrowError();
+    });
+
+    it('throws when token is missing', async () => {
+      const req = new MockRequest(baseRequest);
+      req.write(
+        encode({
+          ...basePayload,
+          client_id: clientDoc.get('_id'),
+          client_secret: 'invalid',
+        })
+      );
+      req.end();
+
+      await expect(
+        validateIntrospectionRevocationRequestPayload(req, res)
+      ).rejects.toThrowError();
+    });
+
+    it('throws when invalid token_type_hint is given', async () => {
+      const accessToken = await createAccessToken();
+
+      const req = new MockRequest(baseRequest);
+      req.write(
+        encode({
+          token: accessToken.get('_id'),
+          token_type_hint: 'invalid',
+          client_id: clientDoc.get('_id'),
+          client_secret: clientDoc.get('client_secret'),
+        })
+      );
+      req.end();
+
+      await expect(
+        validateIntrospectionRevocationRequestPayload(req, res)
+      ).rejects.toThrowError();
+    });
+
+    it('throws when no authorization is assigned to token', async () => {
+      const accessToken = await createAccessToken();
+
+      await connection();
+      await accessToken.updateOne({ authorization: null });
+      await disconnect();
+
+      const req = new MockRequest(baseRequest);
+      req.write(
+        encode({
+          ...basePayload,
+          token: accessToken.get('_id'),
+          client_id: clientDoc.get('_id'),
+          client_secret: clientDoc.get('client_secret'),
+        })
+      );
+      req.end();
+
+      await expect(
+        validateIntrospectionRevocationRequestPayload(req, res)
+      ).rejects.toThrowError();
+    });
+
+    it('throws when client details mismatch those in authorization model', async () => {
+      const accessToken = await createAccessToken();
+
+      const req = new MockRequest({ ...baseRequest, headers: {} });
+      req.write(
+        encode({
+          ...basePayload,
+          token: accessToken.get('_id'),
+          client_id: additionalClientDoc.get('_id'),
+          client_secret: additionalClientDoc.get('client_secret'),
+        })
+      );
+      req.end();
+
+      await expect(
+        validateIntrospectionRevocationRequestPayload(req, res)
+      ).rejects.toThrowError();
+    });
+
+    it('throws when no client is available in authorization model', async () => {
+      await connection();
+      const token = await AccessTokenModel.create({
+        authorization: additionalAuthorizationDoc.get('_id'),
+      });
+      await additionalAuthorizationDoc.updateOne({ client_id: null });
+      await disconnect();
+
+      const req = new MockRequest(baseRequest);
+      req.write(
+        encode({
+          ...basePayload,
+          token: token.get('_id'),
+          client_id: additionalClientDoc.get('_id'),
+          client_secret: additionalClientDoc.get('client_secret'),
+        })
+      );
+      req.end();
+
+      await expect(
+        validateIntrospectionRevocationRequestPayload(req, res)
+      ).rejects.toThrowError();
     });
   });
 });

@@ -317,7 +317,7 @@ export const validateIntrospectionRevocationRequestPayload = async (
       req.url
     );
   }
-  const client = await authorization.get('client');
+  const client = await authorization.get('client_id');
   if (!client) {
     throw new HTTPError(
       `Authorization ID: ${authorization.get('_id')} contains missing client`,
@@ -326,7 +326,7 @@ export const validateIntrospectionRevocationRequestPayload = async (
       req.url
     );
   }
-  if (client.get('client_id') !== client_id) {
+  if (client.get('_id') !== client_id) {
     throw new TokenError(
       'Client authentication failed',
       ERROR_CODE.INVALID_CLIENT
