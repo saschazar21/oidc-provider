@@ -92,19 +92,6 @@ const tokenMiddleware = async (
       req.method,
       req.url
     );
-
-    // const headers = Object.assign(
-    //   {},
-    //   { 'Content-Type': 'application/json' },
-    //   e.statusCode === STATUS_CODE.UNAUTHORIZED
-    //     ? { 'WWW-Authenticate': 'Basic realm="Access to token endpoint"' }
-    //     : {}
-    // );
-    // res.writeHead(e.statusCode, headers);
-    // return res.write(JSON.stringify({
-    //   error: e.errorCode,
-    //   error_description: e.message,
-    // }));
   } finally {
     await disconnect();
   }
