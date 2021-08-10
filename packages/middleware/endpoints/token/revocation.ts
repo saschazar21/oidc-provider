@@ -1,13 +1,13 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
 import methods from 'middleware/lib/methods';
-import tokenMiddleware from 'middleware/lib/token';
+import revocationMiddleware from 'middleware/lib/token/revocation';
 import HTTPError from 'utils/lib/errors/http_error';
 import TokenError from 'utils/lib/errors/token_error';
 import { METHOD } from 'utils/lib/types/method';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 
-const token = async (
+const revocation = async (
   req: IncomingMessage,
   res: ServerResponse
 ): Promise<void> => {
@@ -16,18 +16,13 @@ const token = async (
   await methods(req, res, [METHOD.POST]);
 
   try {
-    const tokenResponsePayload = await tokenMiddleware(req, res);
-    res.writeHead(STATUS_CODE.OK, {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Cache-Control': 'no-store',
-      Pragma: 'no-cache',
-    });
-    res.write(JSON.stringify(tokenResponsePayload));
-  } catch (e) {
-    throw e.name === TokenError.NAME || e.name === HTTPError.NAME
-      ? e
+    await revocationMiddleware(req, res);
+    res.writeHead(STATUS_CODE.OK, { 'Content-Length': 0 });
+  } catch (err) {
+    throw err.name === TokenError.NAME || err.name === HTTPError.NAME
+      ? err
       : new HTTPError(
-          e.message,
+          err.message,
           STATUS_CODE.INTERNAL_SERVER_ERROR,
           req.method,
           req.url
@@ -35,4 +30,4 @@ const token = async (
   }
 };
 
-export default token;
+export default revocation;

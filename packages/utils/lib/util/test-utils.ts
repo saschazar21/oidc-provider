@@ -10,18 +10,18 @@ export const mockResponse = (): ServerResponse => {
   res.flushHeaders = flushHeaders;
   res.writeHead = jest.fn(function writeHead(
     statusCode: number,
-    headers: object
+    headers: { [key: string]: string | number | boolean }
   ): void {
     this.statusCode = statusCode;
     this._header = this._headers = {
       ...this._header,
       ...this._headers,
       ...Object.keys(headers).reduce(
-        (obj: object, key: string) => ({
+        (obj: { [key: string]: string | number | boolean }, key: string) => ({
           ...obj,
           [key.toLowerCase()]: headers[key],
         }),
-        {} as object
+        {} as { [key: string]: string | number | boolean }
       ),
     };
     this.headersSent = true;

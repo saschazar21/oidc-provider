@@ -8,21 +8,14 @@
   "extends": [
     "eslint:recommended", // eslint default rules
     "plugin:@typescript-eslint/eslint-recommended", // eslint TypeScript rules (github.com/typescript-eslint/typescript-eslint)
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended", // eslint react rules (github.com/yannickcr/eslint-plugin-react)
-    "plugin:jsx-a11y/recommended" // accessibility plugin
+    "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
-      { "ignoreRestSiblings": true }
+      { "ignoreRestSiblings": true, "varsIgnorePattern": "^_" }
     ],
     "semi": "error"
-  },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
   }
 }
