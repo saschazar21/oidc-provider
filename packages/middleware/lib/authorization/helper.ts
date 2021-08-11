@@ -60,7 +60,9 @@ export const buildAuthorizationSchema = async (
     if (!authorization) {
       throw new AuthorizationError(
         `No Authorization found with ID: ${auth._id}!`,
-        ERROR_CODE.INVALID_REQUEST
+        ERROR_CODE.INVALID_REQUEST,
+        auth.redirect_uri,
+        auth.state
       );
     }
     return {
@@ -86,7 +88,9 @@ export const getAuthenticationFlow = (
     default:
       throw new AuthorizationError(
         'No supported response_type found!',
-        ERROR_CODE.UNSUPPORTED_RESPONSE_TYPE
+        ERROR_CODE.UNSUPPORTED_RESPONSE_TYPE,
+        auth.redirect_uri,
+        auth.state
       );
   }
 };

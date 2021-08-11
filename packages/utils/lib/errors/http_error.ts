@@ -1,4 +1,4 @@
-import { STATUS_CODES } from 'http';
+import { ServerResponse, STATUS_CODES } from 'http';
 
 import { id } from 'utils/lib/util/id';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
@@ -55,6 +55,18 @@ class HTTPError extends Error implements Error {
 ${this.statusCode} ${STATUS_CODES[this.statusCode]}
 [ID: ${this.id}]
 `;
+  }
+
+  public response(res: ServerResponse): void {
+    const responsePayload = {
+      error: this.message,
+      id: this.id,
+    };
+
+    res.writeHead(this.statusCode, {
+      'Content-Type': 'application/json; charset=UTF-8',
+    });
+    res.write(JSON.stringify(responsePayload));
   }
 }
 

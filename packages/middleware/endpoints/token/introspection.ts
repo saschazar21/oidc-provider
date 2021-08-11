@@ -1,8 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import methods from 'middleware/lib/methods';
 import introspectionMiddleware from 'middleware/lib/token/introspection';
-import HTTPError from 'utils/lib/errors/http_error';
-import TokenError from 'utils/lib/errors/token_error';
+import errorHandler from 'middleware/lib/error-handler';
 import { METHOD } from 'utils/lib/types/method';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 
@@ -20,15 +19,10 @@ const introspection = async (
       'Content-Type': 'application/json; charset=UTF-8',
     });
     res.write(JSON.stringify(payload));
-  } catch (err) {
-    throw err.name === TokenError.NAME || err.name === HTTPError.NAME
-      ? err
-      : new HTTPError(
-          err.message,
-          STATUS_CODE.INTERNAL_SERVER_ERROR,
-          req.method,
-          req.url
-        );
+  } catch (e) {
+    errorHandler(req, res, e);
+  } finally {
+    res.end();
   }
 };
 

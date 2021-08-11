@@ -14,6 +14,7 @@ describe('/.well-known/openid-configuration', () => {
   ) => Promise<void>;
 
   let req;
+  let res;
 
   beforeEach(async () => {
     jest.resetModules();
@@ -26,14 +27,14 @@ describe('/.well-known/openid-configuration', () => {
       method: 'GET',
       url: '/.well-known/openid-configuration',
     });
+
+    res = mockResponse();
   });
 
   it('should fetch the OpenID Configuration', async () => {
     const { default: configuration } = await import(
       'config/lib/openid-configuration'
     );
-
-    const res = mockResponse();
 
     await fetchConfiguration(req, res);
 
@@ -43,11 +44,7 @@ describe('/.well-known/openid-configuration', () => {
   });
 
   it('should return status 405, if method != GET', async () => {
-    const res = mockResponse();
-
-    await expect(() =>
-      fetchConfiguration({ ...req, method: 'POST' }, res)
-    ).rejects.toThrowError();
+    await fetchConfiguration({ ...req, method: 'POST' }, res);
 
     expect(res.getHeader('x-robots-tag')).toEqual('noindex, nofollow');
     expect(res.getHeader('allow')).toEqual(
@@ -69,7 +66,8 @@ describe('/.well-known/openid-configuration', () => {
 
     const res = mockResponse();
 
-    await expect(() => fetchConfiguration(req, res)).rejects.toThrowError();
+    await fetchConfiguration(req, res);
+    expect(res.statusCode).toEqual(STATUS_CODE.INTERNAL_SERVER_ERROR);
 
     expect(res.getHeader('x-robots-tag')).toEqual('noindex, nofollow');
   });

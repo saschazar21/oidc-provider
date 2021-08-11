@@ -115,7 +115,8 @@ describe('Login endpoint', () => {
     req.write(encode(body));
     req.end();
 
-    await expect(loginEndpoint(req, res)).rejects.toThrowError();
+    await loginEndpoint(req, res);
+    expect(res.statusCode).toEqual(401);
   });
 
   it('fails to login user, when e-mail is invalid', async () => {
@@ -129,7 +130,8 @@ describe('Login endpoint', () => {
     req.write(encode(body));
     req.end();
 
-    await expect(loginEndpoint(req, res)).rejects.toThrowError();
+    await loginEndpoint(req, res);
+    expect(res.statusCode).toEqual(401);
   });
 
   it('fails to login user, when password is invalid', async () => {
@@ -143,6 +145,7 @@ describe('Login endpoint', () => {
     req.write(encode(body));
     req.end();
 
-    await expect(loginEndpoint(req, res)).rejects.toThrowError();
+    await loginEndpoint(req, res);
+    expect(res.statusCode).toEqual(401);
   });
 });

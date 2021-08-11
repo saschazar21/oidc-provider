@@ -16,6 +16,7 @@
       "error",
       { "ignoreRestSiblings": true, "varsIgnorePattern": "^_" }
     ],
+    "no-fallthrough": "off",
     "semi": "error"
   }
 }

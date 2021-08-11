@@ -64,14 +64,16 @@ const consent = async (
     !err && !sub?.length
       ? new AuthorizationError(
           'User not authenticated!',
-          ERROR_CODE.LOGIN_REQUIRED
+          ERROR_CODE.LOGIN_REQUIRED,
+          null
         )
       : err;
   err =
     !err && consent !== 'true'
       ? new AuthorizationError(
           'Consent was denied by user!',
-          ERROR_CODE.ACCESS_DENIED
+          ERROR_CODE.ACCESS_DENIED,
+          null
         )
       : err;
   if (err?.name === HTTPError.NAME) {
@@ -101,7 +103,7 @@ const consent = async (
         state ? { state } : null
       );
       const location = new URL(authorization.get('redirect_uri'));
-      location.search = encode(responseQuery);
+      location.search = `?${encode(responseQuery)}`;
 
       return redirect(req, res, {
         location: location.toString(),

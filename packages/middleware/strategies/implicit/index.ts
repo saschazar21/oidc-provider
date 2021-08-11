@@ -21,7 +21,9 @@ class ImplicitStrategy extends AuthStrategy<ImplicitResponsePayload> {
     if (!this.auth.nonce) {
       throw new AuthorizationError(
         'Nonce is required!',
-        ERROR_CODE.INVALID_REQUEST
+        ERROR_CODE.INVALID_REQUEST,
+        this.auth.redirect_uri,
+        this.auth.state
       );
     }
 

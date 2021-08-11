@@ -5,12 +5,12 @@ import authorizationMiddleware from 'middleware/lib/authorization';
 import { AuthorizationResponse } from 'middleware/strategies/AuthStrategy';
 import generateHTML from 'middleware/lib/authorization/form-post';
 import { ResponsePayload } from 'middleware/lib/authorization/helper';
+import errorHandler from 'middleware/lib/error-handler';
 import methods from 'middleware/lib/methods';
+import redirect from 'middleware/lib/redirect';
 import { METHOD } from 'utils/lib/types/method';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
-import HTTPError from 'utils/lib/errors/http_error';
 import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
-import redirect from 'middleware/lib/redirect';
 
 const authorization = async (
   req: IncomingMessage,
@@ -18,11 +18,11 @@ const authorization = async (
 ): Promise<void> => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
 
-  await methods(req, res, [METHOD.GET, METHOD.POST]);
-
-  // TODO: HEAD & OPTIONS handling
-
   try {
+    await methods(req, res, [METHOD.GET, METHOD.POST]);
+
+    // TODO: HEAD & OPTIONS handling
+
     const auth = (await authorizationMiddleware(
       req,
       res
@@ -64,14 +64,9 @@ const authorization = async (
 
     return redirect(req, res, { location: url.toString(), statusCode });
   } catch (e) {
-    throw e.name === HTTPError.NAME
-      ? e
-      : new HTTPError(
-          e.message,
-          STATUS_CODE.INTERNAL_SERVER_ERROR,
-          req.method,
-          req.url
-        );
+    errorHandler(req, res, e);
+  } finally {
+    res.end();
   }
 };
 

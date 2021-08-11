@@ -1,9 +1,8 @@
 import { IncomingMessage, ServerResponse } from 'http';
+import errorHandler from 'middleware/lib/error-handler';
 
 import methods from 'middleware/lib/methods';
 import tokenMiddleware from 'middleware/lib/token';
-import HTTPError from 'utils/lib/errors/http_error';
-import TokenError from 'utils/lib/errors/token_error';
 import { METHOD } from 'utils/lib/types/method';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 
@@ -24,14 +23,9 @@ const token = async (
     });
     res.write(JSON.stringify(tokenResponsePayload));
   } catch (e) {
-    throw e.name === TokenError.NAME || e.name === HTTPError.NAME
-      ? e
-      : new HTTPError(
-          e.message,
-          STATUS_CODE.INTERNAL_SERVER_ERROR,
-          req.method,
-          req.url
-        );
+    errorHandler(req, res, e);
+  } finally {
+    res.end();
   }
 };
 

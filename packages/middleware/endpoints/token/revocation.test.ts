@@ -1,4 +1,3 @@
-import { ServerResponse } from 'http';
 import { Document } from 'mongoose';
 import MockRequest from 'mock-req';
 
@@ -30,7 +29,7 @@ describe('Token revocation endpoint', () => {
   let clientDoc: Document<ClientSchema>;
   let userDoc: Document<UserSchema>;
 
-  let res: ServerResponse;
+  let res;
 
   const createTokens = async (): Promise<
     [Document<AccessTokenSchema>, Document<RefreshTokenSchema>]
@@ -181,6 +180,8 @@ describe('Token revocation endpoint', () => {
     );
     req.end();
 
-    await expect(tokenRevocationEndpoint(req, res)).rejects.toThrowError();
+    await tokenRevocationEndpoint(req, res);
+
+    expect(res.statusCode).toBe(400);
   });
 });

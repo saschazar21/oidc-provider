@@ -1,28 +1,22 @@
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 import { METHOD } from 'utils/lib/types/method';
-import mongoose from 'mongoose';
 import MockRequest from 'mock-req';
 import retry from 'jest-retries';
 
+import connection, { KeyModel, disconnect } from 'database/lib';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('/api/jwks', () => {
-  let KeyModel;
-  let connect;
   let req;
   let res;
 
   afterEach(async () => {
-    await connect().then(() => KeyModel.findByIdAndDelete('master'));
-    await mongoose.connection.close();
+    await connection().then(() => KeyModel.findByIdAndDelete('master'));
+    await disconnect();
   });
 
   beforeEach(async () => {
     jest.resetModules();
-
-    const importedDb = await import('database/lib');
-    connect = importedDb.default;
-    KeyModel = importedDb.KeyModel;
 
     console.error = console.log;
 
@@ -42,7 +36,10 @@ describe('/api/jwks', () => {
 
     const { default: fetchJWKS } = await import('middleware/endpoints/jwks');
 
-    await expect(() => fetchJWKS(req, res)).rejects.toThrowError();
+    await fetchJWKS(req, res);
+
+    expect(res.statusCode).toEqual(500);
+    expect(res.getHeader('Content-Type')).toMatch(/^text\/plain/);
   });
 
   it('should return 405, when method != GET', async () => {
@@ -53,9 +50,9 @@ describe('/api/jwks', () => {
 
     const { default: fetchJWKS } = await import('middleware/endpoints/jwks');
 
-    await expect(() =>
-      fetchJWKS({ ...req, method: 'POST' }, res)
-    ).rejects.toThrowError();
+    await fetchJWKS({ ...req, method: 'POST' }, res);
+
+    expect(res.statusCode).toEqual(405);
     expect(res.getHeader('Allow')).toEqual(
       [METHOD.HEAD, METHOD.OPTIONS, METHOD.GET].join(', ')
     );
@@ -71,10 +68,10 @@ describe('/api/jwks', () => {
 
     const { default: fetchJWKS } = await import('middleware/endpoints/jwks');
 
-    await connect()
+    await connection()
       .then(() => KeyModel.findByIdAndDelete('master'))
       .then(() => fetchJWKS(req, customRes))
-      .then(() => mongoose.connection.close());
+      .then(() => disconnect());
 
     expect(customRes.statusCode).toEqual(STATUS_CODE.OK);
     expect(customRes.getHeader('x-robots-tag')).toEqual('noindex, nofollow');

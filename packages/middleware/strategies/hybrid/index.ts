@@ -26,7 +26,9 @@ class HybridStrategy extends AuthStrategy<HybridResponsePayload> {
     ) {
       throw new AuthorizationError(
         `Nonce is required, when response_type=${RESPONSE_TYPE.ID_TOKEN}!`,
-        ERROR_CODE.INVALID_REQUEST
+        ERROR_CODE.INVALID_REQUEST,
+        this.auth.redirect_uri,
+        this.auth.state
       );
     }
 

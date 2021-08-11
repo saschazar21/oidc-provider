@@ -1,4 +1,3 @@
-import { ServerResponse } from 'http';
 import { Document } from 'mongoose';
 import MockRequest from 'mock-req';
 
@@ -18,7 +17,6 @@ import {
   RefreshTokenSchema,
 } from 'database/lib/schemata/token';
 import tokenIntrospectionEndpoint from 'middleware/endpoints/token/introspection';
-import { IntrospectionResponsePayload } from 'middleware/lib/token/introspection';
 import { ENDPOINT } from 'utils/lib/types/endpoint';
 import { METHOD } from 'utils/lib/types/method';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
@@ -31,9 +29,7 @@ describe('Token endpoint', () => {
   let clientDoc: Document<ClientSchema>;
   let userDoc: Document<UserSchema>;
 
-  let res: ServerResponse & {
-    _getJSON: () => IntrospectionResponsePayload;
-  };
+  let res;
 
   const createTokens = async (): Promise<
     [Document<AccessTokenSchema>, Document<RefreshTokenSchema>]
@@ -103,9 +99,7 @@ describe('Token endpoint', () => {
   });
 
   beforeEach(() => {
-    res = mockResponse() as ServerResponse & {
-      _getJSON: () => IntrospectionResponsePayload;
-    };
+    res = mockResponse();
   });
 
   it('returns information about access token', async () => {
@@ -183,6 +177,8 @@ describe('Token endpoint', () => {
     );
     req.end();
 
-    await expect(tokenIntrospectionEndpoint(req, res)).rejects.toThrowError();
+    await tokenIntrospectionEndpoint(req, res);
+
+    expect(res.statusCode).toBe(400);
   });
 });

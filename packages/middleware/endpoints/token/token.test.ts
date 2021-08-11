@@ -1,4 +1,3 @@
-import { ServerResponse } from 'http';
 import { Document } from 'mongoose';
 import MockRequest from 'mock-req';
 
@@ -20,10 +19,7 @@ import {
   RefreshTokenSchema,
 } from 'database/lib/schemata/token';
 import tokenEndpoint from 'middleware/endpoints/token';
-import {
-  AuthorizationCodeTokenEndpointPayload,
-  RefreshTokenEndpointPayload,
-} from 'middleware/lib/token/validator';
+import { RefreshTokenEndpointPayload } from 'middleware/lib/token/validator';
 import { ENDPOINT } from 'utils/lib/types/endpoint';
 import { METHOD } from 'utils/lib/types/method';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
@@ -37,11 +33,7 @@ describe('Token endpoint', () => {
   let clientDoc: Document<ClientSchema>;
   let userDoc: Document<UserSchema>;
 
-  let res: ServerResponse & {
-    _getJSON: () =>
-      | AuthorizationCodeTokenEndpointPayload
-      | RefreshTokenEndpointPayload;
-  };
+  let res;
 
   const getAuthorizationCode = async (): Promise<
     Document<AuthorizationCodeSchema>
@@ -119,11 +111,7 @@ describe('Token endpoint', () => {
   });
 
   beforeEach(() => {
-    res = mockResponse() as ServerResponse & {
-      _getJSON: () =>
-        | AuthorizationCodeTokenEndpointPayload
-        | RefreshTokenEndpointPayload;
-    };
+    res = mockResponse();
   });
 
   it('creates a token set using grant_type=authorization_code', async () => {
@@ -216,6 +204,8 @@ describe('Token endpoint', () => {
     );
     req.end();
 
-    await expect(tokenEndpoint(req, res)).rejects.toThrowError();
+    await tokenEndpoint(req, res);
+
+    expect(res.statusCode).toBe(400);
   });
 });

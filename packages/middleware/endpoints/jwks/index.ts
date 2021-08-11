@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 
+import errorHandler from 'middleware/lib/error-handler';
 import methods from 'middleware/lib/methods';
 import { METHOD } from 'utils/lib/types/method';
-import HTTPError from 'utils/lib/errors/http_error';
 import { STATUS_CODE } from 'utils/lib/types/status_code';
 import getKeys from 'utils/lib/keys';
 
@@ -12,25 +12,20 @@ const jwks = async (
 ): Promise<void> => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
 
-  await methods(req, res, [METHOD.GET]);
-
-  // TODO: HEAD & OPTIONS handling
-
   try {
+    await methods(req, res, [METHOD.GET]);
+
+    // TODO: HEAD & OPTIONS handling
+
     const { keystore } = await getKeys();
     const keys = await keystore.toJWKS();
 
     res.writeHead(STATUS_CODE.OK, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify(keys));
   } catch (e) {
-    throw e.name === HTTPError.NAME
-      ? e
-      : new HTTPError(
-          e.message,
-          STATUS_CODE.INTERNAL_SERVER_ERROR,
-          req.method,
-          req.url
-        );
+    errorHandler(req, res, e);
+  } finally {
+    res.end();
   }
 };
 

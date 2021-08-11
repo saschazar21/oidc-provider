@@ -168,7 +168,7 @@ describe('Consent endpoint', () => {
     expect(res.getHeader('location')).toMatch(url.toString());
   });
 
-  it('throws, when no Authorization ID found', async () => {
+  it('returns 400, when no Authorization ID found', async () => {
     const userId = userDoc.get('_id');
     const req = new MockRequest({
       ...baseRequest,
@@ -186,10 +186,12 @@ describe('Consent endpoint', () => {
 
     req.end();
 
-    await expect(consent(req, res)).rejects.toThrowError();
+    await consent(req, res);
+
+    expect(res.statusCode).toEqual(400);
   });
 
-  it('throws, when invalid User ID found', async () => {
+  it('returns 500, when invalid User ID found', async () => {
     const authorizationId = authorizationDoc.get('_id');
     const req = new MockRequest({
       ...baseRequest,
@@ -207,6 +209,8 @@ describe('Consent endpoint', () => {
 
     req.end();
 
-    await expect(consent(req, res)).rejects.toThrowError();
+    await consent(req, res);
+
+    expect(res.statusCode).toEqual(500);
   });
 });

@@ -81,7 +81,7 @@ abstract class AuthStrategy<T> {
   }
 
   private async validatePrompt(): Promise<boolean> {
-    const { client_id, prompt, user } = this.auth;
+    const { client_id, prompt, redirect_uri, state, user } = this.auth;
     if (!prompt?.length) {
       return true;
     }
@@ -90,14 +90,18 @@ abstract class AuthStrategy<T> {
       if (prompt.length > 1) {
         throw new AuthorizationError(
           `Invalid prompt, either '${PROMPT.NONE}' or combination of other values is allowed!`,
-          ERROR_CODE.INVALID_REQUEST
+          ERROR_CODE.INVALID_REQUEST,
+          redirect_uri,
+          state
         );
       }
 
       if (!user) {
         throw new AuthorizationError(
           'No active user session found, but client requires existing authentication!',
-          ERROR_CODE.LOGIN_REQUIRED
+          ERROR_CODE.LOGIN_REQUIRED,
+          redirect_uri,
+          state
         );
       }
 
@@ -108,7 +112,9 @@ abstract class AuthStrategy<T> {
         if (!Array.isArray(consents) || !consents.includes(client_id)) {
           throw new AuthorizationError(
             `No consent found for client, but client requires existing consent!`,
-            ERROR_CODE.INTERACTION_REQUIRED
+            ERROR_CODE.INTERACTION_REQUIRED,
+            redirect_uri,
+            state
           );
         }
       } finally {
@@ -125,7 +131,9 @@ abstract class AuthStrategy<T> {
     ) {
       throw new AuthorizationError(
         `scope parameter must contain "${SCOPE.OPENID}"`,
-        ERROR_CODE.INVALID_SCOPE
+        ERROR_CODE.INVALID_SCOPE,
+        this.auth.redirect_uri,
+        this.auth.state
       );
     }
 
@@ -189,7 +197,9 @@ abstract class AuthStrategy<T> {
     if (!this.doc) {
       throw new AuthorizationError(
         'No Authorization available!',
-        ERROR_CODE.SERVER_ERROR
+        ERROR_CODE.SERVER_ERROR,
+        this.auth.redirect_uri,
+        this.auth.state
       );
     }
 
@@ -197,14 +207,18 @@ abstract class AuthStrategy<T> {
     if (Array.isArray(prompts) && prompts.includes(PROMPT.LOGIN)) {
       throw new AuthorizationError(
         'Login required!',
-        ERROR_CODE.LOGIN_REQUIRED
+        ERROR_CODE.LOGIN_REQUIRED,
+        this.auth.redirect_uri,
+        this.auth.state
       );
     }
 
     if (Array.isArray(prompts) && prompts.includes(PROMPT.CONSENT)) {
       throw new AuthorizationError(
         'Consent required!',
-        ERROR_CODE.CONSENT_REQUIRED
+        ERROR_CODE.CONSENT_REQUIRED,
+        this.auth.redirect_uri,
+        this.auth.state
       );
     }
 
@@ -217,7 +231,9 @@ abstract class AuthStrategy<T> {
       if (!user) {
         throw new AuthorizationError(
           `No user assigned to Authorization ID ${this.id}!`,
-          ERROR_CODE.LOGIN_REQUIRED
+          ERROR_CODE.LOGIN_REQUIRED,
+          this.auth.redirect_uri,
+          this.auth.state
         );
       }
       const consents = user.get('consents');
@@ -227,7 +243,9 @@ abstract class AuthStrategy<T> {
       ) {
         throw new AuthorizationError(
           `User has not given consent to Client ID: ${this.auth.client_id}!`,
-          ERROR_CODE.CONSENT_REQUIRED
+          ERROR_CODE.CONSENT_REQUIRED,
+          this.auth.redirect_uri,
+          this.auth.state
         );
       }
       await this.doc.update({ consent: true });
@@ -250,7 +268,9 @@ abstract class AuthStrategy<T> {
           `Failed to fetch/create Authorization using data: ${JSON.stringify(
             this.auth
           )}`,
-          ERROR_CODE.INVALID_REQUEST
+          ERROR_CODE.INVALID_REQUEST,
+          this.auth.redirect_uri,
+          this.auth.state
         );
       }
       const sanitized = this.id && this.sanitizeUpdate();
