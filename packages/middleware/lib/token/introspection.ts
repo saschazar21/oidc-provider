@@ -4,8 +4,6 @@ import { getUrl } from 'config/lib/url';
 import { validateIntrospectionRevocationRequestPayload } from 'middleware/lib/token/validator';
 import { TOKEN_TYPE } from 'utils/lib/types/token_type';
 
-// const BEARER_REGEX = /^bearer\s/i;
-
 export type IntrospectionResponsePayload = {
   active: boolean;
   scope?: string;
