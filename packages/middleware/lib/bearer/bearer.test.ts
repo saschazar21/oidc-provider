@@ -1,5 +1,6 @@
 import MockRequest from 'mock-req';
 
+import getUrl from 'config/lib/url';
 import bearerMiddleware from 'middleware/lib/bearer';
 import { METHOD } from 'utils/lib/types/method';
 import idAsync from 'utils/lib/util/id';
@@ -53,6 +54,22 @@ describe('Bearer middleware', () => {
     expect(extracted).toEqual(token);
   });
 
+  it('parses access token from query params', async () => {
+    const token = await createToken();
+
+    const baseRequest = {
+      method: METHOD.GET,
+      https: true,
+      url: `${getUrl()}/userinfo?access_token=${token}`,
+    };
+
+    const req = new MockRequest(baseRequest);
+
+    const extracted = await bearerMiddleware(req, res);
+
+    expect(extracted).toEqual(token);
+  });
+
   it('returns null, when no token present in Authorization header', async () => {
     const baseRequest = {
       method: METHOD.GET,
@@ -99,5 +116,38 @@ describe('Bearer middleware', () => {
     const extracted = await bearerMiddleware(req, res);
 
     expect(extracted).toBeNull();
+  });
+
+  it('returns null, when no access token is present in query params', async () => {
+    const baseRequest = {
+      method: METHOD.GET,
+      https: true,
+      url: `${getUrl()}/userinfo`,
+    };
+
+    const req = new MockRequest(baseRequest);
+
+    const extracted = await bearerMiddleware(req, res);
+
+    expect(extracted).toBeNull();
+  });
+
+  it('throws, when multiple access tokens are present', async () => {
+    const token = await createToken();
+
+    const baseRequest = {
+      method: METHOD.GET,
+      https: true,
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      url: `${getUrl()}/userinfo?access_token=${token}`,
+    };
+
+    const req = new MockRequest(baseRequest);
+
+    await expect(bearerMiddleware(req, res)).rejects.toThrow(
+      /Multiple access tokens/
+    );
   });
 });
