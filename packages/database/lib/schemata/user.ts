@@ -85,9 +85,10 @@ const addressSchema = new Schema<AddressSchema>(
 );
 
 addressSchema.virtual('formatted').get(function () {
-  return `${this.street_address}
+  const formatted = `${this.street_address}
 ${rightPad(this.postal_code)}${rightPad(this.locality)}${this.region}
 ${this.country}`;
+  return formatted.length ? formatted : undefined;
 });
 
 const userSchema = new Schema<User>(
@@ -120,10 +121,16 @@ const userSchema = new Schema<User>(
       type: String,
     },
     nickname: {
+      default(): string {
+        return this.preferred_username;
+      },
       trim: true,
       type: String,
     },
     preferred_username: {
+      default(): string {
+        return this.nickname;
+      },
       trim: true,
       type: String,
     },
@@ -201,13 +208,15 @@ const userSchema = new Schema<User>(
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
     toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
 userSchema
   .virtual('name')
   .get(function () {
-    return `${rightPad(this.given_name)}${this.family_name}`;
+    const name = `${rightPad(this.given_name)}${this.family_name}`;
+    return name.length ? name : undefined;
   })
   .set(function (name: string): void {
     const [given_name, family_name] = name.split(/\s+/);

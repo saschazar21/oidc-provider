@@ -286,7 +286,7 @@ abstract class AuthStrategy<T> {
         );
       }
       this._id = this.doc.get('_id');
-      this._auth = this.doc.toJSON() as unknown as Authorization;
+      this._auth = this.doc.toObject() as unknown as Authorization;
       return this.doc;
     } finally {
       await disconnect();

@@ -1,6 +1,26 @@
 import { ServerResponse } from 'http';
 import MockRes from 'mock-res';
 
+import { UserSchema } from 'database/lib/schemata/user';
+
+export const mockUser: UserSchema = {
+  password: '',
+  given_name: 'Wainwright',
+  middle_name: 'Calwell',
+  family_name: 'Parlett',
+  email: 'wparlett0@g.co',
+  phone_number: '906-214-5198',
+  nickname: 'wparlett0',
+  picture: 'https://robohash.org/exquiavel.png?size=50x50&set=set1',
+  address: {
+    street_address: '6330 Forest Dale Lane',
+    locality: 'Foros da Catrapona',
+    region: 'Setúbal',
+    country: 'Portugal',
+    postal_code: '2840-051',
+  },
+};
+
 export type MockResponse = {
   _getJSON: () => { [key: string]: never };
   _getString: () => string;

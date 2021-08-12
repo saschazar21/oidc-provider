@@ -66,7 +66,7 @@ export const buildAuthorizationSchema = async (
       );
     }
     return {
-      ...authorization.toJSON(),
+      ...authorization.toObject(),
       ...auth,
     };
   } finally {

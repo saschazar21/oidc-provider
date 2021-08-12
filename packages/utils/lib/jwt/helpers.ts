@@ -21,10 +21,10 @@ export type JWTPayload = {
   [CLAIM.ADDRESS]?: AddressSchema;
 };
 
-const fetchUserData = async (
+export const fetchUserData = async (
   id: string,
   scope: SCOPE[]
-): Promise<UserSchema> => {
+): Promise<Partial<UserSchema>> => {
   const fields = scope.reduce(
     (claims: CLAIM[], current: SCOPE): CLAIM[] =>
       current === SCOPE.OPENID
@@ -42,13 +42,18 @@ const fetchUserData = async (
     const user = await UserModel.findById(id, fields.join(' '), {
       timestamps: true,
     });
-    const { _id, id: theId, ...obj } = user.toJSON();
-    return Object.assign(
-      {},
-      obj,
-      obj.updated_at
-        ? { updated_at: Math.floor(obj.updated_at.valueOf() * 0.001) }
-        : null
+
+    return fields.reduce(
+      (doc: UserSchema, field: CLAIM): Partial<UserSchema> =>
+        Object.assign(
+          {},
+          doc,
+          user.get(field) ? { [field]: user.get(field) } : null,
+          field === 'updated_at'
+            ? { [field]: Math.floor(user.get(field).valueOf() * 0.001) }
+            : null
+        ),
+      {} as UserSchema
     );
   } finally {
     await disconnect();

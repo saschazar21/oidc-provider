@@ -67,7 +67,7 @@ const tokenMiddleware = async (
     ]);
 
     const id_token = await sign({
-      ...(authorization.toJSON() as unknown as AuthorizationSchema & {
+      ...(authorization.toObject() as unknown as AuthorizationSchema & {
         updated_at: Date;
         user: string;
       }),

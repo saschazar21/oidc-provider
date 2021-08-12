@@ -47,7 +47,7 @@ const extractFromQueryParamter = (req: IncomingMessage): string => {
   }
 };
 
-const extractToken = async (
+const bearerMiddleware = async (
   req: IncomingMessage,
   res: ServerResponse
 ): Promise<string> => {
@@ -68,4 +68,4 @@ const extractToken = async (
   return found.length ? found[0] : null;
 };
 
-export default extractToken;
+export default bearerMiddleware;
