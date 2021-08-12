@@ -48,7 +48,9 @@ export const fetchUserData = async (
         Object.assign(
           {},
           doc,
-          user.get(field) ? { [field]: user.get(field) } : null,
+          typeof user.get(field) !== 'undefined'
+            ? { [field]: user.get(field) }
+            : null,
           field === 'updated_at'
             ? { [field]: Math.floor(user.get(field).valueOf() * 0.001) }
             : null
