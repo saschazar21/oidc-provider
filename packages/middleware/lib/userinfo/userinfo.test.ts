@@ -24,7 +24,7 @@ import { METHOD } from 'utils/lib/types/method';
 import { ENDPOINT } from 'utils/lib/types/endpoint';
 import { mockResponse, mockUser } from 'utils/lib/util/test-utils';
 
-describe('Userinfo middleware helpers', () => {
+describe('Userinfo middleware', () => {
   let authorizationDoc: Document<AuthorizationSchema>;
   let clientDoc: Document<ClientSchema>;
   let userDoc: Document<UserSchema>;

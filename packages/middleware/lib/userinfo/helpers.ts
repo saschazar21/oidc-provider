@@ -1,5 +1,6 @@
 import connection, { AccessTokenModel, disconnect } from 'database/lib';
 import { AddressSchema } from 'database/lib/schemata/user';
+import AuthenticationError from 'utils/lib/errors/authentication_error';
 import TokenError from 'utils/lib/errors/token_error';
 import { fetchUserData } from 'utils/lib/jwt/helpers';
 import { ERROR_CODE } from 'utils/lib/types/error_code';
@@ -21,9 +22,10 @@ export const getClaims = async (
     await disconnect();
 
     if (!tokenDoc || !tokenDoc.get('active')) {
-      throw new TokenError(
-        'Missing token',
-        ERROR_CODE.INVALID_REQUEST,
+      throw new AuthenticationError(
+        'Invalid token submitted',
+        ERROR_CODE.INVALID_TOKEN,
+        'userinfo',
         STATUS_CODE.UNAUTHORIZED
       );
     }

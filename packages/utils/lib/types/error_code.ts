@@ -9,6 +9,7 @@ export enum ERROR_CODE {
   INVALID_REQUEST_OBJECT = 'invalid_request_object',
   INVALID_REQUEST_URI = 'invalid_request_uri',
   INVALID_SCOPE = 'invalid_scope',
+  INVALID_TOKEN = 'invalid_token',
   LOGIN_REQUIRED = 'login_required',
   REGISTRATION_NOT_SUPPORTED = 'registration_not_supported',
   REQUEST_NOT_SUPPORTED = 'request_not_supported',

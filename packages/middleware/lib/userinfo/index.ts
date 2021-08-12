@@ -5,7 +5,7 @@ import {
   getClaims,
   UserInfoResponsePayload,
 } from 'middleware/lib/userinfo/helpers';
-import TokenError from 'utils/lib/errors/token_error';
+import AuthenticationError from 'utils/lib/errors/authentication_error';
 import { ERROR_CODE } from 'utils/lib/types/error_code';
 
 const userinfoMiddleware = async (
@@ -15,7 +15,11 @@ const userinfoMiddleware = async (
   const token = await bearerMiddleware(req, res);
 
   if (!token) {
-    throw new TokenError('Missing token', ERROR_CODE.INVALID_REQUEST);
+    throw new AuthenticationError(
+      'Missing token',
+      ERROR_CODE.INVALID_TOKEN,
+      'userinfo'
+    );
   }
 
   return getClaims(token);

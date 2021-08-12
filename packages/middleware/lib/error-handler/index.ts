@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
+import AuthenticationError from 'utils/lib/errors/authentication_error';
 import AuthorizationError from 'utils/lib/errors/authorization_error';
 import HTTPError from 'utils/lib/errors/http_error';
 import logError from 'utils/lib/errors/log_error';
@@ -9,9 +10,10 @@ import { STATUS_CODE } from 'utils/lib/types/status_code';
 const errorHandler = (
   req: IncomingMessage,
   res: ServerResponse,
-  err: Error | AuthorizationError | HTTPError | TokenError
+  err: Error | AuthenticationError | AuthorizationError | HTTPError | TokenError
 ): void => {
   switch (err.name) {
+    case AuthenticationError.NAME:
     case AuthorizationError.NAME:
     case TokenError.NAME:
       logError({

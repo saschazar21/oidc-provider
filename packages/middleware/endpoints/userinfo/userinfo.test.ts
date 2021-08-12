@@ -1,4 +1,5 @@
 import { Document } from 'mongoose';
+import MockRequest from 'mock-req';
 
 import connection, {
   AuthorizationModel,
@@ -15,14 +16,19 @@ import {
 import { AuthorizationSchema } from 'database/lib/schemata/authorization';
 import { ClientSchema } from 'database/lib/schemata/client';
 import { UserSchema } from 'database/lib/schemata/user';
-import { getClaims } from 'middleware/lib/userinfo/helpers';
+import userinfoEndpoint from 'middleware/endpoints/userinfo';
 import { SCOPE } from 'utils/lib/types/scope';
 import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
+import { METHOD } from 'utils/lib/types/method';
+import { ENDPOINT } from 'utils/lib/types/endpoint';
+import { mockResponse, mockUser } from 'utils/lib/util/test-utils';
 
-describe('Userinfo middleware helpers', () => {
+describe('Userinfo endpoint', () => {
   let authorizationDoc: Document<AuthorizationSchema>;
   let clientDoc: Document<ClientSchema>;
   let userDoc: Document<UserSchema>;
+
+  let res;
 
   const createTokens = async (
     id?: string
@@ -42,6 +48,7 @@ describe('Userinfo middleware helpers', () => {
   };
 
   const baseUser: UserSchema = {
+    ...mockUser,
     email: 'test-user-token-middleware-validator@example.com',
     password: 'testpassword',
   };
@@ -58,6 +65,12 @@ describe('Userinfo middleware helpers', () => {
     redirect_uri: baseClient.redirect_uris[0],
     client_id: '',
     user: '',
+  };
+
+  const baseRequest = {
+    method: METHOD.GET,
+    https: true,
+    url: ENDPOINT.USERINFO,
   };
 
   afterAll(async () => {
@@ -88,11 +101,23 @@ describe('Userinfo middleware helpers', () => {
     await disconnect();
   });
 
+  beforeEach(() => {
+    res = mockResponse();
+  });
+
   it('should return claims from access token', async () => {
     const [accessToken] = await createTokens();
 
-    const claims = await getClaims(accessToken.get('_id'));
+    const req = new MockRequest({
+      ...baseRequest,
+      headers: { authorization: `Bearer ${accessToken.get('_id')}` },
+    });
 
+    await userinfoEndpoint(req, res);
+
+    const claims = res._getJSON();
+
+    expect(res.statusCode).toBe(200);
     expect(claims).toMatchObject({
       sub: userDoc.get('_id'),
     });
@@ -108,31 +133,32 @@ describe('Userinfo middleware helpers', () => {
 
     const [accessToken] = await createTokens(authorization.get('_id'));
 
-    const claims = await getClaims(accessToken.get('_id'));
+    const req = new MockRequest({
+      ...baseRequest,
+      headers: { authorization: `Bearer ${accessToken.get('_id')}` },
+    });
 
+    await userinfoEndpoint(req, res);
+
+    const claims = res._getJSON();
+
+    expect(res.statusCode).toBe(200);
     expect(claims).toMatchObject({
       email: baseUser.email,
       sub: userDoc.get('_id'),
     });
   });
 
-  it('throws error, when token is invalid', async () => {
-    await expect(getClaims('invalid-token')).rejects.toThrow(/Invalid token/);
-  });
+  it('throws, when access token is missing in request', async () => {
+    const req = new MockRequest(baseRequest);
+    await userinfoEndpoint(req, res);
 
-  it('throws error, when refresh token was given', async () => {
-    const [_accessToken, refreshToken] = await createTokens();
+    const response = res._getJSON();
 
-    await expect(getClaims(refreshToken.get('_id'))).rejects.toThrow(
-      /Invalid token/
-    );
-  });
-
-  it('throws error, when authorization is missing', async () => {
-    const [accessToken] = await createTokens('invalid');
-
-    await expect(getClaims(accessToken.get('_id'))).rejects.toThrow(
-      /Missing authorization/
-    );
+    expect(res.statusCode).toBe(400);
+    expect(res.getHeader('www-authenticate')).toMatch(/^Bearer/);
+    expect(response).toMatchObject({
+      error: 'invalid_token',
+    });
   });
 });
