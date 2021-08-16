@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "references": [
+    { "path": "../config" },
+    { "path": "../database" },
+    { "path": "../utils" }
+  ]
+}

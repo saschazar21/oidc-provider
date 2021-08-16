@@ -1,5 +1,5 @@
 {
-  "name": "utils",
+  "name": "@saschazar/oidc-provider-utils",
   "version": "0.0.0",
   "description": "A collection of shared utilities for the OpenID Connect provider",
   "author": "Sascha Zarhuber <sascha.zarhuber@gmail.com>",

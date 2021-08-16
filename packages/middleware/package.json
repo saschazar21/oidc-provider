@@ -1,5 +1,5 @@
 {
-  "name": "middleware",
+  "name": "@saschazar/oidc-provider-middleware",
   "version": "0.0.0",
   "description": "A collection of middlewares for the OpenID Connect provider",
   "author": "Sascha Zarhuber <sascha.zarhuber@gmail.com>",

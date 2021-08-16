@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "target": "es5",
+    "composite": true,
+    "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -9,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "downlevelIteration": true,
     "isolatedModules": true,
@@ -23,6 +24,14 @@
       "utils/*": ["packages/utils/*"]
     }
   },
-  "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.tsx"]
+  "references": [
+    { "path": "./packages/config" },
+    { "path": "./packages/database" },
+    { "path": "./packages/lambda" },
+    { "path": "./packages/middleware" },
+    { "path": "./packages/types" },
+    { "path": "./packages/utils" }
+  ],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*/dist"],
+  "include": ["**/*.ts", "**/*.ts"]
 }

@@ -1,5 +1,5 @@
 {
-  "name": "database",
+  "name": "@saschazar/oidc-provider-database",
   "version": "0.0.0",
   "description": "The database module containing models & queries for OpenID Connect authentication'",
   "author": "Sascha Zarhuber <sascha.zarhuber@gmail.com>",
@@ -7,8 +7,7 @@
   "license": "MIT",
   "private": true,
   "directories": {
-    "lib": "lib",
-    "test": "__tests__"
+    "lib": "lib"
   },
   "files": [
     "lib"
