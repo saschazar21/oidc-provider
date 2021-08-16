@@ -4,13 +4,17 @@ import connection, {
   AuthorizationModel,
   disconnect,
   KeyModel,
-} from 'database/lib';
-import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
-import UserModel, { UserSchema } from 'database/lib/schemata/user';
-import { Authorization } from 'database/lib/schemata/authorization';
-import ImplicitStrategy from 'middleware/strategies/implicit';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { SCOPE } from 'utils/lib/types/scope';
+} from '@saschazar/oidc-provider-database/lib/';
+import ClientModel, {
+  ClientSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/client';
+import UserModel, {
+  UserSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/user';
+import { Authorization } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import ImplicitStrategy from '@saschazar/oidc-provider-middleware/strategies/implicit';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { SCOPE } from 'types/lib/scope';
 
 describe('Implicit Strategy', () => {
   let authorization: Document<Authorization>;

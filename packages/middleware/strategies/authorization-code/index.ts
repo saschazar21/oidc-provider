@@ -1,6 +1,6 @@
 import AuthStrategy, {
   AuthorizationResponse,
-} from 'middleware/strategies/AuthStrategy';
+} from '@saschazar/oidc-provider-middleware/strategies/AuthStrategy';
 
 export type AuthorizationCodeResponsePayload = {
   code: string;

@@ -1,11 +1,14 @@
-import connection, { AccessTokenModel, disconnect } from 'database/lib';
-import { AddressSchema } from 'database/lib/schemata/user';
+import connection, {
+  AccessTokenModel,
+  disconnect,
+} from '@saschazar/oidc-provider-database/lib/';
+import { AddressSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import AuthenticationError from 'utils/lib/errors/authentication_error';
 import TokenError from 'utils/lib/errors/token_error';
 import { fetchUserData } from 'utils/lib/jwt/helpers';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
-import { CLAIM } from 'utils/lib/types/claim';
+import { ERROR_CODE } from 'types/lib/error_code';
+import { STATUS_CODE } from 'types/lib/status_code';
+import { CLAIM } from 'types/lib/claim';
 
 export type UserInfoResponsePayload = Partial<
   { [key in CLAIM]: string | boolean | Date | AddressSchema }

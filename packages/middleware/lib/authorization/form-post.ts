@@ -1,5 +1,5 @@
-import { ResponsePayload } from 'middleware/lib/authorization/helper';
-import { AuthorizationResponse } from 'middleware/strategies/AuthStrategy';
+import { ResponsePayload } from '@saschazar/oidc-provider-middleware/lib/authorization/helper';
+import { AuthorizationResponse } from '@saschazar/oidc-provider-middleware/strategies/AuthStrategy';
 
 const assembleInputFields = (payload: ResponsePayload): string =>
   Object.keys(payload).reduce(

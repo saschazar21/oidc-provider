@@ -1,10 +1,16 @@
 import getUrl from 'config/lib/url';
-import connection, { disconnect, UserModel } from 'database/lib';
-import { Authorization } from 'database/lib/schemata/authorization';
-import { AddressSchema, UserSchema } from 'database/lib/schemata/user';
-import { CLAIM } from 'utils/lib/types/claim';
-import { SCOPE, SCOPE_CLAIMS } from 'utils/lib/types/scope';
-import { LIFETIME } from 'utils/lib/types/lifetime';
+import connection, {
+  disconnect,
+  UserModel,
+} from '@saschazar/oidc-provider-database/lib/';
+import { Authorization } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import {
+  AddressSchema,
+  UserSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/user';
+import { CLAIM } from 'types/lib/claim';
+import { SCOPE, SCOPE_CLAIMS } from 'types/lib/scope';
+import { LIFETIME } from 'types/lib/lifetime';
 import hashCodeOrToken from 'utils/lib/util/hash-code-token';
 
 export type JWTAuth = Authorization & {

@@ -3,11 +3,11 @@ import { Mongoose, connection } from 'mongoose';
 import MockReq from 'mock-req';
 import { encode } from 'querystring';
 
-import { UserSchema } from 'database/lib/schemata/user';
-import loginMiddleware from 'middleware/lib/login';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
-import { LoginForm } from 'utils/lib/types/login';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
+import loginMiddleware from '@saschazar/oidc-provider-middleware/lib/login';
+import { ENDPOINT } from 'types/lib/endpoint';
+import { STATUS_CODE } from 'types/lib/status_code';
+import { LoginForm } from 'types/lib/login';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
 const createReq = (configuration?: {
@@ -48,7 +48,7 @@ describe('Login Middleware', () => {
   beforeEach(async () => {
     jest.resetModules();
 
-    const dbImports = await import('database/lib');
+    const dbImports = await import('@saschazar/oidc-provider-database/lib/');
     connect = await dbImports.default;
     UserModel = dbImports.UserModel;
 

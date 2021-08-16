@@ -1,7 +1,9 @@
 import { randomBytes } from 'crypto';
 
-import connect, { disconnect } from 'database/lib/connect';
-import KeyModel from 'database/lib/schemata/key';
+import connect, {
+  disconnect,
+} from '@saschazar/oidc-provider-database/lib/connect';
+import KeyModel from '@saschazar/oidc-provider-database/lib/schemata/key';
 
 describe('KeyModel', () => {
   const _id = 'testmaster';

@@ -1,26 +1,28 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import URL from 'url';
 
-import connection, { disconnect } from 'database/lib/connect';
+import connection, {
+  disconnect,
+} from '@saschazar/oidc-provider-database/lib/connect';
 import AuthorizationModel, {
   AuthorizationSchema,
-} from 'database/lib/schemata/authorization';
+} from '@saschazar/oidc-provider-database/lib/schemata/authorization';
 import AuthorizationCodeStrategy, {
   AuthorizationCodeResponsePayload,
-} from 'middleware/strategies/authorization-code';
-import AuthStrategy from 'middleware/strategies/AuthStrategy';
+} from '@saschazar/oidc-provider-middleware/strategies/authorization-code';
+import AuthStrategy from '@saschazar/oidc-provider-middleware/strategies/AuthStrategy';
 import ImplicitStrategy, {
   ImplicitResponsePayload,
-} from 'middleware/strategies/implicit';
+} from '@saschazar/oidc-provider-middleware/strategies/implicit';
 import HybridStrategy, {
   HybridResponsePayload,
-} from 'middleware/strategies/hybrid';
-import bodyParser from 'middleware/lib/body-parser';
-import { METHOD } from 'utils/lib/types/method';
-import { AUTHENTICATION_FLOW } from 'utils/lib/types/response_type';
+} from '@saschazar/oidc-provider-middleware/strategies/hybrid';
+import bodyParser from '@saschazar/oidc-provider-middleware/lib/body-parser';
+import { METHOD } from 'types/lib/method';
+import { AUTHENTICATION_FLOW } from 'types/lib/response_type';
 import defineFlow from 'utils/lib/util/define-flow';
 import AuthorizationError from 'utils/lib/errors/authorization_error';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
+import { ERROR_CODE } from 'types/lib/error_code';
 
 /**
  * map to string[]

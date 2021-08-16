@@ -6,14 +6,14 @@ import connect, {
   UserModel,
   AuthorizationModel,
   disconnect,
-} from 'database/lib';
-import bodyParser from 'middleware/lib/body-parser';
-import cookieParser from 'middleware/lib/cookies';
-import redirect from 'middleware/lib/redirect';
+} from '@saschazar/oidc-provider-database/lib/';
+import bodyParser from '@saschazar/oidc-provider-middleware/lib/body-parser';
+import cookieParser from '@saschazar/oidc-provider-middleware/lib/cookies';
+import redirect from '@saschazar/oidc-provider-middleware/lib/redirect';
 import AuthorizationError from 'utils/lib/errors/authorization_error';
 import HTTPError from 'utils/lib/errors/http_error';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { ERROR_CODE } from 'types/lib/error_code';
+import { STATUS_CODE } from 'types/lib/status_code';
 
 const IS_TEST = process.env.NODE_ENV === 'test';
 

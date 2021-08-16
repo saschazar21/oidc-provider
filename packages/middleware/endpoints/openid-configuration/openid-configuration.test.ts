@@ -1,8 +1,8 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import MockRequest from 'mock-req';
 
-import { STATUS_CODE } from 'utils/lib/types/status_code';
-import { METHOD } from 'utils/lib/types/method';
+import { STATUS_CODE } from 'types/lib/status_code';
+import { METHOD } from 'types/lib/method';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('/.well-known/openid-configuration', () => {
@@ -20,7 +20,9 @@ describe('/.well-known/openid-configuration', () => {
     jest.resetModules();
 
     fetchConfiguration = await (
-      await import('middleware/endpoints/openid-configuration')
+      await import(
+        '@saschazar/oidc-provider-middleware/endpoints/openid-configuration'
+      )
     ).default;
 
     req = new MockRequest({
@@ -61,7 +63,9 @@ describe('/.well-known/openid-configuration', () => {
     };
 
     fetchConfiguration = await (
-      await import('middleware/endpoints/openid-configuration')
+      await import(
+        '@saschazar/oidc-provider-middleware/endpoints/openid-configuration'
+      )
     ).default;
 
     const res = mockResponse();

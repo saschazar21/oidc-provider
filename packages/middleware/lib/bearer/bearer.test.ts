@@ -1,8 +1,8 @@
 import MockRequest from 'mock-req';
 
 import getUrl from 'config/lib/url';
-import bearerMiddleware from 'middleware/lib/bearer';
-import { METHOD } from 'utils/lib/types/method';
+import bearerMiddleware from '@saschazar/oidc-provider-middleware/lib/bearer';
+import { METHOD } from 'types/lib/method';
 import idAsync from 'utils/lib/util/id';
 import { mockResponse } from 'utils/lib/util/test-utils';
 import { encode } from 'querystring';

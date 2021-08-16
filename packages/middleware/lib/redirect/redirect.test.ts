@@ -1,7 +1,7 @@
 import MockRequest from 'mock-req';
 import type { ServerResponse, IncomingMessage } from 'http';
 
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { STATUS_CODE } from 'types/lib/status_code';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
 const REDIRECT_PATH = '/test/redirect';
@@ -19,7 +19,9 @@ describe('Redirect middleware', () => {
   });
 
   it(`redirects to ${REDIRECT_PATH}`, async () => {
-    const { default: redirect } = await import('middleware/lib/redirect');
+    const { default: redirect } = await import(
+      '@saschazar/oidc-provider-middleware/lib/redirect'
+    );
 
     const options = {
       location: REDIRECT_PATH,

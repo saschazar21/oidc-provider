@@ -5,7 +5,7 @@ import AuthorizationError from 'utils/lib/errors/authorization_error';
 import HTTPError from 'utils/lib/errors/http_error';
 import logError from 'utils/lib/errors/log_error';
 import TokenError from 'utils/lib/errors/token_error';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { STATUS_CODE } from 'types/lib/status_code';
 
 const errorHandler = (
   req: IncomingMessage,

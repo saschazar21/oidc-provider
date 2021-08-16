@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import methods from 'middleware/lib/methods';
-import introspectionMiddleware from 'middleware/lib/token/introspection';
-import errorHandler from 'middleware/lib/error-handler';
-import { METHOD } from 'utils/lib/types/method';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import methods from '@saschazar/oidc-provider-middleware/lib/methods';
+import introspectionMiddleware from '@saschazar/oidc-provider-middleware/lib/token/introspection';
+import errorHandler from '@saschazar/oidc-provider-middleware/lib/error-handler';
+import { METHOD } from 'types/lib/method';
+import { STATUS_CODE } from 'types/lib/status_code';
 
 const introspection = async (
   req: IncomingMessage,

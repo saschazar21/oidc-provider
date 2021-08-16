@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import errorHandler from 'middleware/lib/error-handler';
+import errorHandler from '@saschazar/oidc-provider-middleware/lib/error-handler';
 
-import loginMiddleware from 'middleware/lib/login';
-import methods from 'middleware/lib/methods';
-import { METHOD } from 'utils/lib/types/method';
+import loginMiddleware from '@saschazar/oidc-provider-middleware/lib/login';
+import methods from '@saschazar/oidc-provider-middleware/lib/methods';
+import { METHOD } from 'types/lib/method';
 
 const login = async (
   req: IncomingMessage,

@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 import { ALPHABET_LENGTH } from 'config/lib/id';
-import { LIFETIME } from 'utils/lib/types/lifetime';
-import { TOKEN_TYPE } from 'utils/lib/types/token_type';
+import { LIFETIME } from 'types/lib/lifetime';
+import { TOKEN_TYPE } from 'types/lib/token_type';
 import id from 'utils/lib/util/id';
 
 export type BaseTokenSchema = {

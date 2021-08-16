@@ -2,21 +2,25 @@ import { ServerResponse } from 'http';
 import { Document } from 'mongoose';
 import MockRequest from 'mock-req';
 
-import connection, { disconnect } from 'database/lib';
+import connection, { disconnect } from '@saschazar/oidc-provider-database/lib/';
 import AuthorizationModel, {
   AuthorizationSchema,
-} from 'database/lib/schemata/authorization';
-import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
-import UserModel, { UserSchema } from 'database/lib/schemata/user';
-import consent from 'middleware/endpoints/consent';
-import { METHOD } from 'utils/lib/types/method';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
+} from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import ClientModel, {
+  ClientSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/client';
+import UserModel, {
+  UserSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/user';
+import consent from '@saschazar/oidc-provider-middleware/endpoints/consent';
+import { METHOD } from 'types/lib/method';
+import { ENDPOINT } from 'types/lib/endpoint';
 import { mockResponse } from 'utils/lib/util/test-utils';
 import { encode } from 'querystring';
-import { SCOPE } from 'utils/lib/types/scope';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
+import { SCOPE } from 'types/lib/scope';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
 import getUrl from 'config/lib/url';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
+import { ERROR_CODE } from 'types/lib/error_code';
 
 describe('Consent endpoint', () => {
   let authorizationDoc: Document<AuthorizationSchema>;

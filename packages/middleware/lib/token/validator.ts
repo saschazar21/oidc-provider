@@ -7,16 +7,16 @@ import connection, {
   ClientModel,
   disconnect,
   RefreshTokenModel,
-} from 'database/lib';
-import { BaseTokenSchema } from 'database/lib/schemata/token';
-import bodyParser from 'middleware/lib/body-parser';
-import { fetchToken } from 'middleware/lib/token/helpers';
+} from '@saschazar/oidc-provider-database/lib/';
+import { BaseTokenSchema } from '@saschazar/oidc-provider-database/lib/schemata/token';
+import bodyParser from '@saschazar/oidc-provider-middleware/lib/body-parser';
+import { fetchToken } from '@saschazar/oidc-provider-middleware/lib/token/helpers';
 import HTTPError from 'utils/lib/errors/http_error';
 import TokenError from 'utils/lib/errors/token_error';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
-import { GRANT_TYPE } from 'utils/lib/types/grant_type';
-import { SCOPE } from 'utils/lib/types/scope';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { ERROR_CODE } from 'types/lib/error_code';
+import { GRANT_TYPE } from 'types/lib/grant_type';
+import { SCOPE } from 'types/lib/scope';
+import { STATUS_CODE } from 'types/lib/status_code';
 import verifyCodeChallenge from 'utils/lib/util/verify-code-challenge';
 
 type BaseTokenEndpointPayload = {

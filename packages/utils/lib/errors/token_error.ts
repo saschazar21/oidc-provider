@@ -1,7 +1,7 @@
 import { ServerResponse } from 'http';
 import AuthorizationError from 'utils/lib/errors/authorization_error';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { ERROR_CODE } from 'types/lib/error_code';
+import { STATUS_CODE } from 'types/lib/status_code';
 
 class TokenError extends AuthorizationError {
   public static NAME = 'TokenError';

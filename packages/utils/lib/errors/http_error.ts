@@ -1,7 +1,7 @@
 import { ServerResponse, STATUS_CODES } from 'http';
 
 import { id } from 'utils/lib/util/id';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { STATUS_CODE } from 'types/lib/status_code';
 import logError from 'utils/lib/errors/log_error';
 
 class HTTPError extends Error implements Error {

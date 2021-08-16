@@ -4,7 +4,7 @@ describe('URL', () => {
   });
 
   it('should resolve to PROVIDER_URL when set', async () => {
-    const { getUrl } = await import('config/lib/url');
+    const { getUrl } = await import('./url');
 
     expect(process.env.PROVIDER_URL).toBeDefined();
     expect(getUrl()).toMatch(new RegExp(`^${process.env.PROVIDER_URL}`));
@@ -16,7 +16,7 @@ describe('URL', () => {
       PROVIDER_URL: undefined,
     };
 
-    const { getUrl } = await import('config/lib/url');
+    const { getUrl } = await import('./url');
 
     expect(getUrl).toThrowError(
       'ERROR: No PROVIDER_URL env set, or no URL set by your deployment provider!'

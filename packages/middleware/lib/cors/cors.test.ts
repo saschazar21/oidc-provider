@@ -1,9 +1,12 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import MockRequest from 'mock-req';
 
-import { CorsOptions, CORS_HEADERS } from 'middleware/lib/cors';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
-import { METHOD } from 'utils/lib/types/method';
+import {
+  CorsOptions,
+  CORS_HEADERS,
+} from '@saschazar/oidc-provider-middleware/lib/cors';
+import { STATUS_CODE } from 'types/lib/status_code';
+import { METHOD } from 'types/lib/method';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('CORS', () => {
@@ -27,7 +30,9 @@ describe('CORS', () => {
 
     process.env.ALLOWED_ORIGINS = ORIGIN;
 
-    cors = await (await import('middleware/lib/cors')).default;
+    cors = await (
+      await import('@saschazar/oidc-provider-middleware/lib/cors')
+    ).default;
   });
 
   it('responds to a simple GET request', async () => {

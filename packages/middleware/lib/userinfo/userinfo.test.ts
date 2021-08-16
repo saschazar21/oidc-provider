@@ -9,19 +9,19 @@ import connection, {
   disconnect,
   RefreshTokenModel,
   UserModel,
-} from 'database/lib';
+} from '@saschazar/oidc-provider-database/lib/';
 import {
   AccessTokenSchema,
   RefreshTokenSchema,
-} from 'database/lib/schemata/token';
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
-import { ClientSchema } from 'database/lib/schemata/client';
-import { UserSchema } from 'database/lib/schemata/user';
-import userinfoMiddleware from 'middleware/lib/userinfo';
-import { SCOPE } from 'utils/lib/types/scope';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { METHOD } from 'utils/lib/types/method';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
+} from '@saschazar/oidc-provider-database/lib/schemata/token';
+import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
+import userinfoMiddleware from '@saschazar/oidc-provider-middleware/lib/userinfo';
+import { SCOPE } from 'types/lib/scope';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { METHOD } from 'types/lib/method';
+import { ENDPOINT } from 'types/lib/endpoint';
 import { mockResponse, mockUser } from 'utils/lib/util/test-utils';
 
 describe('Userinfo middleware', () => {

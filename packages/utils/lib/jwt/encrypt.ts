@@ -3,11 +3,11 @@ import { compactDecrypt } from 'jose/jwe/compact/decrypt';
 import { KeyLike } from 'jose/jwk/parse';
 
 import { supportedAlgorithms } from 'config/lib/jwks';
-import { AddressSchema } from 'database/lib/schemata/user';
+import { AddressSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import { JWTAuth, fillClaims } from 'utils/lib/jwt/helpers';
 import getKeys from 'utils/lib/keys';
-import { CLAIM } from 'utils/lib/types/claim';
-import { JWE, JWE_ENC } from 'utils/lib/types/jwe';
+import { CLAIM } from 'types/lib/claim';
+import { JWE, JWE_ENC } from 'types/lib/jwe';
 
 const resolveKey = async (
   protectedHeader: JWEHeaderParameters

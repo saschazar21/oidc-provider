@@ -6,13 +6,13 @@ import connection, {
   ClientModel,
   disconnect,
   UserModel,
-} from 'database/lib';
-import { Authorization } from 'database/lib/schemata/authorization';
-import { ClientSchema } from 'database/lib/schemata/client';
-import { UserSchema } from 'database/lib/schemata/user';
-import AuthorizationCodeStrategy from 'middleware/strategies/authorization-code';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { SCOPE } from 'utils/lib/types/scope';
+} from '@saschazar/oidc-provider-database/lib/';
+import { Authorization } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
+import AuthorizationCodeStrategy from '@saschazar/oidc-provider-middleware/strategies/authorization-code';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { SCOPE } from 'types/lib/scope';
 
 describe('AuthorizationCodeStrategy', () => {
   let authorization: Document<Authorization>;

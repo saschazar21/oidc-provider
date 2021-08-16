@@ -1,12 +1,12 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
-import bearerMiddleware from 'middleware/lib/bearer';
+import bearerMiddleware from '@saschazar/oidc-provider-middleware/lib/bearer';
 import {
   getClaims,
   UserInfoResponsePayload,
-} from 'middleware/lib/userinfo/helpers';
+} from '@saschazar/oidc-provider-middleware/lib/userinfo/helpers';
 import AuthenticationError from 'utils/lib/errors/authentication_error';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
+import { ERROR_CODE } from 'types/lib/error_code';
 
 const userinfoMiddleware = async (
   req: IncomingMessage,

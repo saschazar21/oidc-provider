@@ -1,8 +1,8 @@
 import mongoose, { Schema, UpdateQuery } from 'mongoose';
 
-import { UserSchema } from 'database/lib/schemata/user';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import { ALPHABET_LENGTH } from 'config/lib/id';
-import { HTTPS_REGEX, URL_REGEX } from 'utils/lib/types/url';
+import { HTTPS_REGEX, URL_REGEX } from 'types/lib/url';
 import generateId from 'utils/lib/util/id';
 
 export type ClientSchema = {

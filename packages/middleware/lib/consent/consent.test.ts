@@ -3,19 +3,23 @@ import MockRequest from 'mock-req';
 import { encode } from 'querystring';
 import { Document } from 'mongoose';
 
-import connection, { disconnect } from 'database/lib';
+import connection, { disconnect } from '@saschazar/oidc-provider-database/lib/';
 import AuthorizationModel, {
   AuthorizationSchema,
-} from 'database/lib/schemata/authorization';
-import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
-import UserModel, { UserSchema } from 'database/lib/schemata/user';
-import consentMiddleware from 'middleware/lib/consent';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
-import { METHOD } from 'utils/lib/types/method';
-import { SCOPE } from 'utils/lib/types/scope';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+} from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import ClientModel, {
+  ClientSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/client';
+import UserModel, {
+  UserSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/user';
+import consentMiddleware from '@saschazar/oidc-provider-middleware/lib/consent';
+import { ENDPOINT } from 'types/lib/endpoint';
+import { ERROR_CODE } from 'types/lib/error_code';
+import { METHOD } from 'types/lib/method';
+import { SCOPE } from 'types/lib/scope';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { STATUS_CODE } from 'types/lib/status_code';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('Consent', () => {

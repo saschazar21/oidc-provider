@@ -9,20 +9,20 @@ import connection, {
   disconnect,
   RefreshTokenModel,
   UserModel,
-} from 'database/lib';
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
-import { ClientSchema } from 'database/lib/schemata/client';
-import { UserSchema } from 'database/lib/schemata/user';
-import tokenRevocationMiddleware from 'middleware/lib/token/revocation';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { SCOPE } from 'utils/lib/types/scope';
+} from '@saschazar/oidc-provider-database/lib/';
+import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
+import tokenRevocationMiddleware from '@saschazar/oidc-provider-middleware/lib/token/revocation';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { SCOPE } from 'types/lib/scope';
 import { mockResponse } from 'utils/lib/util/test-utils';
 import {
   AccessTokenSchema,
   RefreshTokenSchema,
-} from 'database/lib/schemata/token';
+} from '@saschazar/oidc-provider-database/lib/schemata/token';
 import { encode } from 'querystring';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
+import { ENDPOINT } from 'types/lib/endpoint';
 
 describe('Token Revocation middleware', () => {
   let authorizationDoc: Document<AuthorizationSchema>;

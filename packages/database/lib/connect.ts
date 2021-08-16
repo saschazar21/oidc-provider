@@ -1,6 +1,6 @@
 import mongoose, { Mongoose, ConnectionOptions } from 'mongoose';
 
-import connectionDetails from 'database/lib/config';
+import connectionDetails from '@saschazar/oidc-provider-database/lib/config';
 
 const { password: pass, url, user } = connectionDetails();
 

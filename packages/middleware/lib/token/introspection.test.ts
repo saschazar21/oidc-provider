@@ -9,19 +9,19 @@ import connection, {
   disconnect,
   RefreshTokenModel,
   UserModel,
-} from 'database/lib';
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
-import { ClientSchema } from 'database/lib/schemata/client';
-import { UserSchema } from 'database/lib/schemata/user';
-import introspectionMiddleware from 'middleware/lib/token/introspection';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { SCOPE } from 'utils/lib/types/scope';
+} from '@saschazar/oidc-provider-database/lib/';
+import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
+import introspectionMiddleware from '@saschazar/oidc-provider-middleware/lib/token/introspection';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { SCOPE } from 'types/lib/scope';
 import { mockResponse } from 'utils/lib/util/test-utils';
 import {
   AccessTokenSchema,
   RefreshTokenSchema,
-} from 'database/lib/schemata/token';
-import { METHOD } from 'utils/lib/types/method';
+} from '@saschazar/oidc-provider-database/lib/schemata/token';
+import { METHOD } from 'types/lib/method';
 import { encode } from 'querystring';
 
 describe('Token Introspection middleware', () => {

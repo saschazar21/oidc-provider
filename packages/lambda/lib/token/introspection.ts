@@ -1,5 +1,5 @@
 import serverless from 'serverless-http';
 
-import introspection from 'middleware/endpoints/token/introspection';
+import introspection from '@saschazar/oidc-provider-middleware/endpoints/token/introspection';
 
 export const handler = serverless(introspection);

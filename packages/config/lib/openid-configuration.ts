@@ -1,15 +1,15 @@
-import { supportedAlgorithms } from 'config/lib/jwks';
-import getUrl from 'config/lib/url';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
-import { SCOPE } from 'utils/lib/types/scope';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
-import { GRANT_TYPE } from 'utils/lib/types/grant_type';
-import { ACR_VALUES } from 'utils/lib/types/acr';
-import { SUBJECT_TYPE } from 'utils/lib/types/subject_type';
-import { TOKEN_ENDPOINT_AUTH_METHODS } from 'utils/lib/types/auth_methods';
-import { DISPLAY } from 'utils/lib/types/display';
-import { CLAIM } from 'utils/lib/types/claim';
+import { ENDPOINT } from 'types/lib/endpoint';
+import { SCOPE } from 'types/lib/scope';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { RESPONSE_MODE } from 'types/lib/response_mode';
+import { GRANT_TYPE } from 'types/lib/grant_type';
+import { ACR_VALUES } from 'types/lib/acr';
+import { SUBJECT_TYPE } from 'types/lib/subject_type';
+import { TOKEN_ENDPOINT_AUTH_METHODS } from 'types/lib/auth_methods';
+import { DISPLAY } from 'types/lib/display';
+import { CLAIM } from 'types/lib/claim';
+import { supportedAlgorithms } from './jwks';
+import getUrl from './url';
 
 export type OpenIDConfiguration = {
   issuer: string;
@@ -51,7 +51,9 @@ export type OpenIDConfiguration = {
 
 let openidConfiguration: OpenIDConfiguration;
 
-const configuration = (configuration?: OpenIDConfiguration): OpenIDConfiguration => {
+const configuration = (
+  configuration?: OpenIDConfiguration
+): OpenIDConfiguration => {
   if (openidConfiguration) {
     return openidConfiguration;
   }

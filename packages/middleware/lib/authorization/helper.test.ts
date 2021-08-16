@@ -7,22 +7,22 @@ import connection, {
   ClientModel,
   disconnect,
   UserModel,
-} from 'database/lib';
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
-import { ClientSchema } from 'database/lib/schemata/client';
-import { UserSchema } from 'database/lib/schemata/user';
+} from '@saschazar/oidc-provider-database/lib/';
+import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import {
   buildAuthorizationSchema,
   getAuthenticationFlow,
   mapAuthRequest,
-} from 'middleware/lib/authorization/helper';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
-import { SCOPE } from 'utils/lib/types/scope';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { DISPLAY } from 'utils/lib/types/display';
-import { METHOD } from 'utils/lib/types/method';
-import { PROMPT } from 'utils/lib/types/prompt';
-import { ACR_VALUES } from 'utils/lib/types/acr';
+} from '@saschazar/oidc-provider-middleware/lib/authorization/helper';
+import { ENDPOINT } from 'types/lib/endpoint';
+import { SCOPE } from 'types/lib/scope';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { DISPLAY } from 'types/lib/display';
+import { METHOD } from 'types/lib/method';
+import { PROMPT } from 'types/lib/prompt';
+import { ACR_VALUES } from 'types/lib/acr';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('Authorization Helpers', () => {

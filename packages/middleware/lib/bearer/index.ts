@@ -1,10 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
-import bodyParser from 'middleware/lib/body-parser';
+import bodyParser from '@saschazar/oidc-provider-middleware/lib/body-parser';
 import TokenError from 'utils/lib/errors/token_error';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
-import { METHOD } from 'utils/lib/types/method';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { ERROR_CODE } from 'types/lib/error_code';
+import { METHOD } from 'types/lib/method';
+import { STATUS_CODE } from 'types/lib/status_code';
 
 // https://datatracker.ietf.org/doc/html/rfc6750#section-2.1
 export const BEARER_REGEX = /^Bearer\s(?<token>[a-zA-Z0-9-._~+/]+=*)$/;

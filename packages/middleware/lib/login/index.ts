@@ -1,13 +1,16 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import type Cookies from 'cookies';
 
-import connect, { disconnect, UserModel } from 'database/lib';
-import bodyParser from 'middleware/lib/body-parser';
-import cookieParser from 'middleware/lib/cookies';
-import redirect from 'middleware/lib/redirect';
+import connect, {
+  disconnect,
+  UserModel,
+} from '@saschazar/oidc-provider-database/lib/';
+import bodyParser from '@saschazar/oidc-provider-middleware/lib/body-parser';
+import cookieParser from '@saschazar/oidc-provider-middleware/lib/cookies';
+import redirect from '@saschazar/oidc-provider-middleware/lib/redirect';
 import HTTPError from 'utils/lib/errors/http_error';
-import { LoginForm } from 'utils/lib/types/login';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { LoginForm } from 'types/lib/login';
+import { STATUS_CODE } from 'types/lib/status_code';
 
 const MAX_AGE = {
   sub: 1000 * 60 * 5, // 5 minutes, only for authorization, no session is persisted

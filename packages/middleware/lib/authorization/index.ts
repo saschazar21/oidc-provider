@@ -9,17 +9,17 @@ import {
   getAuthenticationFlow,
   mapAuthRequest,
   ResponsePayload,
-} from 'middleware/lib/authorization/helper';
-import cookieParser from 'middleware/lib/cookies';
-import redirect from 'middleware/lib/redirect';
+} from '@saschazar/oidc-provider-middleware/lib/authorization/helper';
+import cookieParser from '@saschazar/oidc-provider-middleware/lib/cookies';
+import redirect from '@saschazar/oidc-provider-middleware/lib/redirect';
 import AuthStrategy, {
   AuthorizationResponse,
-} from 'middleware/strategies/AuthStrategy';
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
-import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
-import { METHOD } from 'utils/lib/types/method';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+} from '@saschazar/oidc-provider-middleware/strategies/AuthStrategy';
+import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import { CLIENT_ENDPOINT, ENDPOINT } from 'types/lib/endpoint';
+import { ERROR_CODE } from 'types/lib/error_code';
+import { METHOD } from 'types/lib/method';
+import { STATUS_CODE } from 'types/lib/status_code';
 import HTTPError from 'utils/lib/errors/http_error';
 import AuthorizationError from 'utils/lib/errors/authorization_error';
 

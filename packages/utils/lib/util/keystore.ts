@@ -6,8 +6,8 @@ import {
 import { fromKeyLike, JWK, KeyLike } from 'jose/jwk/from_key_like';
 import { parseJwk } from 'jose/jwk/parse';
 
-import { JWE } from 'utils/lib/types/jwe';
-import { JWS } from 'utils/lib/types/jws';
+import { JWE } from 'types/lib/jwe';
+import { JWS } from 'types/lib/jws';
 
 class KeyStore {
   private _keystore: Map<JWS | JWE, KeyLike>;

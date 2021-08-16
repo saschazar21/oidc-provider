@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import errorHandler from 'middleware/lib/error-handler';
-import methods from 'middleware/lib/methods';
-import userinfoMiddleware from 'middleware/lib/userinfo';
-import { METHOD } from 'utils/lib/types/method';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import errorHandler from '@saschazar/oidc-provider-middleware/lib/error-handler';
+import methods from '@saschazar/oidc-provider-middleware/lib/methods';
+import userinfoMiddleware from '@saschazar/oidc-provider-middleware/lib/userinfo';
+import { METHOD } from 'types/lib/method';
+import { STATUS_CODE } from 'types/lib/status_code';
 
 const userinfo = async (
   req: IncomingMessage,

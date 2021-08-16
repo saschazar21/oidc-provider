@@ -1,8 +1,11 @@
 import { Document } from 'mongoose';
 import Keygrip from 'keygrip';
 
-import connect, { disconnect, KeyModel } from 'database/lib';
-import { KeySchema } from 'database/lib/schemata/key';
+import connect, {
+  disconnect,
+  KeyModel,
+} from '@saschazar/oidc-provider-database/lib/';
+import { KeySchema } from '@saschazar/oidc-provider-database/lib/schemata/key';
 import getKeystore from 'utils/lib/keys/jwks';
 import createCookieSecrets from 'config/lib/keygrip';
 import getKeygrip from 'utils/lib/keys/keygrip';

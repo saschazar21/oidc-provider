@@ -3,13 +3,15 @@ import { CompactSign } from 'jose/jws/compact/sign';
 import { compactVerify } from 'jose/jws/compact/verify';
 
 import { supportedAlgorithms } from 'config/lib/jwks';
-import connection, { disconnect } from 'database/lib/connect';
-import ClientModel from 'database/lib/schemata/client';
-import { AddressSchema } from 'database/lib/schemata/user';
+import connection, {
+  disconnect,
+} from '@saschazar/oidc-provider-database/lib/connect';
+import ClientModel from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { AddressSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import { JWTAuth, fillClaims } from 'utils/lib/jwt/helpers';
 import getKeys from 'utils/lib/keys';
-import { CLAIM } from 'utils/lib/types/claim';
-import { JWS } from 'utils/lib/types/jws';
+import { CLAIM } from 'types/lib/claim';
+import { JWS } from 'types/lib/jws';
 
 const DEFAULT_ALGORITHM = 'RS256';
 

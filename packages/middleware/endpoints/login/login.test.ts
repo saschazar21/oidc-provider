@@ -2,12 +2,15 @@ import { ServerResponse } from 'http';
 import { Document } from 'mongoose';
 import MockRequest from 'mock-req';
 
-import connection, { disconnect, UserModel } from 'database/lib';
-import { UserSchema } from 'database/lib/schemata/user';
-import loginEndpoint from 'middleware/endpoints/login';
+import connection, {
+  disconnect,
+  UserModel,
+} from '@saschazar/oidc-provider-database/lib/';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
+import loginEndpoint from '@saschazar/oidc-provider-middleware/endpoints/login';
 import { mockResponse } from 'utils/lib/util/test-utils';
-import { METHOD } from 'utils/lib/types/method';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
+import { METHOD } from 'types/lib/method';
+import { ENDPOINT } from 'types/lib/endpoint';
 import getUrl from 'config/lib/url';
 import { encode } from 'querystring';
 

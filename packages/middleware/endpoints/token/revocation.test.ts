@@ -7,20 +7,22 @@ import {
   ClientModel,
   RefreshTokenModel,
   UserModel,
-} from 'database/lib';
-import connection, { disconnect } from 'database/lib/connect';
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
-import { ClientSchema } from 'database/lib/schemata/client';
-import { UserSchema } from 'database/lib/schemata/user';
+} from '@saschazar/oidc-provider-database/lib/';
+import connection, {
+  disconnect,
+} from '@saschazar/oidc-provider-database/lib/connect';
+import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import {
   AccessTokenSchema,
   RefreshTokenSchema,
-} from 'database/lib/schemata/token';
-import tokenRevocationEndpoint from 'middleware/endpoints/token/revocation';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
-import { METHOD } from 'utils/lib/types/method';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { SCOPE } from 'utils/lib/types/scope';
+} from '@saschazar/oidc-provider-database/lib/schemata/token';
+import tokenRevocationEndpoint from '@saschazar/oidc-provider-middleware/endpoints/token/revocation';
+import { ENDPOINT } from 'types/lib/endpoint';
+import { METHOD } from 'types/lib/method';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { SCOPE } from 'types/lib/scope';
 import { mockResponse } from 'utils/lib/util/test-utils';
 import { encode } from 'querystring';
 

@@ -1,24 +1,24 @@
 import type { Document } from 'mongoose';
 
-import connect, { disconnect } from 'database/lib';
+import connect, { disconnect } from '@saschazar/oidc-provider-database/lib/';
 import AuthorizationModel, {
   Authorization,
-} from 'database/lib/schemata/authorization';
+} from '@saschazar/oidc-provider-database/lib/schemata/authorization';
 import {
   AccessTokenModel,
   AccessTokenSchema,
   AuthorizationCodeModel,
   AuthorizationCodeSchema,
-} from 'database/lib/schemata/token';
-import UserModel from 'database/lib/schemata/user';
+} from '@saschazar/oidc-provider-database/lib/schemata/token';
+import UserModel from '@saschazar/oidc-provider-database/lib/schemata/user';
 import AuthorizationError from 'utils/lib/errors/authorization_error';
 import encrypt from 'utils/lib/jwt/encrypt';
 import sign from 'utils/lib/jwt/sign';
 import { JWTAuth } from 'utils/lib/jwt/helpers';
-import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
-import { SCOPE } from 'utils/lib/types/scope';
-import { ERROR_CODE } from 'utils/lib/types/error_code';
-import { PROMPT } from 'utils/lib/types/prompt';
+import { RESPONSE_MODE } from 'types/lib/response_mode';
+import { SCOPE } from 'types/lib/scope';
+import { ERROR_CODE } from 'types/lib/error_code';
+import { PROMPT } from 'types/lib/prompt';
 
 export type ImplicitOrHybridResponsePayload = {
   access_token: string;

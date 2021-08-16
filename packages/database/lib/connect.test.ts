@@ -61,7 +61,9 @@ describe('MongoDB Configuration', () => {
       user: OLD_ENV.MONGO_USER,
     };
 
-    const { default: connectionDetails } = await import('database/lib/config');
+    const { default: connectionDetails } = await import(
+      '@saschazar/oidc-provider-database/lib/config'
+    );
 
     expect(connectionDetails()).toMatchObject(mapping);
   });
@@ -71,7 +73,9 @@ describe('MongoDB Configuration', () => {
       ...OLD_ENV,
       MONGO_PASSWORD: undefined,
     };
-    const { default: connectionDetails } = await import('database/lib/config');
+    const { default: connectionDetails } = await import(
+      '@saschazar/oidc-provider-database/lib/config'
+    );
 
     expect(process.env.MONGO_PASSWORD).not.toBeDefined();
     expect(connectionDetails).toThrowError();
@@ -82,7 +86,9 @@ describe('MongoDB Configuration', () => {
       ...OLD_ENV,
       MONGO_USER: undefined,
     };
-    const { default: connectionDetails } = await import('database/lib/config');
+    const { default: connectionDetails } = await import(
+      '@saschazar/oidc-provider-database/lib/config'
+    );
 
     expect(process.env.MONGO_USER).not.toBeDefined();
     expect(connectionDetails).toThrowError();
@@ -93,7 +99,9 @@ describe('MongoDB Configuration', () => {
       ...OLD_ENV,
       MONGO_URL: undefined,
     };
-    const { default: connectionDetails } = await import('database/lib/config');
+    const { default: connectionDetails } = await import(
+      '@saschazar/oidc-provider-database/lib/config'
+    );
 
     expect(process.env.MONGO_URL).not.toBeDefined();
     expect(connectionDetails).toThrowError();

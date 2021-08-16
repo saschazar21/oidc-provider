@@ -2,7 +2,7 @@ import {
   AUTHENTICATION_FLOW,
   RESPONSE_TYPE,
   RESPONSE_TYPE_FLOW,
-} from 'utils/lib/types/response_type';
+} from 'types/lib/response_type';
 
 const defineFlow = (
   response_type: RESPONSE_TYPE[] = []

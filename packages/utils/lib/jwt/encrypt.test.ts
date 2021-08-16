@@ -1,14 +1,16 @@
 import { compactDecrypt } from 'jose/jwe/compact/decrypt';
 
-import { KeyModel } from 'database/lib';
-import connection, { disconnect } from 'database/lib/connect';
+import { KeyModel } from '@saschazar/oidc-provider-database/lib/';
+import connection, {
+  disconnect,
+} from '@saschazar/oidc-provider-database/lib/connect';
 import encrypt, { decrypt } from 'utils/lib/jwt/encrypt';
 import { JWTAuth } from 'utils/lib/jwt/helpers';
 import getKeys from 'utils/lib/keys';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { SCOPE } from 'utils/lib/types/scope';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { SCOPE } from 'types/lib/scope';
 import KeyStore from 'utils/lib/util/keystore';
-import { JWE, JWE_ENC } from 'utils/lib/types/jwe';
+import { JWE, JWE_ENC } from 'types/lib/jwe';
 
 describe('JWT Encode', () => {
   let keys: KeyStore;

@@ -5,28 +5,34 @@ import { encode, ParsedUrlQueryInput } from 'querystring';
 import { URL } from 'url';
 
 import getUrl from 'config/lib/url';
-import connection, { disconnect } from 'database/lib/connect';
+import connection, {
+  disconnect,
+} from '@saschazar/oidc-provider-database/lib/connect';
 import AuthorizationModel, {
   AuthorizationSchema,
-} from 'database/lib/schemata/authorization';
-import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
-import KeyModel from 'database/lib/schemata/key';
-import { AuthorizationCodeModel } from 'database/lib/schemata/token';
-import UserModel, { UserSchema } from 'database/lib/schemata/user';
-import authorizationMiddleware from 'middleware/lib/authorization';
-import { AuthorizationResponse } from 'middleware/strategies/AuthStrategy';
+} from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import ClientModel, {
+  ClientSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/client';
+import KeyModel from '@saschazar/oidc-provider-database/lib/schemata/key';
+import { AuthorizationCodeModel } from '@saschazar/oidc-provider-database/lib/schemata/token';
+import UserModel, {
+  UserSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/user';
+import authorizationMiddleware from '@saschazar/oidc-provider-middleware/lib/authorization';
+import { AuthorizationResponse } from '@saschazar/oidc-provider-middleware/strategies/AuthStrategy';
 import AuthorizationCodeStrategy, {
   AuthorizationCodeResponsePayload,
-} from 'middleware/strategies/authorization-code';
+} from '@saschazar/oidc-provider-middleware/strategies/authorization-code';
 import ImplicitStrategy, {
   ImplicitResponsePayload,
-} from 'middleware/strategies/implicit';
+} from '@saschazar/oidc-provider-middleware/strategies/implicit';
 import { verify } from 'utils/lib/jwt/sign';
-import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
-import { METHOD } from 'utils/lib/types/method';
-import { PROMPT } from 'utils/lib/types/prompt';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { SCOPE } from 'utils/lib/types/scope';
+import { CLIENT_ENDPOINT, ENDPOINT } from 'types/lib/endpoint';
+import { METHOD } from 'types/lib/method';
+import { PROMPT } from 'types/lib/prompt';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { SCOPE } from 'types/lib/scope';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('Authorization Middleware', () => {

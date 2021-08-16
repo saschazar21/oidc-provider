@@ -12,18 +12,18 @@ import connection, {
   ClientModel,
   KeyModel,
   UserModel,
-} from 'database/lib';
-import { disconnect } from 'database/lib/connect';
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
-import { ClientSchema } from 'database/lib/schemata/client';
-import { UserSchema } from 'database/lib/schemata/user';
-import authorizationEndpoint from 'middleware/endpoints/authorization';
+} from '@saschazar/oidc-provider-database/lib/';
+import { disconnect } from '@saschazar/oidc-provider-database/lib/connect';
+import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
+import authorizationEndpoint from '@saschazar/oidc-provider-middleware/endpoints/authorization';
 import { mockResponse } from 'utils/lib/util/test-utils';
-import { SCOPE } from 'utils/lib/types/scope';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { METHOD } from 'utils/lib/types/method';
-import { CLIENT_ENDPOINT, ENDPOINT } from 'utils/lib/types/endpoint';
-import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
+import { SCOPE } from 'types/lib/scope';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { METHOD } from 'types/lib/method';
+import { CLIENT_ENDPOINT, ENDPOINT } from 'types/lib/endpoint';
+import { RESPONSE_MODE } from 'types/lib/response_mode';
 
 describe('Authorization Endpoint', () => {
   let res: ServerResponse;

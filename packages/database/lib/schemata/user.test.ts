@@ -1,7 +1,9 @@
-import { ClientModel, UserModel } from 'database/lib';
-import connect, { disconnect } from 'database/lib/connect';
-import { ClientSchema } from 'database/lib/schemata/client';
-import { ACR_VALUES } from 'utils/lib/types/acr';
+import { ClientModel, UserModel } from '@saschazar/oidc-provider-database/lib';
+import connect, {
+  disconnect,
+} from '@saschazar/oidc-provider-database/lib/connect';
+import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { ACR_VALUES } from 'types/lib/acr';
 
 describe('UserModel', () => {
   let sub: string;

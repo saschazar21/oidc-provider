@@ -1,16 +1,23 @@
 import { Document } from 'mongoose';
 
-import connection, { disconnect, KeyModel } from 'database/lib';
+import connection, {
+  disconnect,
+  KeyModel,
+} from '@saschazar/oidc-provider-database/lib/';
 import AuthorizationModel, {
   Authorization,
   AuthorizationSchema,
-} from 'database/lib/schemata/authorization';
-import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
-import { AuthorizationCodeModel } from 'database/lib/schemata/token';
-import UserModel, { UserSchema } from 'database/lib/schemata/user';
-import HybridStrategy from 'middleware/strategies/hybrid';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { SCOPE } from 'utils/lib/types/scope';
+} from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import ClientModel, {
+  ClientSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { AuthorizationCodeModel } from '@saschazar/oidc-provider-database/lib/schemata/token';
+import UserModel, {
+  UserSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/user';
+import HybridStrategy from '@saschazar/oidc-provider-middleware/strategies/hybrid';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { SCOPE } from 'types/lib/scope';
 
 describe('Hybrid Strategy', () => {
   let authorization: Document<Authorization>;

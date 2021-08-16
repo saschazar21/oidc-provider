@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 
 import { ALLOWED_ORIGINS } from 'config/lib/origin';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
-import { METHOD } from 'utils/lib/types/method';
+import { STATUS_CODE } from 'types/lib/status_code';
+import { METHOD } from 'types/lib/method';
 
 const MAX_AGE = 86400;
 const ALLOW_METHODS = [METHOD.GET, METHOD.HEAD];

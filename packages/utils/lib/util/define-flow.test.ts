@@ -1,8 +1,5 @@
 import defineFlow from 'utils/lib/util/define-flow';
-import {
-  AUTHENTICATION_FLOW,
-  RESPONSE_TYPE,
-} from 'utils/lib/types/response_type';
+import { AUTHENTICATION_FLOW, RESPONSE_TYPE } from 'types/lib/response_type';
 
 describe('Define Flow', () => {
   it('detects Authorization Code Flow', () => {

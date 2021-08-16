@@ -4,8 +4,8 @@ import {
   AccessTokenModel,
   BaseTokenSchema,
   RefreshTokenModel,
-} from 'database/lib/schemata/token';
-import connection, { disconnect } from 'database/lib';
+} from '@saschazar/oidc-provider-database/lib/schemata/token';
+import connection, { disconnect } from '@saschazar/oidc-provider-database/lib/';
 
 export const fetchToken = async (
   token: string

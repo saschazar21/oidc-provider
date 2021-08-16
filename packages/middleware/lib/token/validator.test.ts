@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 import MockRequest from 'mock-req';
 import pkce from 'pkce-challenge';
 
-import connection, { disconnect } from 'database/lib';
+import connection, { disconnect } from '@saschazar/oidc-provider-database/lib/';
 import {
   AccessTokenModel,
   AccessTokenSchema,
@@ -11,23 +11,27 @@ import {
   AuthorizationCodeSchema,
   RefreshTokenModel,
   RefreshTokenSchema,
-} from 'database/lib/schemata/token';
+} from '@saschazar/oidc-provider-database/lib/schemata/token';
 import AuthorizationModel, {
   AuthorizationSchema,
-} from 'database/lib/schemata/authorization';
-import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
-import UserModel, { UserSchema } from 'database/lib/schemata/user';
+} from '@saschazar/oidc-provider-database/lib/schemata/authorization';
+import ClientModel, {
+  ClientSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/client';
+import UserModel, {
+  UserSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/user';
 import tokenMiddlewareValidator, {
   AuthorizationCodeTokenEndpointPayload,
   validateIntrospectionRevocationRequestPayload,
-} from 'middleware/lib/token/validator';
-import { SCOPE } from 'utils/lib/types/scope';
-import { METHOD } from 'utils/lib/types/method';
-import { ENDPOINT } from 'utils/lib/types/endpoint';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
+} from '@saschazar/oidc-provider-middleware/lib/token/validator';
+import { SCOPE } from 'types/lib/scope';
+import { METHOD } from 'types/lib/method';
+import { ENDPOINT } from 'types/lib/endpoint';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
 import { mockResponse } from 'utils/lib/util/test-utils';
 import { encode } from 'querystring';
-import { GRANT_TYPE } from 'utils/lib/types/grant_type';
+import { GRANT_TYPE } from 'types/lib/grant_type';
 
 describe('Token middleware validator', () => {
   let authorizationDoc: Document<AuthorizationSchema>;

@@ -6,14 +6,16 @@ import {
   AuthorizationCodeModel,
   RefreshTokenModel,
   UserModel,
-} from 'database/lib';
-import connect, { disconnect } from 'database/lib/connect';
-import { ClientSchema } from 'database/lib/schemata/client';
-import { UserSchema } from 'database/lib/schemata/user';
-import { LIFETIME } from 'utils/lib/types/lifetime';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { TOKEN_TYPE } from 'utils/lib/types/token_type';
-import { SCOPE } from 'utils/lib/types/scope';
+} from '@saschazar/oidc-provider-database/lib';
+import connect, {
+  disconnect,
+} from '@saschazar/oidc-provider-database/lib/connect';
+import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
+import { LIFETIME } from 'types/lib/lifetime';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { TOKEN_TYPE } from 'types/lib/token_type';
+import { SCOPE } from 'types/lib/scope';
 
 describe('TokenModel', () => {
   let client_id: string;

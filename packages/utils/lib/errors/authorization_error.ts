@@ -1,8 +1,8 @@
 import { ServerResponse } from 'http';
 import { encode } from 'querystring';
 
-import { ERROR_CODE } from 'utils/lib/types/error_code';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { ERROR_CODE } from 'types/lib/error_code';
+import { STATUS_CODE } from 'types/lib/status_code';
 
 class AuthorizationError extends Error implements Error {
   private _errorCode: ERROR_CODE;

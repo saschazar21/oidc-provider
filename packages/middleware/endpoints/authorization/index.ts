@@ -1,16 +1,16 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { encode } from 'querystring';
 
-import authorizationMiddleware from 'middleware/lib/authorization';
-import { AuthorizationResponse } from 'middleware/strategies/AuthStrategy';
-import generateHTML from 'middleware/lib/authorization/form-post';
-import { ResponsePayload } from 'middleware/lib/authorization/helper';
-import errorHandler from 'middleware/lib/error-handler';
-import methods from 'middleware/lib/methods';
-import redirect from 'middleware/lib/redirect';
-import { METHOD } from 'utils/lib/types/method';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
-import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
+import authorizationMiddleware from '@saschazar/oidc-provider-middleware/lib/authorization';
+import { AuthorizationResponse } from '@saschazar/oidc-provider-middleware/strategies/AuthStrategy';
+import generateHTML from '@saschazar/oidc-provider-middleware/lib/authorization/form-post';
+import { ResponsePayload } from '@saschazar/oidc-provider-middleware/lib/authorization/helper';
+import errorHandler from '@saschazar/oidc-provider-middleware/lib/error-handler';
+import methods from '@saschazar/oidc-provider-middleware/lib/methods';
+import redirect from '@saschazar/oidc-provider-middleware/lib/redirect';
+import { METHOD } from 'types/lib/method';
+import { STATUS_CODE } from 'types/lib/status_code';
+import { RESPONSE_MODE } from 'types/lib/response_mode';
 
 const authorization = async (
   req: IncomingMessage,

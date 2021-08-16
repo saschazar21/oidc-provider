@@ -1,7 +1,7 @@
 import MockReq from 'mock-req';
 
-import bodyParser from 'middleware/lib/body-parser';
-import { METHOD } from 'utils/lib/types/method';
+import bodyParser from '@saschazar/oidc-provider-middleware/lib/body-parser';
+import { METHOD } from 'types/lib/method';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('BodyParser', () => {

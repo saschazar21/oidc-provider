@@ -3,15 +3,21 @@ import { compactVerify } from 'jose/jws/compact/verify';
 import parseJwk from 'jose/jwk/parse';
 
 import { getUrl } from 'config/lib/url';
-import { KeyModel } from 'database/lib';
-import connection, { disconnect } from 'database/lib/connect';
-import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
-import UserModel, { UserSchema } from 'database/lib/schemata/user';
+import { KeyModel } from '@saschazar/oidc-provider-database/lib/';
+import connection, {
+  disconnect,
+} from '@saschazar/oidc-provider-database/lib/connect';
+import ClientModel, {
+  ClientSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/client';
+import UserModel, {
+  UserSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/user';
 import { JWTAuth } from 'utils/lib/jwt/helpers';
 import sign, { verify } from 'utils/lib/jwt/sign';
 import getKeys from 'utils/lib/keys';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { SCOPE } from 'utils/lib/types/scope';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { SCOPE } from 'types/lib/scope';
 import KeyStore from 'utils/lib/util/keystore';
 
 describe('JWT Sign', () => {

@@ -1,9 +1,9 @@
 import mongoose, { Document, Schema, UpdateQuery } from 'mongoose';
 
-import { ACR_VALUES } from 'utils/lib/types/acr';
+import { ACR_VALUES } from 'types/lib/acr';
 import { ALPHABET_LENGTH } from 'config/lib/id';
-import { EMAIL_REGEX } from 'utils/lib/types/email';
-import { URL_REGEX } from 'utils/lib/types/url';
+import { EMAIL_REGEX } from 'types/lib/email';
+import { URL_REGEX } from 'types/lib/url';
 import id from 'utils/lib/util/id';
 import hashPassword, { comparePassword } from 'utils/lib/util/password';
 

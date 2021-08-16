@@ -1,9 +1,12 @@
-import { STATUS_CODE } from 'utils/lib/types/status_code';
-import { METHOD } from 'utils/lib/types/method';
+import { STATUS_CODE } from 'types/lib/status_code';
+import { METHOD } from 'types/lib/method';
 import MockRequest from 'mock-req';
 import retry from 'jest-retries';
 
-import connection, { KeyModel, disconnect } from 'database/lib';
+import connection, {
+  KeyModel,
+  disconnect,
+} from '@saschazar/oidc-provider-database/lib/';
 import { mockResponse } from 'utils/lib/util/test-utils';
 
 describe('/api/jwks', () => {
@@ -34,7 +37,9 @@ describe('/api/jwks', () => {
       MASTER_KEY: undefined,
     };
 
-    const { default: fetchJWKS } = await import('middleware/endpoints/jwks');
+    const { default: fetchJWKS } = await import(
+      '@saschazar/oidc-provider-middleware/endpoints/jwks'
+    );
 
     await fetchJWKS(req, res);
 
@@ -48,7 +53,9 @@ describe('/api/jwks', () => {
       MASTER_KEY: 'testkey',
     };
 
-    const { default: fetchJWKS } = await import('middleware/endpoints/jwks');
+    const { default: fetchJWKS } = await import(
+      '@saschazar/oidc-provider-middleware/endpoints/jwks'
+    );
 
     await fetchJWKS({ ...req, method: 'POST' }, res);
 
@@ -66,7 +73,9 @@ describe('/api/jwks', () => {
 
     const customRes = mockResponse();
 
-    const { default: fetchJWKS } = await import('middleware/endpoints/jwks');
+    const { default: fetchJWKS } = await import(
+      '@saschazar/oidc-provider-middleware/endpoints/jwks'
+    );
 
     await connection()
       .then(() => KeyModel.findByIdAndDelete('master'))

@@ -1,15 +1,15 @@
 import mongoose, { Document, Schema, UpdateQuery } from 'mongoose';
 
-import { ClientModel, UserModel } from 'database/lib';
+import { ClientModel, UserModel } from '@saschazar/oidc-provider-database/lib';
 import { ALPHABET_LENGTH } from 'config/lib/id';
-import { ACR_VALUES } from 'utils/lib/types/acr';
-import { DISPLAY } from 'utils/lib/types/display';
-import { LIFETIME } from 'utils/lib/types/lifetime';
-import { PKCE } from 'utils/lib/types/pkce';
-import { PROMPT } from 'utils/lib/types/prompt';
-import { RESPONSE_MODE } from 'utils/lib/types/response_mode';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
-import { SCOPE } from 'utils/lib/types/scope';
+import { ACR_VALUES } from 'types/lib/acr';
+import { DISPLAY } from 'types/lib/display';
+import { LIFETIME } from 'types/lib/lifetime';
+import { PKCE } from 'types/lib/pkce';
+import { PROMPT } from 'types/lib/prompt';
+import { RESPONSE_MODE } from 'types/lib/response_mode';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { SCOPE } from 'types/lib/scope';
 import id from 'utils/lib/util/id';
 
 export type Authorization = {

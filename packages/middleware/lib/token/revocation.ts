@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
-import connection, { disconnect } from 'database/lib';
-import { AccessTokenModel } from 'database/lib/schemata/token';
-import { validateIntrospectionRevocationRequestPayload } from 'middleware/lib/token/validator';
-import { TOKEN_TYPE } from 'utils/lib/types/token_type';
+import connection, { disconnect } from '@saschazar/oidc-provider-database/lib/';
+import { AccessTokenModel } from '@saschazar/oidc-provider-database/lib/schemata/token';
+import { validateIntrospectionRevocationRequestPayload } from '@saschazar/oidc-provider-middleware/lib/token/validator';
+import { TOKEN_TYPE } from 'types/lib/token_type';
 
 const revocationMiddleware = async (
   req: IncomingMessage,

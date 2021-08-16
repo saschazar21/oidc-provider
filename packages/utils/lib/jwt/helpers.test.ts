@@ -4,17 +4,19 @@ import connection, {
   AuthorizationModel,
   disconnect,
   UserModel,
-} from 'database/lib';
-import { UserSchema } from 'database/lib/schemata/user';
-import ClientModel, { ClientSchema } from 'database/lib/schemata/client';
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
+} from '@saschazar/oidc-provider-database/lib/';
+import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
+import ClientModel, {
+  ClientSchema,
+} from '@saschazar/oidc-provider-database/lib/schemata/client';
+import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
 import {
   AccessTokenModel,
   AuthorizationCodeModel,
-} from 'database/lib/schemata/token';
+} from '@saschazar/oidc-provider-database/lib/schemata/token';
 import { fillClaims, JWTAuth } from 'utils/lib/jwt/helpers';
-import { SCOPE, SCOPE_CLAIMS } from 'utils/lib/types/scope';
-import { RESPONSE_TYPE } from 'utils/lib/types/response_type';
+import { SCOPE, SCOPE_CLAIMS } from 'types/lib/scope';
+import { RESPONSE_TYPE } from 'types/lib/response_type';
 import hashCodeOrToken from 'utils/lib/util/hash-code-token';
 
 describe('JWT helpers', () => {

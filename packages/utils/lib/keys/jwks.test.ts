@@ -3,8 +3,8 @@ import { compactVerify } from 'jose/jws/compact/verify';
 
 import { JWKS as config, JWE, JWS, supportedAlgorithms } from 'config/lib/jwks';
 import KeyStore from 'utils/lib/util/keystore';
-import { JWE as JWEAlg } from 'utils/lib/types/jwe';
-import { JWS as JWSAlg } from 'utils/lib/types/jws';
+import { JWE as JWEAlg } from 'types/lib/jwe';
+import { JWS as JWSAlg } from 'types/lib/jws';
 
 describe('JWKS', () => {
   beforeEach(() => {

@@ -6,16 +6,16 @@ import connection, {
   AuthorizationCodeModel,
   disconnect,
   RefreshTokenModel,
-} from 'database/lib';
-import { AuthorizationSchema } from 'database/lib/schemata/authorization';
+} from '@saschazar/oidc-provider-database/lib/';
+import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
 import validateRequestPayload, {
   AuthorizationCodeTokenEndpointPayload,
   RefreshTokenEndpointPayload,
-} from 'middleware/lib/token/validator';
+} from '@saschazar/oidc-provider-middleware/lib/token/validator';
 import HTTPError from 'utils/lib/errors/http_error';
 import sign from 'utils/lib/jwt/sign';
-import { LIFETIME } from 'utils/lib/types/lifetime';
-import { STATUS_CODE } from 'utils/lib/types/status_code';
+import { LIFETIME } from 'types/lib/lifetime';
+import { STATUS_CODE } from 'types/lib/status_code';
 
 export type TokenResponsePayload = {
   access_token: string;

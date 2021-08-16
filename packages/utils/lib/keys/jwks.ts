@@ -1,8 +1,8 @@
 import { JWK } from 'jose/webcrypto/types';
 
 import config, { JWKSConfig } from 'config/lib/jwks';
-import { JWE } from 'utils/lib/types/jwe';
-import { JWS } from 'utils/lib/types/jws';
+import { JWE } from 'types/lib/jwe';
+import { JWS } from 'types/lib/jws';
 import KeyStore from 'utils/lib/util/keystore';
 
 const keystore = new KeyStore();

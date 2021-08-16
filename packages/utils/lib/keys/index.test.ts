@@ -2,8 +2,8 @@ import mongoose from 'mongoose';
 import retry from 'jest-retries';
 
 import KeyStore from 'utils/lib/util/keystore';
-import { JWE } from 'utils/lib/types/jwe';
-import { JWS } from 'utils/lib/types/jws';
+import { JWE } from 'types/lib/jwe';
+import { JWS } from 'types/lib/jws';
 
 const MASTER_KEY = 'testkey';
 
@@ -18,7 +18,7 @@ describe('Keys', () => {
   afterEach(async () => KeyModel.findByIdAndDelete('master'));
 
   beforeAll(async () => {
-    const importedDb = await import('database/lib');
+    const importedDb = await import('@saschazar/oidc-provider-database/lib/');
     connection = importedDb.default;
     KeyModel = importedDb.KeyModel;
     await connection();
@@ -89,7 +89,7 @@ describe('Existing Keys', () => {
     };
     bin = await encrypt(MASTER_KEY, JSON.stringify(keys));
 
-    const importedDb = await import('database/lib');
+    const importedDb = await import('@saschazar/oidc-provider-database/lib/');
     connection = importedDb.default;
     KeyModel = importedDb.KeyModel;
     await connection();
