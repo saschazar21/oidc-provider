@@ -1,9 +1,7 @@
 import { ServerResponse } from 'http';
 import MockRes from 'mock-res';
 
-import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
-
-export const mockUser: UserSchema = {
+export const mockUser = {
   password: '',
   given_name: 'Wainwright',
   middle_name: 'Calwell',

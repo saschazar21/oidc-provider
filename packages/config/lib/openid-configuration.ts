@@ -1,3 +1,5 @@
+import { supportedAlgorithms } from 'config/lib/jwks';
+import getUrl from 'config/lib/url';
 import { ENDPOINT } from 'types/lib/endpoint';
 import { SCOPE } from 'types/lib/scope';
 import { RESPONSE_TYPE } from 'types/lib/response_type';
@@ -8,8 +10,6 @@ import { SUBJECT_TYPE } from 'types/lib/subject_type';
 import { TOKEN_ENDPOINT_AUTH_METHODS } from 'types/lib/auth_methods';
 import { DISPLAY } from 'types/lib/display';
 import { CLAIM } from 'types/lib/claim';
-import { supportedAlgorithms } from './jwks';
-import getUrl from './url';
 
 export type OpenIDConfiguration = {
   issuer: string;

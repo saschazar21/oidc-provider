@@ -4,7 +4,7 @@ import { KeyLike } from 'jose/jwk/parse';
 
 import { supportedAlgorithms } from 'config/lib/jwks';
 import { AddressSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
-import { JWTAuth, fillClaims } from 'utils/lib/jwt/helpers';
+import { JWTAuth, fillClaims } from 'jwt/lib/helpers';
 import getKeys from 'utils/lib/keys';
 import { CLAIM } from 'types/lib/claim';
 import { JWE, JWE_ENC } from 'types/lib/jwe';

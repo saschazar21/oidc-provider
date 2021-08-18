@@ -13,8 +13,8 @@ import ClientModel, {
 import UserModel, {
   UserSchema,
 } from '@saschazar/oidc-provider-database/lib/schemata/user';
-import { JWTAuth } from 'utils/lib/jwt/helpers';
-import sign, { verify } from 'utils/lib/jwt/sign';
+import { JWTAuth } from 'jwt/lib/helpers';
+import sign, { verify } from 'jwt/lib/sign';
 import getKeys from 'utils/lib/keys';
 import { RESPONSE_TYPE } from 'types/lib/response_type';
 import { SCOPE } from 'types/lib/scope';

@@ -5,7 +5,7 @@ import connection, {
 import { AddressSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import AuthenticationError from 'utils/lib/errors/authentication_error';
 import TokenError from 'utils/lib/errors/token_error';
-import { fetchUserData } from 'utils/lib/jwt/helpers';
+import { fetchUserData } from 'jwt/lib/helpers';
 import { ERROR_CODE } from 'types/lib/error_code';
 import { STATUS_CODE } from 'types/lib/status_code';
 import { CLAIM } from 'types/lib/claim';

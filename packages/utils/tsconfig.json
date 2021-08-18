@@ -3,5 +3,6 @@
   "compilerOptions": {
     "outDir": "dist"
   },
-  "references": [{ "path": "../config" }, { "path": "../database" }]
+  "references": [{ "path": "../config" }, { "path": "../types" }],
+  "include": ["**/*.ts"]
 }

@@ -13,7 +13,7 @@ import validateRequestPayload, {
   RefreshTokenEndpointPayload,
 } from '@saschazar/oidc-provider-middleware/lib/token/validator';
 import HTTPError from 'utils/lib/errors/http_error';
-import sign from 'utils/lib/jwt/sign';
+import sign from 'jwt/lib/sign';
 import { LIFETIME } from 'types/lib/lifetime';
 import { STATUS_CODE } from 'types/lib/status_code';
 

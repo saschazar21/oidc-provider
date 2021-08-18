@@ -8,7 +8,7 @@ import connection, {
 } from '@saschazar/oidc-provider-database/lib/connect';
 import ClientModel from '@saschazar/oidc-provider-database/lib/schemata/client';
 import { AddressSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
-import { JWTAuth, fillClaims } from 'utils/lib/jwt/helpers';
+import { JWTAuth, fillClaims } from 'jwt/lib/helpers';
 import getKeys from 'utils/lib/keys';
 import { CLAIM } from 'types/lib/claim';
 import { JWS } from 'types/lib/jws';

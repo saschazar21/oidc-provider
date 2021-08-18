@@ -27,7 +27,7 @@ import AuthorizationCodeStrategy, {
 import ImplicitStrategy, {
   ImplicitResponsePayload,
 } from '@saschazar/oidc-provider-middleware/strategies/implicit';
-import { verify } from 'utils/lib/jwt/sign';
+import { verify } from 'jwt/lib/sign';
 import { CLIENT_ENDPOINT, ENDPOINT } from 'types/lib/endpoint';
 import { METHOD } from 'types/lib/method';
 import { PROMPT } from 'types/lib/prompt';

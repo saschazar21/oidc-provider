@@ -14,7 +14,7 @@ import {
   AccessTokenModel,
   AuthorizationCodeModel,
 } from '@saschazar/oidc-provider-database/lib/schemata/token';
-import { fillClaims, JWTAuth } from 'utils/lib/jwt/helpers';
+import { fillClaims, JWTAuth } from 'jwt/lib/helpers';
 import { SCOPE, SCOPE_CLAIMS } from 'types/lib/scope';
 import { RESPONSE_TYPE } from 'types/lib/response_type';
 import hashCodeOrToken from 'utils/lib/util/hash-code-token';

@@ -21,13 +21,16 @@
       "config/*": ["packages/config/*"],
       "database/*": ["packages/database/*"],
       "functions/*": ["packages/functions/*"],
+      "jwt/*": ["packages/jwt/*"],
       "middleware/*": ["packages/middleware/*"],
+      "types/*": ["packages/types/*"],
       "utils/*": ["packages/utils/*"]
     }
   },
   "references": [
     { "path": "./packages/config" },
     { "path": "./packages/database" },
+    { "path": "./packages/jwt" },
     { "path": "./packages/lambda" },
     { "path": "./packages/middleware" },
     { "path": "./packages/types" },

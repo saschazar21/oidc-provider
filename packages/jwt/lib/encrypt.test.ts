@@ -4,8 +4,8 @@ import { KeyModel } from '@saschazar/oidc-provider-database/lib/';
 import connection, {
   disconnect,
 } from '@saschazar/oidc-provider-database/lib/connect';
-import encrypt, { decrypt } from 'utils/lib/jwt/encrypt';
-import { JWTAuth } from 'utils/lib/jwt/helpers';
+import encrypt, { decrypt } from 'jwt/lib/encrypt';
+import { JWTAuth } from 'jwt/lib/helpers';
 import getKeys from 'utils/lib/keys';
 import { RESPONSE_TYPE } from 'types/lib/response_type';
 import { SCOPE } from 'types/lib/scope';

@@ -1,13 +1,11 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "emitDeclarationOnly": true
+    "outDir": "dist"
   },
   "references": [
     { "path": "../config" },
     { "path": "../database" },
-    { "path": "../jwt" },
     { "path": "../types" },
     { "path": "../utils" }
   ],
