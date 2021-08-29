@@ -17,7 +17,9 @@
     "url": "git+https://github.com/saschazar21/now-oidc-provider.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "build:clean": "rimraf dist",
+    "build:js": "tsc -b",
+    "build": "run-s build:*"
   },
   "bugs": {
     "url": "https://github.com/saschazar21/now-oidc-provider/issues"
