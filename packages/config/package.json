@@ -5,7 +5,6 @@
   "author": "Sascha Zarhuber <sascha.zarhuber@gmail.com>",
   "homepage": "https://github.com/saschazar21/now-oidc-provider#readme",
   "license": "MIT",
-  "private": true,
   "directories": {
     "lib": "lib"
   },
