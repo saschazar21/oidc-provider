@@ -16,6 +16,7 @@
     "downlevelIteration": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
+    "sourceMap": true,
     "jsx": "preserve"
   },
   "references": [
@@ -27,6 +28,6 @@
     { "path": "./packages/types" },
     { "path": "./packages/utils" }
   ],
-  "exclude": ["node_modules", "**/*.test.ts", "**/*/dist"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.d.ts", "**/*/dist"],
   "include": ["**/*.ts", "**/*.ts"]
 }

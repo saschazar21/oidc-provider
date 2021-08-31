@@ -18,7 +18,11 @@
     "url": "git+https://github.com/saschazar21/now-oidc-provider.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build:clean": "rimraf dist",
+    "build:js": "tsc -b",
+    "build:pkg": "cpy package.json README.md ../../LICENSE dist",
+    "build": "run-s build:*"
   },
   "bugs": {
     "url": "https://github.com/saschazar21/now-oidc-provider/issues"
@@ -26,7 +30,6 @@
   "dependencies": {
     "@saschazar/oidc-provider-config": "^0.0.0",
     "@saschazar/oidc-provider-database": "^0.0.0",
-    "@saschazar/oidc-provider-jwt": "^0.0.0",
     "@saschazar/oidc-provider-types": "^0.0.0",
     "@saschazar/oidc-provider-utils": "^0.0.0"
   }

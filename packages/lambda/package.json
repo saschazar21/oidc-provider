@@ -5,6 +5,7 @@
   "author": "Sascha Zarhuber <sascha.zarhuber@gmail.com>",
   "homepage": "https://github.com/saschazar21/now-oidc-provider#readme",
   "license": "MIT",
+  "main": "index.js",
   "directories": {
     "lib": "lib"
   },
@@ -17,8 +18,8 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "build:clean": "tsc --clean",
     "build:js": "tsc -b",
+    "build:pkg": "cpy package.json README.md ../../LICENSE dist",
     "build": "run-s build:*"
   },
   "bugs": {

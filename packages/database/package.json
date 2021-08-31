@@ -19,8 +19,8 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "build:clean": "tsc --clean",
     "build:js": "tsc -b",
+    "build:pkg": "cpy package.json README.md ../../LICENSE dist",
     "build": "run-s build:*"
   },
   "bugs": {

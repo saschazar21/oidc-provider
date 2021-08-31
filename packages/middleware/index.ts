@@ -1,0 +1,9 @@
+export { default as authorization } from './endpoints/authorization';
+export { default as consent } from './endpoints/consent';
+export { default as jwks } from './endpoints/jwks';
+export { default as login } from './endpoints/login';
+export { default as openidConfiguration } from './endpoints/openid-configuration';
+export { default as token } from './endpoints/token';
+export { default as introspection } from './endpoints/token/introspection';
+export { default as revocation } from './endpoints/token/revocation';
+export { default as userinfo } from './endpoints/userinfo';
