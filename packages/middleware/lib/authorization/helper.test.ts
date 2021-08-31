@@ -16,14 +16,14 @@ import {
   getAuthenticationFlow,
   mapAuthRequest,
 } from '@saschazar/oidc-provider-middleware/lib/authorization/helper';
-import { ENDPOINT } from 'types/lib/endpoint';
-import { SCOPE } from 'types/lib/scope';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { DISPLAY } from 'types/lib/display';
-import { METHOD } from 'types/lib/method';
-import { PROMPT } from 'types/lib/prompt';
-import { ACR_VALUES } from 'types/lib/acr';
-import { mockResponse } from 'utils/lib/util/test-utils';
+import { ENDPOINT } from '@saschazar/oidc-provider-types/lib/endpoint';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { DISPLAY } from '@saschazar/oidc-provider-types/lib/display';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { PROMPT } from '@saschazar/oidc-provider-types/lib/prompt';
+import { ACR_VALUES } from '@saschazar/oidc-provider-types/lib/acr';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
 
 describe('Authorization Helpers', () => {
   let req;

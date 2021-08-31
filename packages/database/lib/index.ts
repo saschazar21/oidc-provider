@@ -1,14 +1,11 @@
-export {
-  default,
-  disconnect,
-} from '@saschazar/oidc-provider-database/lib/connect';
+export { default, disconnect } from './connect';
 
-export { default as AuthorizationModel } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
-export { default as ClientModel } from '@saschazar/oidc-provider-database/lib/schemata/client';
-export { default as KeyModel } from '@saschazar/oidc-provider-database/lib/schemata/key';
+export { default as AuthorizationModel } from './schemata/authorization';
+export { default as ClientModel } from './schemata/client';
+export { default as KeyModel } from './schemata/key';
 export {
   AccessTokenModel,
   AuthorizationCodeModel,
   RefreshTokenModel,
-} from '@saschazar/oidc-provider-database/lib/schemata/token';
-export { default as UserModel } from '@saschazar/oidc-provider-database/lib/schemata/user';
+} from './schemata/token';
+export { default as UserModel } from './schemata/user';

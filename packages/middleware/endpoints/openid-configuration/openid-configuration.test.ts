@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import MockRequest from 'mock-req';
 
-import { STATUS_CODE } from 'types/lib/status_code';
-import { METHOD } from 'types/lib/method';
-import { mockResponse } from 'utils/lib/util/test-utils';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
 
 describe('/.well-known/openid-configuration', () => {
   console.error = console.log;
@@ -35,7 +35,7 @@ describe('/.well-known/openid-configuration', () => {
 
   it('should fetch the OpenID Configuration', async () => {
     const { default: configuration } = await import(
-      'config/lib/openid-configuration'
+      '@saschazar/oidc-provider-config/lib/openid-configuration'
     );
 
     await fetchConfiguration(req, res);

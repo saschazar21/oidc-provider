@@ -18,11 +18,11 @@ import HybridStrategy, {
   HybridResponsePayload,
 } from '@saschazar/oidc-provider-middleware/strategies/hybrid';
 import bodyParser from '@saschazar/oidc-provider-middleware/lib/body-parser';
-import { METHOD } from 'types/lib/method';
-import { AUTHENTICATION_FLOW } from 'types/lib/response_type';
-import defineFlow from 'utils/lib/util/define-flow';
-import AuthorizationError from 'utils/lib/errors/authorization_error';
-import { ERROR_CODE } from 'types/lib/error_code';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { AUTHENTICATION_FLOW } from '@saschazar/oidc-provider-types/lib/response_type';
+import defineFlow from '@saschazar/oidc-provider-utils/lib/util/define-flow';
+import AuthorizationError from '@saschazar/oidc-provider-utils/lib/errors/authorization_error';
+import { ERROR_CODE } from '@saschazar/oidc-provider-types/lib/error_code';
 
 /**
  * map to string[]

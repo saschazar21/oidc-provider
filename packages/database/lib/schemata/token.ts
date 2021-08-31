@@ -1,9 +1,9 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-import { ALPHABET_LENGTH } from 'config/lib/id';
-import { LIFETIME } from 'types/lib/lifetime';
-import { TOKEN_TYPE } from 'types/lib/token_type';
-import id from 'utils/lib/util/id';
+import { ALPHABET_LENGTH } from '@saschazar/oidc-provider-config/lib/id';
+import { LIFETIME } from '@saschazar/oidc-provider-types/lib/lifetime';
+import { TOKEN_TYPE } from '@saschazar/oidc-provider-types/lib/token_type';
+import id from '@saschazar/oidc-provider-utils/lib/util/id';
 
 export type BaseTokenSchema = {
   _id?: string;

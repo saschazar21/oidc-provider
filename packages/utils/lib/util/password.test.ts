@@ -1,4 +1,7 @@
-import { comparePassword, hashPassword } from 'utils/lib/util/password';
+import {
+  comparePassword,
+  hashPassword,
+} from '@saschazar/oidc-provider-utils/lib/util/password';
 
 describe('Password', () => {
   let hashed: string;

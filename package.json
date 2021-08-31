@@ -7,10 +7,10 @@
   ],
   "scripts": {
     "postinstall": "lerna bootstrap",
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "test:lint": "eslint --ext .ts,.tsx ./",
+    "build:clean": "lerna exec tsc -- -b --clean",
+    "build:js": "lerna exec yarn build",
+    "build": "run-s build:*",
+    "test:lint": "eslint --ext .js,.jsx,.ts,.tsx ./",
     "test:jest": "jest --coverage --runInBand --forceExit",
     "test": "yarn test:lint && yarn test:jest"
   },

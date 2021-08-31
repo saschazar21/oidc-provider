@@ -1,5 +1,5 @@
-import { STATUS_CODE } from 'types/lib/status_code';
-import { METHOD } from 'types/lib/method';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
 import MockRequest from 'mock-req';
 import retry from 'jest-retries';
 
@@ -7,7 +7,7 @@ import connection, {
   KeyModel,
   disconnect,
 } from '@saschazar/oidc-provider-database/lib/';
-import { mockResponse } from 'utils/lib/util/test-utils';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
 
 describe('/api/jwks', () => {
   let req;

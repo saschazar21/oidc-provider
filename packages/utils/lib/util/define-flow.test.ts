@@ -1,5 +1,8 @@
-import defineFlow from 'utils/lib/util/define-flow';
-import { AUTHENTICATION_FLOW, RESPONSE_TYPE } from 'types/lib/response_type';
+import defineFlow from '@saschazar/oidc-provider-utils/lib/util/define-flow';
+import {
+  AUTHENTICATION_FLOW,
+  RESPONSE_TYPE,
+} from '@saschazar/oidc-provider-types/lib/response_type';
 
 describe('Define Flow', () => {
   it('detects Authorization Code Flow', () => {

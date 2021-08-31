@@ -1,7 +1,10 @@
 import { customAlphabet } from 'nanoid';
 import { customAlphabet as customAlphabetAsync } from 'nanoid/async';
 
-import { ALPHABET, ALPHABET_LENGTH } from 'config/lib/id';
+import {
+  ALPHABET,
+  ALPHABET_LENGTH,
+} from '@saschazar/oidc-provider-config/lib/id';
 
 export const id = (len = ALPHABET_LENGTH.DEFAULT): (() => string) =>
   customAlphabet(ALPHABET, len);

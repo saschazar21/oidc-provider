@@ -1,10 +1,10 @@
 import AuthStrategy, {
   AuthorizationResponse,
 } from '@saschazar/oidc-provider-middleware/strategies/AuthStrategy';
-import AuthorizationError from 'utils/lib/errors/authorization_error';
-import { ERROR_CODE } from 'types/lib/error_code';
-import { RESPONSE_MODE } from 'types/lib/response_mode';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
+import AuthorizationError from '@saschazar/oidc-provider-utils/lib/errors/authorization_error';
+import { ERROR_CODE } from '@saschazar/oidc-provider-types/lib/error_code';
+import { RESPONSE_MODE } from '@saschazar/oidc-provider-types/lib/response_mode';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
 
 export type ImplicitResponsePayload = {
   access_token?: string;

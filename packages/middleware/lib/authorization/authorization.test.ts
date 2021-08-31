@@ -4,7 +4,7 @@ import MockRequest from 'mock-req';
 import { encode, ParsedUrlQueryInput } from 'querystring';
 import { URL } from 'url';
 
-import getUrl from 'config/lib/url';
+import getUrl from '@saschazar/oidc-provider-config/lib/url';
 import connection, {
   disconnect,
 } from '@saschazar/oidc-provider-database/lib/connect';
@@ -27,13 +27,16 @@ import AuthorizationCodeStrategy, {
 import ImplicitStrategy, {
   ImplicitResponsePayload,
 } from '@saschazar/oidc-provider-middleware/strategies/implicit';
-import { verify } from 'jwt/lib/sign';
-import { CLIENT_ENDPOINT, ENDPOINT } from 'types/lib/endpoint';
-import { METHOD } from 'types/lib/method';
-import { PROMPT } from 'types/lib/prompt';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { SCOPE } from 'types/lib/scope';
-import { mockResponse } from 'utils/lib/util/test-utils';
+import { verify } from '@saschazar/oidc-provider-jwt/lib/sign';
+import {
+  CLIENT_ENDPOINT,
+  ENDPOINT,
+} from '@saschazar/oidc-provider-types/lib/endpoint';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { PROMPT } from '@saschazar/oidc-provider-types/lib/prompt';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
 
 describe('Authorization Middleware', () => {
   let res: ServerResponse;

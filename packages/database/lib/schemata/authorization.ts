@@ -1,16 +1,17 @@
 import mongoose, { Document, Schema, UpdateQuery } from 'mongoose';
 
-import { ClientModel, UserModel } from '@saschazar/oidc-provider-database/lib';
-import { ALPHABET_LENGTH } from 'config/lib/id';
-import { ACR_VALUES } from 'types/lib/acr';
-import { DISPLAY } from 'types/lib/display';
-import { LIFETIME } from 'types/lib/lifetime';
-import { PKCE } from 'types/lib/pkce';
-import { PROMPT } from 'types/lib/prompt';
-import { RESPONSE_MODE } from 'types/lib/response_mode';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { SCOPE } from 'types/lib/scope';
-import id from 'utils/lib/util/id';
+import { ALPHABET_LENGTH } from '@saschazar/oidc-provider-config/lib/id';
+import { ACR_VALUES } from '@saschazar/oidc-provider-types/lib/acr';
+import { DISPLAY } from '@saschazar/oidc-provider-types/lib/display';
+import { LIFETIME } from '@saschazar/oidc-provider-types/lib/lifetime';
+import { PKCE } from '@saschazar/oidc-provider-types/lib/pkce';
+import { PROMPT } from '@saschazar/oidc-provider-types/lib/prompt';
+import { RESPONSE_MODE } from '@saschazar/oidc-provider-types/lib/response_mode';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import id from '@saschazar/oidc-provider-utils/lib/util/id';
+
+import { ClientModel, UserModel } from '../';
 
 export type Authorization = {
   _id?: string;

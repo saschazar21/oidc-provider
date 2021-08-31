@@ -1,5 +1,7 @@
-import createKeys, { KEYGRIP_LENGTH } from 'config/lib/keygrip';
-import keygrip from 'utils/lib/keys/keygrip';
+import createKeys, {
+  KEYGRIP_LENGTH,
+} from '@saschazar/oidc-provider-config/lib/keygrip';
+import keygrip from '@saschazar/oidc-provider-utils/lib/keys/keygrip';
 
 const TEST_STRING = 'hello world';
 

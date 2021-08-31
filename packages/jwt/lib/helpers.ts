@@ -1,4 +1,4 @@
-import getUrl from 'config/lib/url';
+import getUrl from '@saschazar/oidc-provider-config/lib/url';
 import connection, {
   disconnect,
   UserModel,
@@ -8,10 +8,10 @@ import {
   AddressSchema,
   UserSchema,
 } from '@saschazar/oidc-provider-database/lib/schemata/user';
-import { CLAIM } from 'types/lib/claim';
-import { SCOPE, SCOPE_CLAIMS } from 'types/lib/scope';
-import { LIFETIME } from 'types/lib/lifetime';
-import hashCodeOrToken from 'utils/lib/util/hash-code-token';
+import { CLAIM } from '@saschazar/oidc-provider-types/lib/claim';
+import { SCOPE, SCOPE_CLAIMS } from '@saschazar/oidc-provider-types/lib/scope';
+import { LIFETIME } from '@saschazar/oidc-provider-types/lib/lifetime';
+import hashCodeOrToken from '@saschazar/oidc-provider-utils/lib/util/hash-code-token';
 
 export type JWTAuth = Authorization & {
   updated_at: Date;

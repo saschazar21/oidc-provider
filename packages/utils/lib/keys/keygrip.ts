@@ -1,6 +1,6 @@
 import Keygrip from 'keygrip';
 
-import createKeys from 'config/lib/keygrip';
+import createKeys from '@saschazar/oidc-provider-config/lib/keygrip';
 
 let keys: Keygrip;
 

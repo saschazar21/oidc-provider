@@ -14,13 +14,13 @@ import UserModel, {
   UserSchema,
 } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import consentMiddleware from '@saschazar/oidc-provider-middleware/lib/consent';
-import { ENDPOINT } from 'types/lib/endpoint';
-import { ERROR_CODE } from 'types/lib/error_code';
-import { METHOD } from 'types/lib/method';
-import { SCOPE } from 'types/lib/scope';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { STATUS_CODE } from 'types/lib/status_code';
-import { mockResponse } from 'utils/lib/util/test-utils';
+import { ENDPOINT } from '@saschazar/oidc-provider-types/lib/endpoint';
+import { ERROR_CODE } from '@saschazar/oidc-provider-types/lib/error_code';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
 
 describe('Consent', () => {
   let authorizationDoc: Document<AuthorizationSchema>;

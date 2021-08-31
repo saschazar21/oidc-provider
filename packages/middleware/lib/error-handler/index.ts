@@ -1,11 +1,11 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
-import AuthenticationError from 'utils/lib/errors/authentication_error';
-import AuthorizationError from 'utils/lib/errors/authorization_error';
-import HTTPError from 'utils/lib/errors/http_error';
-import logError from 'utils/lib/errors/log_error';
-import TokenError from 'utils/lib/errors/token_error';
-import { STATUS_CODE } from 'types/lib/status_code';
+import AuthenticationError from '@saschazar/oidc-provider-utils/lib/errors/authentication_error';
+import AuthorizationError from '@saschazar/oidc-provider-utils/lib/errors/authorization_error';
+import HTTPError from '@saschazar/oidc-provider-utils/lib/errors/http_error';
+import logError from '@saschazar/oidc-provider-utils/lib/errors/log_error';
+import TokenError from '@saschazar/oidc-provider-utils/lib/errors/token_error';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
 
 const errorHandler = (
   req: IncomingMessage,

@@ -2,12 +2,13 @@ import { CompactEncrypt, JWEHeaderParameters } from 'jose/jwe/compact/encrypt';
 import { compactDecrypt } from 'jose/jwe/compact/decrypt';
 import { KeyLike } from 'jose/jwk/parse';
 
-import { supportedAlgorithms } from 'config/lib/jwks';
+import { supportedAlgorithms } from '@saschazar/oidc-provider-config/lib/jwks';
 import { AddressSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
-import { JWTAuth, fillClaims } from 'jwt/lib/helpers';
-import getKeys from 'utils/lib/keys';
-import { CLAIM } from 'types/lib/claim';
-import { JWE, JWE_ENC } from 'types/lib/jwe';
+import getKeys from '@saschazar/oidc-provider-utils/lib/keys';
+import { CLAIM } from '@saschazar/oidc-provider-types/lib/claim';
+import { JWE, JWE_ENC } from '@saschazar/oidc-provider-types/lib/jwe';
+
+import { JWTAuth, fillClaims } from './helpers';
 
 const resolveKey = async (
   protectedHeader: JWEHeaderParameters

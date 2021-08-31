@@ -1,8 +1,8 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
-import { getUrl } from 'config/lib/url';
+import { getUrl } from '@saschazar/oidc-provider-config/lib/url';
 import { validateIntrospectionRevocationRequestPayload } from '@saschazar/oidc-provider-middleware/lib/token/validator';
-import { TOKEN_TYPE } from 'types/lib/token_type';
+import { TOKEN_TYPE } from '@saschazar/oidc-provider-types/lib/token_type';
 
 export type IntrospectionResponsePayload = {
   active: boolean;

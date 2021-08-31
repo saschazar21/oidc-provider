@@ -6,8 +6,8 @@ import {
 import { fromKeyLike, JWK, KeyLike } from 'jose/jwk/from_key_like';
 import { parseJwk } from 'jose/jwk/parse';
 
-import { JWE } from 'types/lib/jwe';
-import { JWS } from 'types/lib/jws';
+import { JWE } from '@saschazar/oidc-provider-types/lib/jwe';
+import { JWS } from '@saschazar/oidc-provider-types/lib/jws';
 
 class KeyStore {
   private _keystore: Map<JWS | JWE, KeyLike>;

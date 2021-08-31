@@ -3,8 +3,8 @@ import errorHandler from '@saschazar/oidc-provider-middleware/lib/error-handler'
 
 import methods from '@saschazar/oidc-provider-middleware/lib/methods';
 import tokenMiddleware from '@saschazar/oidc-provider-middleware/lib/token';
-import { METHOD } from 'types/lib/method';
-import { STATUS_CODE } from 'types/lib/status_code';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
 
 const token = async (
   req: IncomingMessage,

@@ -1,4 +1,4 @@
-import { CLAIM } from 'types/lib/claim';
+import { CLAIM } from './claim';
 
 export enum SCOPE {
   OPENID = 'openid',

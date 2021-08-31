@@ -4,7 +4,7 @@ import { customAlphabet } from 'nanoid';
 import {
   CODE_VERIFIER_ALPHABET,
   verifyCodeChallenge,
-} from 'utils/lib/util/verify-code-challenge';
+} from '@saschazar/oidc-provider-utils/lib/util/verify-code-challenge';
 
 describe('Validate Code Challenge', () => {
   // https://datatracker.ietf.org/doc/html/rfc7636#appendix-B

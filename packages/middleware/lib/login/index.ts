@@ -8,9 +8,9 @@ import connect, {
 import bodyParser from '@saschazar/oidc-provider-middleware/lib/body-parser';
 import cookieParser from '@saschazar/oidc-provider-middleware/lib/cookies';
 import redirect from '@saschazar/oidc-provider-middleware/lib/redirect';
-import HTTPError from 'utils/lib/errors/http_error';
-import { LoginForm } from 'types/lib/login';
-import { STATUS_CODE } from 'types/lib/status_code';
+import HTTPError from '@saschazar/oidc-provider-utils/lib/errors/http_error';
+import { LoginForm } from '@saschazar/oidc-provider-types/lib/login';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
 
 const MAX_AGE = {
   sub: 1000 * 60 * 5, // 5 minutes, only for authorization, no session is persisted

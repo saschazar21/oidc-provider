@@ -11,13 +11,13 @@ import connection, {
 import { BaseTokenSchema } from '@saschazar/oidc-provider-database/lib/schemata/token';
 import bodyParser from '@saschazar/oidc-provider-middleware/lib/body-parser';
 import { fetchToken } from '@saschazar/oidc-provider-middleware/lib/token/helpers';
-import HTTPError from 'utils/lib/errors/http_error';
-import TokenError from 'utils/lib/errors/token_error';
-import { ERROR_CODE } from 'types/lib/error_code';
-import { GRANT_TYPE } from 'types/lib/grant_type';
-import { SCOPE } from 'types/lib/scope';
-import { STATUS_CODE } from 'types/lib/status_code';
-import verifyCodeChallenge from 'utils/lib/util/verify-code-challenge';
+import HTTPError from '@saschazar/oidc-provider-utils/lib/errors/http_error';
+import TokenError from '@saschazar/oidc-provider-utils/lib/errors/token_error';
+import { ERROR_CODE } from '@saschazar/oidc-provider-types/lib/error_code';
+import { GRANT_TYPE } from '@saschazar/oidc-provider-types/lib/grant_type';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import verifyCodeChallenge from '@saschazar/oidc-provider-utils/lib/util/verify-code-challenge';
 
 type BaseTokenEndpointPayload = {
   grant_type: GRANT_TYPE;

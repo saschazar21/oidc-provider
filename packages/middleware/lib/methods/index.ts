@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 
-import { METHOD } from 'types/lib/method';
-import { STATUS_CODE } from 'types/lib/status_code';
-import HTTPError from 'utils/lib/errors/http_error';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import HTTPError from '@saschazar/oidc-provider-utils/lib/errors/http_error';
 
 const methods = async (
   req: IncomingMessage,

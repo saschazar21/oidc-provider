@@ -25,13 +25,13 @@ import tokenMiddlewareValidator, {
   AuthorizationCodeTokenEndpointPayload,
   validateIntrospectionRevocationRequestPayload,
 } from '@saschazar/oidc-provider-middleware/lib/token/validator';
-import { SCOPE } from 'types/lib/scope';
-import { METHOD } from 'types/lib/method';
-import { ENDPOINT } from 'types/lib/endpoint';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { mockResponse } from 'utils/lib/util/test-utils';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { ENDPOINT } from '@saschazar/oidc-provider-types/lib/endpoint';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
 import { encode } from 'querystring';
-import { GRANT_TYPE } from 'types/lib/grant_type';
+import { GRANT_TYPE } from '@saschazar/oidc-provider-types/lib/grant_type';
 
 describe('Token middleware validator', () => {
   let authorizationDoc: Document<AuthorizationSchema>;

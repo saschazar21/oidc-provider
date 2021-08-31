@@ -14,10 +14,10 @@ import {
   AccessTokenModel,
   AuthorizationCodeModel,
 } from '@saschazar/oidc-provider-database/lib/schemata/token';
-import { fillClaims, JWTAuth } from 'jwt/lib/helpers';
-import { SCOPE, SCOPE_CLAIMS } from 'types/lib/scope';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import hashCodeOrToken from 'utils/lib/util/hash-code-token';
+import { fillClaims, JWTAuth } from '@saschazar/oidc-provider-jwt/lib/helpers';
+import { SCOPE, SCOPE_CLAIMS } from '@saschazar/oidc-provider-types/lib/scope';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import hashCodeOrToken from '@saschazar/oidc-provider-utils/lib/util/hash-code-token';
 
 describe('JWT helpers', () => {
   let clientDoc: Document<ClientSchema>;

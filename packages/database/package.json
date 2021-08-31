@@ -6,6 +6,7 @@
   "homepage": "https://github.com/saschazar21/now-oidc-provider#readme",
   "license": "MIT",
   "private": true,
+  "main": "lib/index.js",
   "directories": {
     "lib": "lib"
   },
@@ -17,7 +18,8 @@
     "url": "git+https://github.com/saschazar21/now-oidc-provider.git"
   },
   "scripts": {
-    "build:clean": "rimraf dist",
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build:clean": "tsc --clean",
     "build:js": "tsc -b",
     "build": "run-s build:*"
   },
@@ -25,6 +27,8 @@
     "url": "https://github.com/saschazar21/now-oidc-provider/issues"
   },
   "dependencies": {
+    "@saschazar/oidc-provider-types": "^0.0.0",
+    "@saschazar/oidc-provider-utils": "^0.0.0",
     "mongoose": "^5.12.12"
   },
   "devDependencies": {

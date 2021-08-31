@@ -1,10 +1,10 @@
 import MockRequest from 'mock-req';
 
-import getUrl from 'config/lib/url';
+import getUrl from '@saschazar/oidc-provider-config/lib/url';
 import bearerMiddleware from '@saschazar/oidc-provider-middleware/lib/bearer';
-import { METHOD } from 'types/lib/method';
-import idAsync from 'utils/lib/util/id';
-import { mockResponse } from 'utils/lib/util/test-utils';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import idAsync from '@saschazar/oidc-provider-utils/lib/util/id';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
 import { encode } from 'querystring';
 
 describe('Bearer middleware', () => {

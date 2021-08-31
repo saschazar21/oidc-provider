@@ -3,7 +3,7 @@ import connect, {
   disconnect,
 } from '@saschazar/oidc-provider-database/lib/connect';
 import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
-import { ACR_VALUES } from 'types/lib/acr';
+import { ACR_VALUES } from '@saschazar/oidc-provider-types/lib/acr';
 
 describe('UserModel', () => {
   let sub: string;

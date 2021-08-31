@@ -10,10 +10,10 @@ import connect, {
 import bodyParser from '@saschazar/oidc-provider-middleware/lib/body-parser';
 import cookieParser from '@saschazar/oidc-provider-middleware/lib/cookies';
 import redirect from '@saschazar/oidc-provider-middleware/lib/redirect';
-import AuthorizationError from 'utils/lib/errors/authorization_error';
-import HTTPError from 'utils/lib/errors/http_error';
-import { ERROR_CODE } from 'types/lib/error_code';
-import { STATUS_CODE } from 'types/lib/status_code';
+import AuthorizationError from '@saschazar/oidc-provider-utils/lib/errors/authorization_error';
+import HTTPError from '@saschazar/oidc-provider-utils/lib/errors/http_error';
+import { ERROR_CODE } from '@saschazar/oidc-provider-types/lib/error_code';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
 
 const IS_TEST = process.env.NODE_ENV === 'test';
 

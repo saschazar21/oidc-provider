@@ -11,8 +11,8 @@ import { Authorization } from '@saschazar/oidc-provider-database/lib/schemata/au
 import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
 import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import AuthorizationCodeStrategy from '@saschazar/oidc-provider-middleware/strategies/authorization-code';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { SCOPE } from 'types/lib/scope';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
 
 describe('AuthorizationCodeStrategy', () => {
   let authorization: Document<Authorization>;

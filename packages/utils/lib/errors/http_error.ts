@@ -1,8 +1,9 @@
 import { ServerResponse, STATUS_CODES } from 'http';
 
-import { id } from 'utils/lib/util/id';
-import { STATUS_CODE } from 'types/lib/status_code';
-import logError from 'utils/lib/errors/log_error';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+
+import { id } from '../util/id';
+import logError from './log_error';
 
 class HTTPError extends Error implements Error {
   private _id: string;

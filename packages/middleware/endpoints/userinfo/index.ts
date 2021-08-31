@@ -2,8 +2,8 @@ import { IncomingMessage, ServerResponse } from 'http';
 import errorHandler from '@saschazar/oidc-provider-middleware/lib/error-handler';
 import methods from '@saschazar/oidc-provider-middleware/lib/methods';
 import userinfoMiddleware from '@saschazar/oidc-provider-middleware/lib/userinfo';
-import { METHOD } from 'types/lib/method';
-import { STATUS_CODE } from 'types/lib/status_code';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
 
 const userinfo = async (
   req: IncomingMessage,

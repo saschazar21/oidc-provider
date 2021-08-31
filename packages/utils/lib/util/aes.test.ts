@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 
-import { decrypt, encrypt } from 'utils/lib/util/aes';
+import { decrypt, encrypt } from '@saschazar/oidc-provider-utils/lib/util/aes';
 
 let masterkey: string;
 

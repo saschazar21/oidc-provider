@@ -1,6 +1,6 @@
 import { compare, hash } from 'bcrypt';
 
-import { SALT_ROUNDS } from 'config/lib/password';
+import { SALT_ROUNDS } from '@saschazar/oidc-provider-config/lib/password';
 
 export const hashPassword = (plain: string): Promise<string> =>
   hash(plain, SALT_ROUNDS);

@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import Cookies from 'cookies';
 
-import getKeys from 'utils/lib/keys';
+import getKeys from '@saschazar/oidc-provider-utils/lib/keys';
 
 const middleware = async (
   req: IncomingMessage,

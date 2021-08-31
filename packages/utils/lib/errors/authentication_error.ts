@@ -1,8 +1,9 @@
 import { ServerResponse } from 'http';
 
-import AuthorizationError from 'utils/lib/errors/authorization_error';
-import { STATUS_CODE } from 'types/lib/status_code';
-import { ERROR_CODE } from 'types/lib/error_code';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import { ERROR_CODE } from '@saschazar/oidc-provider-types/lib/error_code';
+
+import AuthorizationError from './authorization_error';
 
 class AuthenticationError extends AuthorizationError {
   private _realm: string;

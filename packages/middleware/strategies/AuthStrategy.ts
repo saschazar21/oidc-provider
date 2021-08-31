@@ -11,14 +11,14 @@ import {
   AuthorizationCodeSchema,
 } from '@saschazar/oidc-provider-database/lib/schemata/token';
 import UserModel from '@saschazar/oidc-provider-database/lib/schemata/user';
-import AuthorizationError from 'utils/lib/errors/authorization_error';
-import encrypt from 'jwt/lib/encrypt';
-import sign from 'jwt/lib/sign';
-import { JWTAuth } from 'jwt/lib/helpers';
-import { RESPONSE_MODE } from 'types/lib/response_mode';
-import { SCOPE } from 'types/lib/scope';
-import { ERROR_CODE } from 'types/lib/error_code';
-import { PROMPT } from 'types/lib/prompt';
+import AuthorizationError from '@saschazar/oidc-provider-utils/lib/errors/authorization_error';
+import encrypt from '@saschazar/oidc-provider-jwt/lib/encrypt';
+import sign from '@saschazar/oidc-provider-jwt/lib/sign';
+import { JWTAuth } from '@saschazar/oidc-provider-jwt/lib/helpers';
+import { RESPONSE_MODE } from '@saschazar/oidc-provider-types/lib/response_mode';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import { ERROR_CODE } from '@saschazar/oidc-provider-types/lib/error_code';
+import { PROMPT } from '@saschazar/oidc-provider-types/lib/prompt';
 
 export type ImplicitOrHybridResponsePayload = {
   access_token: string;

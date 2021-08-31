@@ -1,9 +1,10 @@
 import { JWK } from 'jose/webcrypto/types';
 
-import config, { JWKSConfig } from 'config/lib/jwks';
-import { JWE } from 'types/lib/jwe';
-import { JWS } from 'types/lib/jws';
-import KeyStore from 'utils/lib/util/keystore';
+import config, { JWKSConfig } from '@saschazar/oidc-provider-config/lib/jwks';
+import { JWE } from '@saschazar/oidc-provider-types/lib/jwe';
+import { JWS } from '@saschazar/oidc-provider-types/lib/jws';
+
+import KeyStore from '../util/keystore';
 
 const keystore = new KeyStore();
 

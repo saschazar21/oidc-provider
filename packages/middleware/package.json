@@ -7,10 +7,7 @@
   "license": "MIT",
   "main": "lib/middleware.js",
   "directories": {
-    "lib": "lib",
-    "middleware": "middleware",
-    "endpoints": "middleware/endpoints",
-    "strategies": "strategies"
+    "lib": "lib"
   },
   "files": [
     "endpoints",
@@ -22,12 +19,20 @@
     "url": "git+https://github.com/saschazar21/now-oidc-provider.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build:clean": "tsc -b --clean",
+    "build:js": "tsc -b",
+    "build": "run-s build:*"
   },
   "bugs": {
     "url": "https://github.com/saschazar21/now-oidc-provider/issues"
   },
   "dependencies": {
+    "@saschazar/oidc-provider-config": "^0.0.0",
+    "@saschazar/oidc-provider-database": "^0.0.0",
+    "@saschazar/oidc-provider-jwt": "^0.0.0",
+    "@saschazar/oidc-provider-types": "^0.0.0",
+    "@saschazar/oidc-provider-utils": "^0.0.0",
     "basic-auth": "^2.0.1",
     "body": "^5.1.0",
     "cookies": "^0.8.0"

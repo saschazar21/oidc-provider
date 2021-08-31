@@ -1,4 +1,4 @@
-import { ALPHABET_LENGTH } from 'config/lib/id';
+import { ALPHABET_LENGTH } from '@saschazar/oidc-provider-config/lib/id';
 import {
   AuthorizationModel,
   ClientModel,
@@ -12,10 +12,10 @@ import connect, {
 } from '@saschazar/oidc-provider-database/lib/connect';
 import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
 import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
-import { LIFETIME } from 'types/lib/lifetime';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { TOKEN_TYPE } from 'types/lib/token_type';
-import { SCOPE } from 'types/lib/scope';
+import { LIFETIME } from '@saschazar/oidc-provider-types/lib/lifetime';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { TOKEN_TYPE } from '@saschazar/oidc-provider-types/lib/token_type';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
 
 describe('TokenModel', () => {
   let client_id: string;

@@ -14,14 +14,14 @@ import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schem
 import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
 import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import introspectionMiddleware from '@saschazar/oidc-provider-middleware/lib/token/introspection';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { SCOPE } from 'types/lib/scope';
-import { mockResponse } from 'utils/lib/util/test-utils';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
 import {
   AccessTokenSchema,
   RefreshTokenSchema,
 } from '@saschazar/oidc-provider-database/lib/schemata/token';
-import { METHOD } from 'types/lib/method';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
 import { encode } from 'querystring';
 
 describe('Token Introspection middleware', () => {

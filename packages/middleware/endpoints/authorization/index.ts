@@ -8,9 +8,9 @@ import { ResponsePayload } from '@saschazar/oidc-provider-middleware/lib/authori
 import errorHandler from '@saschazar/oidc-provider-middleware/lib/error-handler';
 import methods from '@saschazar/oidc-provider-middleware/lib/methods';
 import redirect from '@saschazar/oidc-provider-middleware/lib/redirect';
-import { METHOD } from 'types/lib/method';
-import { STATUS_CODE } from 'types/lib/status_code';
-import { RESPONSE_MODE } from 'types/lib/response_mode';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import { RESPONSE_MODE } from '@saschazar/oidc-provider-types/lib/response_mode';
 
 const authorization = async (
   req: IncomingMessage,

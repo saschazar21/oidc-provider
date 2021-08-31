@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-env node */
 
 const { readFile } = require('fs');

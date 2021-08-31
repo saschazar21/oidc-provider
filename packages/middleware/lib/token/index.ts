@@ -12,10 +12,10 @@ import validateRequestPayload, {
   AuthorizationCodeTokenEndpointPayload,
   RefreshTokenEndpointPayload,
 } from '@saschazar/oidc-provider-middleware/lib/token/validator';
-import HTTPError from 'utils/lib/errors/http_error';
-import sign from 'jwt/lib/sign';
-import { LIFETIME } from 'types/lib/lifetime';
-import { STATUS_CODE } from 'types/lib/status_code';
+import HTTPError from '@saschazar/oidc-provider-utils/lib/errors/http_error';
+import sign from '@saschazar/oidc-provider-jwt/lib/sign';
+import { LIFETIME } from '@saschazar/oidc-provider-types/lib/lifetime';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
 
 export type TokenResponsePayload = {
   access_token: string;

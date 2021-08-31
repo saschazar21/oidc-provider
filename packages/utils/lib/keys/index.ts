@@ -1,17 +1,18 @@
 import { Document } from 'mongoose';
 import Keygrip from 'keygrip';
+import { JWK } from 'jose/webcrypto/types';
 
 import connect, {
   disconnect,
   KeyModel,
-} from '@saschazar/oidc-provider-database/lib/';
+} from '@saschazar/oidc-provider-database/lib';
 import { KeySchema } from '@saschazar/oidc-provider-database/lib/schemata/key';
-import getKeystore from 'utils/lib/keys/jwks';
-import createCookieSecrets from 'config/lib/keygrip';
-import getKeygrip from 'utils/lib/keys/keygrip';
-import { decrypt, encrypt } from 'utils/lib/util/aes';
-import { JWK } from 'jose/webcrypto/types';
-import KeyStore from 'utils/lib/util/keystore';
+import createCookieSecrets from '@saschazar/oidc-provider-config/lib/keygrip';
+
+import { decrypt, encrypt } from '../util/aes';
+import KeyStore from '../util/keystore';
+import getKeystore from './jwks';
+import getKeygrip from './keygrip';
 
 export interface KeyObject {
   cookies: string[];

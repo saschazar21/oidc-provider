@@ -4,7 +4,7 @@ import cookie from 'cookie-parse';
 import { Document } from 'mongoose';
 import MockRequest from 'mock-req';
 
-import getUrl from 'config/lib/url';
+import getUrl from '@saschazar/oidc-provider-config/lib/url';
 import connection, {
   AccessTokenModel,
   AuthorizationCodeModel,
@@ -18,12 +18,15 @@ import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schem
 import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
 import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import authorizationEndpoint from '@saschazar/oidc-provider-middleware/endpoints/authorization';
-import { mockResponse } from 'utils/lib/util/test-utils';
-import { SCOPE } from 'types/lib/scope';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { METHOD } from 'types/lib/method';
-import { CLIENT_ENDPOINT, ENDPOINT } from 'types/lib/endpoint';
-import { RESPONSE_MODE } from 'types/lib/response_mode';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import {
+  CLIENT_ENDPOINT,
+  ENDPOINT,
+} from '@saschazar/oidc-provider-types/lib/endpoint';
+import { RESPONSE_MODE } from '@saschazar/oidc-provider-types/lib/response_mode';
 
 describe('Authorization Endpoint', () => {
   let res: ServerResponse;

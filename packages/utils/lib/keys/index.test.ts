@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import retry from 'jest-retries';
 
-import KeyStore from 'utils/lib/util/keystore';
-import { JWE } from 'types/lib/jwe';
-import { JWS } from 'types/lib/jws';
+import KeyStore from '@saschazar/oidc-provider-utils/lib/util/keystore';
+import { JWE } from '@saschazar/oidc-provider-types/lib/jwe';
+import { JWS } from '@saschazar/oidc-provider-types/lib/jws';
 
 const MASTER_KEY = 'testkey';
 
@@ -27,7 +27,9 @@ describe('Keys', () => {
   beforeEach(async () => {
     jest.resetModules();
 
-    const importedKeys = await import('utils/lib/keys');
+    const importedKeys = await import(
+      '@saschazar/oidc-provider-utils/lib/keys'
+    );
     getKeys = importedKeys.default;
   });
 
@@ -65,9 +67,15 @@ describe('Existing Keys', () => {
   afterEach(async () => await KeyModel.findByIdAndDelete('master'));
 
   beforeAll(async () => {
-    const { encrypt } = await import('utils/lib/util/aes');
-    const { default: JWKSConfig } = await import('config/lib/jwks');
-    const { default: createCookieSecrets } = await import('config/lib/keygrip');
+    const { encrypt } = await import(
+      '@saschazar/oidc-provider-utils/lib/util/aes'
+    );
+    const { default: JWKSConfig } = await import(
+      '@saschazar/oidc-provider-config/lib/jwks'
+    );
+    const { default: createCookieSecrets } = await import(
+      '@saschazar/oidc-provider-config/lib/keygrip'
+    );
     const cookies = await createCookieSecrets();
     const keystore = new KeyStore();
 
@@ -98,7 +106,9 @@ describe('Existing Keys', () => {
   beforeEach(async () => {
     jest.resetModules();
 
-    const importedKeys = await import('utils/lib/keys');
+    const importedKeys = await import(
+      '@saschazar/oidc-provider-utils/lib/keys'
+    );
     getKeys = importedKeys.default;
 
     await KeyModel.findByIdAndDelete('master');

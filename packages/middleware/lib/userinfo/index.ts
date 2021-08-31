@@ -5,8 +5,8 @@ import {
   getClaims,
   UserInfoResponsePayload,
 } from '@saschazar/oidc-provider-middleware/lib/userinfo/helpers';
-import AuthenticationError from 'utils/lib/errors/authentication_error';
-import { ERROR_CODE } from 'types/lib/error_code';
+import AuthenticationError from '@saschazar/oidc-provider-utils/lib/errors/authentication_error';
+import { ERROR_CODE } from '@saschazar/oidc-provider-types/lib/error_code';
 
 const userinfoMiddleware = async (
   req: IncomingMessage,

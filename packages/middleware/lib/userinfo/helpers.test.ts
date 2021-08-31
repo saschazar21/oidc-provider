@@ -16,8 +16,8 @@ import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schem
 import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
 import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import { getClaims } from '@saschazar/oidc-provider-middleware/lib/userinfo/helpers';
-import { SCOPE } from 'types/lib/scope';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
 
 describe('Userinfo middleware helpers', () => {
   let authorizationDoc: Document<AuthorizationSchema>;

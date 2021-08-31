@@ -2,7 +2,7 @@ import { Document } from 'mongoose';
 import { compactVerify } from 'jose/jws/compact/verify';
 import parseJwk from 'jose/jwk/parse';
 
-import { getUrl } from 'config/lib/url';
+import { getUrl } from '@saschazar/oidc-provider-config/lib/url';
 import { KeyModel } from '@saschazar/oidc-provider-database/lib/';
 import connection, {
   disconnect,
@@ -13,12 +13,12 @@ import ClientModel, {
 import UserModel, {
   UserSchema,
 } from '@saschazar/oidc-provider-database/lib/schemata/user';
-import { JWTAuth } from 'jwt/lib/helpers';
-import sign, { verify } from 'jwt/lib/sign';
-import getKeys from 'utils/lib/keys';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { SCOPE } from 'types/lib/scope';
-import KeyStore from 'utils/lib/util/keystore';
+import { JWTAuth } from '@saschazar/oidc-provider-jwt/lib/helpers';
+import sign, { verify } from '@saschazar/oidc-provider-jwt/lib/sign';
+import getKeys from '@saschazar/oidc-provider-utils/lib/keys';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import KeyStore from '@saschazar/oidc-provider-utils/lib/util/keystore';
 
 describe('JWT Sign', () => {
   let keys: KeyStore;

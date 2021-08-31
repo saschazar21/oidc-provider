@@ -5,9 +5,9 @@ import {
   CorsOptions,
   CORS_HEADERS,
 } from '@saschazar/oidc-provider-middleware/lib/cors';
-import { STATUS_CODE } from 'types/lib/status_code';
-import { METHOD } from 'types/lib/method';
-import { mockResponse } from 'utils/lib/util/test-utils';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
 
 describe('CORS', () => {
   let cors: (

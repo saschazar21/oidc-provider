@@ -16,8 +16,8 @@ import UserModel, {
   UserSchema,
 } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import HybridStrategy from '@saschazar/oidc-provider-middleware/strategies/hybrid';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { SCOPE } from 'types/lib/scope';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
 
 describe('Hybrid Strategy', () => {
   let authorization: Document<Authorization>;

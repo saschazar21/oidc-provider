@@ -3,7 +3,7 @@ import type Cookies from 'cookies';
 import { URL } from 'url';
 import { encode } from 'querystring';
 
-import getUrl from 'config/lib/url';
+import getUrl from '@saschazar/oidc-provider-config/lib/url';
 import {
   buildAuthorizationSchema,
   getAuthenticationFlow,
@@ -16,12 +16,15 @@ import AuthStrategy, {
   AuthorizationResponse,
 } from '@saschazar/oidc-provider-middleware/strategies/AuthStrategy';
 import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
-import { CLIENT_ENDPOINT, ENDPOINT } from 'types/lib/endpoint';
-import { ERROR_CODE } from 'types/lib/error_code';
-import { METHOD } from 'types/lib/method';
-import { STATUS_CODE } from 'types/lib/status_code';
-import HTTPError from 'utils/lib/errors/http_error';
-import AuthorizationError from 'utils/lib/errors/authorization_error';
+import {
+  CLIENT_ENDPOINT,
+  ENDPOINT,
+} from '@saschazar/oidc-provider-types/lib/endpoint';
+import { ERROR_CODE } from '@saschazar/oidc-provider-types/lib/error_code';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import HTTPError from '@saschazar/oidc-provider-utils/lib/errors/http_error';
+import AuthorizationError from '@saschazar/oidc-provider-utils/lib/errors/authorization_error';
 
 // TODO: move to a general config space;
 const MAX_AGE = 1000 * 60 * 15; // 15 minutes between login & authorization

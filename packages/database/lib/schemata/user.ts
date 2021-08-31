@@ -1,11 +1,13 @@
 import mongoose, { Document, Schema, UpdateQuery } from 'mongoose';
 
-import { ACR_VALUES } from 'types/lib/acr';
-import { ALPHABET_LENGTH } from 'config/lib/id';
-import { EMAIL_REGEX } from 'types/lib/email';
-import { URL_REGEX } from 'types/lib/url';
-import id from 'utils/lib/util/id';
-import hashPassword, { comparePassword } from 'utils/lib/util/password';
+import { ACR_VALUES } from '@saschazar/oidc-provider-types/lib/acr';
+import { ALPHABET_LENGTH } from '@saschazar/oidc-provider-config/lib/id';
+import { EMAIL_REGEX } from '@saschazar/oidc-provider-types/lib/email';
+import { URL_REGEX } from '@saschazar/oidc-provider-types/lib/url';
+import id from '@saschazar/oidc-provider-utils/lib/util/id';
+import hashPassword, {
+  comparePassword,
+} from '@saschazar/oidc-provider-utils/lib/util/password';
 
 export type AddressSchema = {
   formatted?: string;

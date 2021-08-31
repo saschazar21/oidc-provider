@@ -3,7 +3,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 import consentMiddleware from '@saschazar/oidc-provider-middleware/lib/consent';
 import errorHandler from '@saschazar/oidc-provider-middleware/lib/error-handler';
 import methods from '@saschazar/oidc-provider-middleware/lib/methods';
-import { METHOD } from 'types/lib/method';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
 
 const consent = async (
   req: IncomingMessage,

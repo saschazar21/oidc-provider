@@ -2,9 +2,9 @@ import type { IncomingMessage, ServerResponse } from 'http';
 
 import errorHandler from '@saschazar/oidc-provider-middleware/lib/error-handler';
 import methods from '@saschazar/oidc-provider-middleware/lib/methods';
-import { METHOD } from 'types/lib/method';
-import { STATUS_CODE } from 'types/lib/status_code';
-import getKeys from 'utils/lib/keys';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import getKeys from '@saschazar/oidc-provider-utils/lib/keys';
 
 const jwks = async (
   req: IncomingMessage,

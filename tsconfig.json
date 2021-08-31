@@ -16,16 +16,7 @@
     "downlevelIteration": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    "jsx": "preserve",
-    "paths": {
-      "config/*": ["packages/config/*"],
-      "database/*": ["packages/database/*"],
-      "functions/*": ["packages/functions/*"],
-      "jwt/*": ["packages/jwt/*"],
-      "middleware/*": ["packages/middleware/*"],
-      "types/*": ["packages/types/*"],
-      "utils/*": ["packages/utils/*"]
-    }
+    "jsx": "preserve"
   },
   "references": [
     { "path": "./packages/config" },

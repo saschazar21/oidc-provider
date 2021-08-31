@@ -1,5 +1,5 @@
-import { ALPHABET_LENGTH } from 'config/lib/id';
-import { id } from 'utils/lib/util/id';
+import { ALPHABET_LENGTH } from '@saschazar/oidc-provider-config/lib/id';
+import { id } from '@saschazar/oidc-provider-utils/lib/util/id';
 import hashCodeOrToken from './hash-code-token';
 
 describe('Hash AccessToken or Authorization Code', () => {

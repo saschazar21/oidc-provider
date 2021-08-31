@@ -1,10 +1,15 @@
 import { CompactSign } from 'jose/jws/compact/sign';
 import { compactVerify } from 'jose/jws/compact/verify';
 
-import { JWKS as config, JWE, JWS, supportedAlgorithms } from 'config/lib/jwks';
-import KeyStore from 'utils/lib/util/keystore';
-import { JWE as JWEAlg } from 'types/lib/jwe';
-import { JWS as JWSAlg } from 'types/lib/jws';
+import {
+  JWKS as config,
+  JWE,
+  JWS,
+  supportedAlgorithms,
+} from '@saschazar/oidc-provider-config/lib/jwks';
+import KeyStore from '@saschazar/oidc-provider-utils/lib/util/keystore';
+import { JWE as JWEAlg } from '@saschazar/oidc-provider-types/lib/jwe';
+import { JWS as JWSAlg } from '@saschazar/oidc-provider-types/lib/jws';
 
 describe('JWKS', () => {
   beforeEach(() => {
@@ -12,14 +17,18 @@ describe('JWKS', () => {
   });
 
   it('should throw on malformatted Keystore', async () => {
-    const { default: getKeystore } = await import('utils/lib/keys/jwks');
+    const { default: getKeystore } = await import(
+      '@saschazar/oidc-provider-utils/lib/keys/jwks'
+    );
     await expect(getKeystore({ keys: null })).rejects.toThrowError();
   });
 
   it('creates a new Keystore', async () => {
     const filteredConfig = config.filter(({ kty }) => kty !== 'oct');
 
-    const { default: getKeystore } = await import('utils/lib/keys/jwks');
+    const { default: getKeystore } = await import(
+      '@saschazar/oidc-provider-utils/lib/keys/jwks'
+    );
     const jwks = await (await getKeystore()).export();
 
     expect(jwks).toHaveProperty('keys');
@@ -27,7 +36,9 @@ describe('JWKS', () => {
   });
 
   it('reuses an existing Keystore', async () => {
-    const { default: getKeystore } = await import('utils/lib/keys/jwks');
+    const { default: getKeystore } = await import(
+      '@saschazar/oidc-provider-utils/lib/keys/jwks'
+    );
 
     const jwt = { sub: 'test' };
     const algorithms = ['RS256', 'ES256'] as Array<JWEAlg | JWSAlg>;

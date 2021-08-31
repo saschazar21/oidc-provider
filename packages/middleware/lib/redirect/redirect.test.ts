@@ -1,8 +1,8 @@
 import MockRequest from 'mock-req';
 import type { ServerResponse, IncomingMessage } from 'http';
 
-import { STATUS_CODE } from 'types/lib/status_code';
-import { mockResponse } from 'utils/lib/util/test-utils';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
 
 const REDIRECT_PATH = '/test/redirect';
 

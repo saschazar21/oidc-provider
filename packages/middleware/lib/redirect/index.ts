@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 
-import { STATUS_CODE } from 'types/lib/status_code';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
 
 export interface RedirectOptions {
   location: string;

@@ -5,10 +5,10 @@ import { encode } from 'querystring';
 
 import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
 import loginMiddleware from '@saschazar/oidc-provider-middleware/lib/login';
-import { ENDPOINT } from 'types/lib/endpoint';
-import { STATUS_CODE } from 'types/lib/status_code';
-import { LoginForm } from 'types/lib/login';
-import { mockResponse } from 'utils/lib/util/test-utils';
+import { ENDPOINT } from '@saschazar/oidc-provider-types/lib/endpoint';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import { LoginForm } from '@saschazar/oidc-provider-types/lib/login';
+import { mockResponse } from '@saschazar/oidc-provider-utils/lib/util/test-utils';
 
 const createReq = (configuration?: {
   [key: string]: string | number;

@@ -4,13 +4,13 @@ import { KeyModel } from '@saschazar/oidc-provider-database/lib/';
 import connection, {
   disconnect,
 } from '@saschazar/oidc-provider-database/lib/connect';
-import encrypt, { decrypt } from 'jwt/lib/encrypt';
-import { JWTAuth } from 'jwt/lib/helpers';
-import getKeys from 'utils/lib/keys';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { SCOPE } from 'types/lib/scope';
-import KeyStore from 'utils/lib/util/keystore';
-import { JWE, JWE_ENC } from 'types/lib/jwe';
+import encrypt, { decrypt } from '@saschazar/oidc-provider-jwt/lib/encrypt';
+import { JWTAuth } from '@saschazar/oidc-provider-jwt/lib/helpers';
+import getKeys from '@saschazar/oidc-provider-utils/lib/keys';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
+import KeyStore from '@saschazar/oidc-provider-utils/lib/util/keystore';
+import { JWE, JWE_ENC } from '@saschazar/oidc-provider-types/lib/jwe';
 
 describe('JWT Encode', () => {
   let keys: KeyStore;

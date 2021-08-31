@@ -1,17 +1,21 @@
-import { AuthorizationModel, ClientModel, UserModel } from '@saschazar/oidc-provider-database/lib';
+import {
+  AuthorizationModel,
+  ClientModel,
+  UserModel,
+} from '@saschazar/oidc-provider-database/lib';
 import connect, {
   disconnect,
 } from '@saschazar/oidc-provider-database/lib/connect';
 import { AuthorizationSchema } from '@saschazar/oidc-provider-database/lib/schemata/authorization';
 import { ClientSchema } from '@saschazar/oidc-provider-database/lib/schemata/client';
 import { UserSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
-import { ACR_VALUES } from 'types/lib/acr';
-import { DISPLAY } from 'types/lib/display';
-import { PKCE } from 'types/lib/pkce';
-import { PROMPT } from 'types/lib/prompt';
-import { RESPONSE_MODE } from 'types/lib/response_mode';
-import { RESPONSE_TYPE } from 'types/lib/response_type';
-import { SCOPE } from 'types/lib/scope';
+import { ACR_VALUES } from '@saschazar/oidc-provider-types/lib/acr';
+import { DISPLAY } from '@saschazar/oidc-provider-types/lib/display';
+import { PKCE } from '@saschazar/oidc-provider-types/lib/pkce';
+import { PROMPT } from '@saschazar/oidc-provider-types/lib/prompt';
+import { RESPONSE_MODE } from '@saschazar/oidc-provider-types/lib/response_mode';
+import { RESPONSE_TYPE } from '@saschazar/oidc-provider-types/lib/response_type';
+import { SCOPE } from '@saschazar/oidc-provider-types/lib/scope';
 
 describe('AuthorizationModel', () => {
   let authorization_id: string;

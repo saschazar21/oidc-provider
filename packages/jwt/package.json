@@ -1,11 +1,12 @@
 {
-  "name": "jwt",
+  "name": "@saschazar/oidc-provider-jwt",
   "version": "0.0.0",
   "description": "A collection of JWT-related functions for the OpenID Connect provider",
   "author": "Sascha Zarhuber <sascha.zarhuber@gmail.com>",
   "homepage": "https://github.com/saschazar21/now-oidc-provider#readme",
   "license": "MIT",
   "private": true,
+  "main": "index.js",
   "directories": {
     "lib": "lib"
   },
@@ -21,5 +22,12 @@
   },
   "bugs": {
     "url": "https://github.com/saschazar21/now-oidc-provider/issues"
+  },
+  "dependencies": {
+    "@saschazar/oidc-provider-config": "^0.0.0",
+    "@saschazar/oidc-provider-database": "^0.0.0",
+    "@saschazar/oidc-provider-jwt": "^0.0.0",
+    "@saschazar/oidc-provider-types": "^0.0.0",
+    "@saschazar/oidc-provider-utils": "^0.0.0"
   }
 }

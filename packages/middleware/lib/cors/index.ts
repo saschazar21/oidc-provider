@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 
-import { ALLOWED_ORIGINS } from 'config/lib/origin';
-import { STATUS_CODE } from 'types/lib/status_code';
-import { METHOD } from 'types/lib/method';
+import { ALLOWED_ORIGINS } from '@saschazar/oidc-provider-config/lib/origin';
+import { STATUS_CODE } from '@saschazar/oidc-provider-types/lib/status_code';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
 
 const MAX_AGE = 86400;
 const ALLOW_METHODS = [METHOD.GET, METHOD.HEAD];

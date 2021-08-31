@@ -2,16 +2,17 @@ import { KeyLike, parseJwk } from 'jose/jwk/parse';
 import { CompactSign } from 'jose/jws/compact/sign';
 import { compactVerify } from 'jose/jws/compact/verify';
 
-import { supportedAlgorithms } from 'config/lib/jwks';
+import { supportedAlgorithms } from '@saschazar/oidc-provider-config/lib/jwks';
 import connection, {
   disconnect,
 } from '@saschazar/oidc-provider-database/lib/connect';
 import ClientModel from '@saschazar/oidc-provider-database/lib/schemata/client';
 import { AddressSchema } from '@saschazar/oidc-provider-database/lib/schemata/user';
-import { JWTAuth, fillClaims } from 'jwt/lib/helpers';
-import getKeys from 'utils/lib/keys';
-import { CLAIM } from 'types/lib/claim';
-import { JWS } from 'types/lib/jws';
+import getKeys from '@saschazar/oidc-provider-utils/lib/keys';
+import { CLAIM } from '@saschazar/oidc-provider-types/lib/claim';
+import { JWS } from '@saschazar/oidc-provider-types/lib/jws';
+
+import { JWTAuth, fillClaims } from './helpers';
 
 const DEFAULT_ALGORITHM = 'RS256';
 

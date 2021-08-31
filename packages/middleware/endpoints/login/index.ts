@@ -3,7 +3,7 @@ import errorHandler from '@saschazar/oidc-provider-middleware/lib/error-handler'
 
 import loginMiddleware from '@saschazar/oidc-provider-middleware/lib/login';
 import methods from '@saschazar/oidc-provider-middleware/lib/methods';
-import { METHOD } from 'types/lib/method';
+import { METHOD } from '@saschazar/oidc-provider-types/lib/method';
 
 const login = async (
   req: IncomingMessage,
