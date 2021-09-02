@@ -6,6 +6,10 @@
   "homepage": "https://github.com/saschazar21/now-oidc-provider#readme",
   "license": "MIT",
   "main": "index.js",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
   "directories": {
     "lib": "lib"
   },
@@ -22,7 +26,9 @@
     "test": "echo \"Error: run tests from root\" && exit 1",
     "build:js": "tsc -b",
     "build:pkg": "cpy package.json README.md ../../LICENSE dist",
-    "build": "run-s build:*"
+    "build": "run-s build:*",
+    "package:link": "cd dist && yarn link",
+    "package:unlink": "cd dist && yarn unlink"
   },
   "bugs": {
     "url": "https://github.com/saschazar21/now-oidc-provider/issues"
