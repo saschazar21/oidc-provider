@@ -26,7 +26,8 @@
     "build:pkg": "cpy package.json README.md CHANGELOG.md ../../LICENSE dist",
     "build": "run-s build:*",
     "package:link": "cd dist && yarn link",
-    "package:unlink": "cd dist && yarn unlink"
+    "package:unlink": "cd dist && yarn unlink",
+    "package:publish": "cd dist && npm publish"
   },
   "bugs": {
     "url": "https://github.com/saschazar21/now-oidc-provider/issues"
