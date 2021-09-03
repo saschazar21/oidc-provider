@@ -10,20 +10,20 @@
 
 This is a monorepo containing the bare-minimal functionality to start building an OpenID Connect RP from scratch. It is divided into several packages:
 
-- **[`@saschazar/oidc-provider-config`](https://github.com/saschazar21/now-oidc-provider/tree/master/packages/config)** - sources for providing the global configuration of the provider.
-- **[`@saschazar/oidc-provider-database`](https://github.com/saschazar21/now-oidc-provider/tree/master/packages/database)** - [MongoDB](https://mongodb.com/) database client and models.
-- **[`@saschazar/oidc-provider-jwt`](https://github.com/saschazar21/now-oidc-provider/tree/master/packages/jwt)** - helper functions for signing/verifying, as well as encrypting/decrypting JWTs.
-- **[`@saschazar/oidc-provider-lambda`](https://github.com/saschazar21/now-oidc-provider/tree/master/packages/lambda)** - adapter for [AWS Lambda](https://aws.amazon.com/lambda/) functions. This package wraps functions exported from [`middleware/endpoints`](https://github.com/saschazar21/now-oidc-provider/tree/main/packages/middleware/endpoints).
-- **[`@saschazar/oidc-provider-middleware`](https://github.com/saschazar21/now-oidc-provider/tree/master/packages/middleware)** - contains the main logic of the provider:
-  - **[`endpoints`](https://github.com/saschazar21/now-oidc-provider/tree/main/packages/middleware/endpoints)** - the raw request handlers, each exports a function that takes an `IncomingMessage` and `ServerResponse` as parameters and returns a `Promise`. (see [Endpoints](#endpoints) below)
-  - **[`lib`](https://github.com/saschazar21/now-oidc-provider/tree/main/packages/middleware/lib)** - contains the actual endpoint logic.
-  - **[`strategies`](https://github.com/saschazar21/now-oidc-provider/tree/main/packages/middleware/strategies)** - defines the contents of the `/api/authorization` endpoints, based on the `response_type` parameter of the initial request.
-- **[`@saschazar/oidc-provider-types`](https://github.com/saschazar21/now-oidc-provider/tree/master/packages/types)** - contains various type definitions across OpenID Connect and OAuth 2.0.
-- **[`@saschazar/oidc-provider-utils`](https://github.com/saschazar21/now-oidc-provider/tree/master/packages/utils)** - shared utility functionality.
+- **[`@saschazar/oidc-provider-config`](https://github.com/saschazar21/oidc-provider/tree/master/packages/config)** - sources for providing the global configuration of the provider.
+- **[`@saschazar/oidc-provider-database`](https://github.com/saschazar21/oidc-provider/tree/master/packages/database)** - [MongoDB](https://mongodb.com/) database client and models.
+- **[`@saschazar/oidc-provider-jwt`](https://github.com/saschazar21/oidc-provider/tree/master/packages/jwt)** - helper functions for signing/verifying, as well as encrypting/decrypting JWTs.
+- **[`@saschazar/oidc-provider-lambda`](https://github.com/saschazar21/oidc-provider/tree/master/packages/lambda)** - adapter for [AWS Lambda](https://aws.amazon.com/lambda/) functions. This package wraps functions exported from [`middleware/endpoints`](https://github.com/saschazar21/oidc-provider/tree/main/packages/middleware/endpoints).
+- **[`@saschazar/oidc-provider-middleware`](https://github.com/saschazar21/oidc-provider/tree/master/packages/middleware)** - contains the main logic of the provider:
+  - **[`endpoints`](https://github.com/saschazar21/oidc-provider/tree/main/packages/middleware/endpoints)** - the raw request handlers, each exports a function that takes an `IncomingMessage` and `ServerResponse` as parameters and returns a `Promise`. (see [Endpoints](#endpoints) below)
+  - **[`lib`](https://github.com/saschazar21/oidc-provider/tree/main/packages/middleware/lib)** - contains the actual endpoint logic.
+  - **[`strategies`](https://github.com/saschazar21/oidc-provider/tree/main/packages/middleware/strategies)** - defines the contents of the `/api/authorization` endpoints, based on the `response_type` parameter of the initial request.
+- **[`@saschazar/oidc-provider-types`](https://github.com/saschazar21/oidc-provider/tree/master/packages/types)** - contains various type definitions across OpenID Connect and OAuth 2.0.
+- **[`@saschazar/oidc-provider-utils`](https://github.com/saschazar21/oidc-provider/tree/master/packages/utils)** - shared utility functionality.
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org) - the chosen runtime for this project,
+- [Node.js](https://nodejs.org) - the chosen runtime for this project.
 - [MongoDB](https://mongodb.com) - the database engine used for storing session data, tokens, etc.
 
 Other than the above, no other dependencies are required by this project. However, this is not a standalone project, but rather a starting point for building an OpenID Connect provider.
@@ -50,10 +50,10 @@ The following endpoints are included by default and each consists of a single en
 
 The following [MongoDB](https://mongodb.com/) database models are used by the provider, and should be used when extending the functionality (e.g. user management):
 
-- [`AuthorizationModel`](https://github.com/saschazar21/now-oidc-provider/blob/master/packages/database/lib/schemata/authorization.ts) - creates and handles authorization sessions.
-- [`ClientModel`](https://github.com/saschazar21/now-oidc-provider/blob/master/packages/database/lib/schemata/client.ts) - used to register and retrieve client applications.
-- [`AuthorizationCodeModel`, `AccessTokenModel` & `RefreshTokenModel`](https://github.com/saschazar21/now-oidc-provider/blob/master/packages/database/lib/schemata/token.ts) - creates authorization code, access- and refresh tokens, each linked to their respective authorization session.
-- [`UserModel`](https://github.com/saschazar21/now-oidc-provider/blob/master/packages/database/lib/schemata/user.ts) - used to register and retrieve users.
+- [`AuthorizationModel`](https://github.com/saschazar21/oidc-provider/blob/master/packages/database/lib/schemata/authorization.ts) - creates and handles authorization sessions.
+- [`ClientModel`](https://github.com/saschazar21/oidc-provider/blob/master/packages/database/lib/schemata/client.ts) - used to register and retrieve client applications.
+- [`AuthorizationCodeModel`, `AccessTokenModel` & `RefreshTokenModel`](https://github.com/saschazar21/oidc-provider/blob/master/packages/database/lib/schemata/token.ts) - creates authorization code, access- and refresh tokens, each linked to their respective authorization session.
+- [`UserModel`](https://github.com/saschazar21/oidc-provider/blob/master/packages/database/lib/schemata/user.ts) - used to register and retrieve users.
 
 ### Not included
 

@@ -1,5 +1,5 @@
 {
-  "name": "now-oidc-provider",
+  "name": "oidc-provider",
   "version": "0.1.0",
   "private": true,
   "publishConfig": {
