@@ -41,7 +41,13 @@ jobs:
       - name: Deploy pre-release
         if: ${{ github.ref == 'refs/heads/next' }}
         run: yarn publish:prerelease
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Deploy release
         if: ${{ github.ref == 'refs/heads/main' }}
         run: yarn publish:release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
