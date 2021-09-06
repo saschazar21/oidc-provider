@@ -1,4 +1,4 @@
-name: Deploy to NPM
+name: Test, build & deploy to NPM
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   setup:
-    name: Setup
+    name: Test, build & deploy to NPM
     runs-on: ubuntu-latest
 
     steps:
