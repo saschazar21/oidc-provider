@@ -1,6 +1,7 @@
 <div align="center">
   <h1>OpenID Connect Provider</h1>
-  <strong>A bare-bones <a href="https://openid.net/connect/" rel="noopener noreferrer">OpenID Connect</a> framework. 🔐</strong>
+  <strong>A bare-bones <a href="https://openid.net/connect/" rel="noopener noreferrer">OpenID Connect</a> framework. 🔐</strong><br />
+  <a href="https://github.com/saschazar21/oidc-provider/actions/workflows/test.yml"><img alt="Result of the latest Test workflow run" src="https://github.com/saschazar21/oidc-provider/actions/workflows/test.yml/badge.svg" /></a>
   <br />
   <br />
   <br />
