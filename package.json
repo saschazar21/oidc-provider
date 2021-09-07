@@ -15,7 +15,7 @@
     "build": "run-s build:*",
     "packages:link": "lerna exec yarn package:link",
     "packages:unlink": "lerna exec yarn package:unlink",
-    "publish:prerelease": "lerna publish --yes --canary --contents dist --preid next",
+    "publish:prerelease": "lerna publish --yes --canary --contents dist --preid next --dist-tag next",
     "publish:release": "lerna publish --yes --conventional-commits --contents dist",
     "test:clean": "yarn build:clean",
     "test:lint": "eslint --ext .js,.jsx,.ts,.tsx ./",
