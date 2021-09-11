@@ -1,7 +1,7 @@
 {
   "name": "@saschazar/oidc-provider-lambda",
   "version": "0.0.0",
-  "description": "A collection of AWS Lambda functions for providing the necessary OpenID Connect endpoints'",
+  "description": "A collection of AWS Lambda functions for providing the necessary OpenID Connect endpoints",
   "author": "Sascha Zarhuber <sascha.zarhuber@gmail.com>",
   "homepage": "https://github.com/saschazar21/oidc-provider#readme",
   "license": "MIT",
