@@ -1,6 +1,6 @@
 {
   "name": "@saschazar/oidc-provider-utils",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A collection of shared utilities for the OpenID Connect provider",
   "author": "Sascha Zarhuber <sascha.zarhuber@gmail.com>",
   "homepage": "https://github.com/saschazar21/oidc-provider#readme",
@@ -32,8 +32,8 @@
     "url": "https://github.com/saschazar21/oidc-provider/issues"
   },
   "dependencies": {
-    "@saschazar/oidc-provider-config": "^0.0.0",
-    "@saschazar/oidc-provider-types": "^0.0.0",
+    "@saschazar/oidc-provider-config": "^0.0.1",
+    "@saschazar/oidc-provider-types": "^0.0.1",
     "bcrypt": "^4.0.1",
     "jose": "^3.14.0",
     "keygrip": "^1.1.0",

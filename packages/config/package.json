@@ -1,6 +1,6 @@
 {
   "name": "@saschazar/oidc-provider-config",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A collection of config files for the OpenID Connect provider",
   "author": "Sascha Zarhuber <sascha.zarhuber@gmail.com>",
   "homepage": "https://github.com/saschazar21/oidc-provider#readme",
@@ -32,7 +32,7 @@
     "url": "https://github.com/saschazar21/oidc-provider/issues"
   },
   "dependencies": {
-    "@saschazar/oidc-provider-types": "^0.0.0",
+    "@saschazar/oidc-provider-types": "^0.0.1",
     "nanoid": "^3.1.9"
   }
 }

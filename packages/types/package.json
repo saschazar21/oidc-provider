@@ -1,6 +1,6 @@
 {
   "name": "@saschazar/oidc-provider-types",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A collection of enums and type definitions for the OpenID Connect provider",
   "author": "Sascha Zarhuber <sascha.zarhuber@gmail.com>",
   "homepage": "https://github.com/saschazar21/oidc-provider#readme",
