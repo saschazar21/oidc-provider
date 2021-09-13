@@ -19,6 +19,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
+      - name: Set git user
+        run: |
+          git config user.name "Sascha Zarhuber"
+          git config user.email sascha.zarhuber@gmail.com
+
       - name: Use Node.js 14
         uses: actions/setup-node@v2
         with:
