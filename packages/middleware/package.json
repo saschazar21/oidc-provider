@@ -25,8 +25,8 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
     "build:js": "tsc -b",
-    "build:pkg": "cpy package.json README.md CHANGELOG.md ../../LICENSE dist",
     "build": "run-s build:*",
+    "prepack": "cpy package.json README.md CHANGELOG.md ../../LICENSE dist",
     "package:link": "cd dist && yarn link",
     "package:unlink": "cd dist && yarn unlink",
     "package:publish": "cd dist && npm publish"
