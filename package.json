@@ -17,7 +17,6 @@
     "packages:unlink": "lerna exec yarn package:unlink",
     "publish:prerelease": "lerna publish --yes --canary --contents dist --preid next --dist-tag next",
     "publish:release": "lerna publish --yes --conventional-commits --contents dist",
-    "test:clean": "yarn build:clean",
     "test:lint": "eslint --ext .js,.jsx,.ts,.tsx ./",
     "test:jest": "jest --coverage --runInBand --forceExit",
     "test": "run-s test:*"

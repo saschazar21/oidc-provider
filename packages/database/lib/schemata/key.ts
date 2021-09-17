@@ -1,5 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
+export const NAME = 'Key';
+
 export type KeySchema = {
   _id?: string;
   created_at?: Date;
@@ -22,6 +24,7 @@ keySchema.post('findOneAndUpdate', async function () {
   await this.update({ $inc: { __v: 1 } });
 });
 
-export const KeyModel = mongoose.model<KeySchema>('Key', keySchema);
+export const KeyModel =
+  mongoose.models[NAME] || mongoose.model<KeySchema>(NAME, keySchema);
 
 export default KeyModel;

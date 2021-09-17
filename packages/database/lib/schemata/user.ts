@@ -9,6 +9,8 @@ import hashPassword, {
   comparePassword,
 } from '@saschazar/oidc-provider-utils/lib/util/password';
 
+export const NAME = 'User';
+
 export type AddressSchema = {
   formatted?: string;
   street_address?: string;
@@ -273,6 +275,6 @@ userSchema.pre('findOneAndUpdate', async function () {
   await this.update({}, { $inc: { __v: 1 } });
 });
 
-const User = mongoose.model<User>('User', userSchema);
+const User = mongoose.models[NAME] || mongoose.model<User>(NAME, userSchema);
 
 export default User;

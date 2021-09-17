@@ -96,10 +96,9 @@ baseTokenSchema.pre('validate', async function () {
   this.set({ _id: await generateId() });
 });
 
-const BaseTokenModel = mongoose.model<BaseTokenSchema>(
-  TOKEN_TYPE.BASE_TOKEN,
-  baseTokenSchema
-);
+const BaseTokenModel =
+  mongoose.model[TOKEN_TYPE.BASE_TOKEN] ||
+  mongoose.model<BaseTokenSchema>(TOKEN_TYPE.BASE_TOKEN, baseTokenSchema);
 
 export const AccessTokenModel = BaseTokenModel.discriminator(
   TOKEN_TYPE.ACCESS_TOKEN,

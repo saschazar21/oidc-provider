@@ -6,6 +6,8 @@ import generateId from '@saschazar/oidc-provider-utils/lib/util/id';
 
 import { UserSchema } from './user';
 
+export const NAME = 'Client';
+
 export type ClientSchema = {
   _id?: string;
   active?: boolean;
@@ -118,6 +120,7 @@ clientSchema.pre('findOneAndUpdate', async function () {
   await this.update({}, { $inc: { __v: 1 } });
 });
 
-export const ClientModel = mongoose.model<ClientSchema>('Client', clientSchema);
+export const ClientModel =
+  mongoose.models[NAME] || mongoose.model<ClientSchema>(NAME, clientSchema);
 
 export default ClientModel;

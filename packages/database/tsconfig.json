@@ -4,5 +4,6 @@
     "outDir": "dist"
   },
   "references": [{ "path": "../types" }, { "path": "../utils" }],
-  "include": ["**/*.ts"]
+  "exclude": ["dist", "**/*.test.ts"],
+  "include": ["lib"]
 }

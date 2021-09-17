@@ -13,6 +13,8 @@ import id from '@saschazar/oidc-provider-utils/lib/util/id';
 
 import { ClientModel, UserModel } from '../';
 
+export const NAME = 'Authorization';
+
 export type Authorization = {
   _id?: string;
   created_at?: Date;
@@ -163,9 +165,8 @@ authSchema.pre('findOneAndUpdate', async function () {
   await this.update({}, { $inc: { __v: 1 } });
 });
 
-export const AuthorizationModel = mongoose.model<AuthorizationSchema>(
-  'Authorization',
-  authSchema
-);
+export const AuthorizationModel =
+  mongoose.models[NAME] ||
+  mongoose.model<AuthorizationSchema>(NAME, authSchema);
 
 export default AuthorizationModel;

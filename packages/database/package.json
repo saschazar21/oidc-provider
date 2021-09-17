@@ -22,7 +22,7 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "build:js": "tsc -b",
+    "build:js": "echo \"database: will be built alongside dependent packages\"",
     "build": "run-s build:*",
     "prepack": "cpy package.json README.md CHANGELOG.md ../../LICENSE dist",
     "package:link": "cd dist && yarn link",
