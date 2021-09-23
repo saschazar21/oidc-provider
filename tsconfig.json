@@ -16,8 +16,7 @@
     "downlevelIteration": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    "sourceMap": true,
-    "jsx": "preserve"
+    "sourceMap": true
   },
   "references": [
     { "path": "./packages/config" },

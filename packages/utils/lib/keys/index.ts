@@ -81,7 +81,7 @@ const getKeys = async (
     const encrypted = (await encrypt(
       masterkey,
       JSON.stringify({
-        ...keys.keystore.export(true),
+        ...(await keys.keystore.export(true)),
         cookies: cookieSecrets,
       })
     )) as Buffer;
